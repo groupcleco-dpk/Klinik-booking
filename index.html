@@ -2,618 +2,1041 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Booking TAPA JIVA</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>Booking Klinik Terapi</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#f0f4f8;min-height:100vh}
-:root{--blue:#2563eb;--blue-l:#dbeafe;--green:#16a34a;--green-l:#dcfce7;--red:#dc2626;--red-l:#fee2e2;--orange:#d97706;--navy:#1e3a5f}
+:root{--blue:#2563eb;--blue-l:#dbeafe;--green:#16a34a;--green-l:#dcfce7;--red:#dc2626;--red-l:#fee2e2;--orange:#d97706;--navy:#1e3a5f;--purple:#7c3aed}
 input,select,textarea,button{font-family:inherit}
 button{cursor:pointer;border:none;outline:none}
 .hidden{display:none!important}
 
-/* SETUP & LOGIN */
-.full-screen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:999;padding:20px}
-#setup-screen{background:linear-gradient(135deg,#0f172a,#1e3a5f)}
-#login-screen{background:linear-gradient(135deg,#0f172a,#1e3a5f)}
-.auth-card{background:#fff;border-radius:24px;padding:28px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.4)}
-.auth-logo{text-align:center;margin-bottom:20px}
-.auth-logo-icon{font-size:2.8rem;margin-bottom:6px}
-.auth-logo-title{font-size:1.2rem;font-weight:900;color:#0f172a}
-.auth-logo-sub{font-size:0.72rem;color:#94a3b8;margin-top:3px}
-.auth-field{margin-bottom:12px}
-.auth-label{display:block;font-size:0.7rem;font-weight:700;color:#374151;margin-bottom:5px;text-transform:uppercase;letter-spacing:0.5px}
-.auth-input{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:0.88rem;outline:none;background:#f8fafc}
-.auth-input:focus{border-color:var(--blue)}
-.auth-btn{width:100%;padding:13px;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;font-size:0.9rem;margin-top:8px}
-.auth-btn-ghost{width:100%;padding:11px;border-radius:12px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;font-weight:600;font-size:0.82rem;margin-top:8px}
-.auth-err{background:#fee2e2;color:#dc2626;border-radius:8px;padding:10px 14px;font-size:0.78rem;font-weight:600;margin-top:10px}
-.auth-hint{font-size:0.65rem;color:#94a3b8;margin-top:4px}
-.step-box{background:#f0f7ff;border-radius:10px;padding:12px 14px;margin-bottom:14px}
-.step-box-title{font-size:0.72rem;font-weight:800;color:var(--blue);margin-bottom:8px}
-.step-item{display:flex;gap:8px;margin-bottom:6px;font-size:0.72rem;color:#374151}
-.step-num{background:var(--blue);color:#fff;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.6rem;flex-shrink:0}
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0f172a,#1e3a5f);display:flex;align-items:center;justify-content:center;z-index:999;padding:20px}
+.login-card{background:#fff;border-radius:24px;padding:28px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.login-logo{text-align:center;margin-bottom:20px}
+.l-icon{font-size:2.8rem;margin-bottom:6px}
+.l-title{font-size:1.2rem;font-weight:900;color:#0f172a}
+.l-sub{font-size:.72rem;color:#94a3b8;margin-top:3px}
+.lf{margin-bottom:12px}
+.ll{display:block;font-size:.7rem;font-weight:700;color:#374151;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
+.li{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:.88rem;outline:none;background:#f8fafc}
+.li:focus{border-color:var(--blue)}
+.lb{width:100%;padding:13px;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;font-size:.9rem;margin-top:8px}
+.lerr{background:#fee2e2;color:#dc2626;border-radius:8px;padding:10px 14px;font-size:.78rem;font-weight:600;margin-top:10px}
 
 /* HEADER */
-.header{background:linear-gradient(135deg,var(--navy),var(--blue));padding:14px 16px 12px;position:sticky;top:0;z-index:100}
+.header{background:linear-gradient(135deg,var(--navy),var(--blue));padding:12px 14px 10px;position:sticky;top:0;z-index:100}
 .header-top{display:flex;justify-content:space-between;align-items:center}
-.btn-header{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:9px;padding:6px 10px;color:#fff;font-weight:700;font-size:0.68rem;display:flex;align-items:center;gap:4px}
-.date-nav{display:flex;align-items:center;gap:8px;margin-top:10px}
-.date-nav-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;border-radius:8px;padding:5px 14px;font-weight:700;font-size:1rem}
-.date-label{flex:1;text-align:center;color:#fff;font-weight:700;font-size:0.8rem}
+.btn-h{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);border-radius:9px;padding:6px 9px;color:#fff;font-weight:700;font-size:.68rem;display:flex;align-items:center;gap:4px}
+.date-nav{display:flex;align-items:center;gap:8px;margin-top:9px}
+.dn-btn{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:8px;padding:5px 14px;font-weight:700;font-size:1rem}
+.dn-lbl{flex:1;text-align:center;color:#fff;font-weight:700;font-size:.8rem}
 
-/* RT DOT */
-.rt-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
-.rt-online{background:#4ade80;animation:pulse 2s infinite}
-.rt-offline{background:#f87171}
+/* RT INDICATOR */
+.rt-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:3px}
+.rt-on{background:#4ade80;animation:pulse 2s infinite}
+.rt-off{background:#f87171}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 /* TOAST */
-#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 20px;border-radius:50px;font-size:0.78rem;font-weight:600;z-index:500;opacity:0;transition:opacity 0.3s;white-space:nowrap;pointer-events:none}
+#toast{position:fixed;bottom:86px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 20px;border-radius:50px;font-size:.78rem;font-weight:600;z-index:600;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
 #toast.show{opacity:1}
 
 /* STATS */
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px 14px 8px}
-.stat-card{background:#fff;border-radius:14px;padding:11px 8px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.06)}
-.stat-icon{font-size:1.3rem;margin-bottom:3px}
-.stat-val{font-size:1.5rem;font-weight:900;line-height:1}
-.stat-lbl{font-size:.58rem;color:#94a3b8;margin-top:3px;font-weight:600;line-height:1.3}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px 12px 6px}
+.sc{background:#fff;border-radius:12px;padding:10px 6px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.si{font-size:1.2rem;margin-bottom:2px}
+.sv{font-size:1.4rem;font-weight:900;line-height:1}
+.sl{font-size:.56rem;color:#94a3b8;margin-top:3px;font-weight:600;line-height:1.3}
 
 /* TABS */
-.tabs{display:flex;gap:8px;padding:4px 14px 8px}
-.tab-btn{flex:1;padding:9px 4px;border-radius:10px;font-weight:700;font-size:.72rem;background:#fff;color:#64748b;transition:all .15s}
-.tab-btn.active{background:var(--blue);color:#fff;box-shadow:0 4px 12px rgba(37,99,235,.4)}
+.tabs{display:flex;gap:6px;padding:4px 12px 6px}
+.tab-btn{flex:1;padding:8px 2px;border-radius:9px;font-weight:700;font-size:.68rem;background:#fff;color:#64748b;transition:all .15s}
+.tab-btn.active{background:var(--blue);color:#fff;box-shadow:0 4px 10px rgba(37,99,235,.4)}
 
 /* GRID */
-.grid-wrap{margin:0 14px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:90px}
-.grid-header-bar{padding:10px 14px 8px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center}
-.grid-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{border-collapse:collapse;min-width:600px;width:100%}
-.th-time{background:var(--navy);color:#fff;font-weight:800;font-size:.72rem;padding:10px 8px;text-align:center;min-width:80px;position:sticky;left:0;z-index:20}
-.th-room{background:var(--navy);color:#fff;font-weight:800;font-size:.72rem;padding:10px 8px;text-align:center;min-width:95px}
-.td-time{padding:6px 8px;border-bottom:1px solid #e2e8f0;border-right:2px solid #bfdbfe;text-align:center;font-weight:800;font-size:.72rem;color:var(--navy);position:sticky;left:0;z-index:10;white-space:nowrap}
-.td-room{padding:3px;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;cursor:pointer;height:48px;vertical-align:top;min-width:95px}
-.td-room:hover{opacity:.85}
-.bk-card{padding:3px 5px;height:100%}
-.bk-name{font-size:.65rem;font-weight:800;color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bk-sub{font-size:.58rem;color:rgba(255,255,255,.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.bk-badge{font-size:.5rem;background:rgba(255,255,255,.25);border-radius:2px;padding:1px 3px;display:inline-block;color:#fff;margin-top:1px}
+.grid-wrap{margin:0 12px;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:86px}
+.g-header{padding:9px 12px 7px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;font-weight:800;color:#0f172a;font-size:.82rem}
+.g-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{border-collapse:collapse;min-width:560px;width:100%}
+.th-t{background:var(--navy);color:#fff;font-weight:800;font-size:.68rem;padding:8px 6px;text-align:center;min-width:72px;position:sticky;left:0;z-index:20}
+.th-r{background:var(--navy);color:#fff;font-weight:800;font-size:.68rem;padding:8px 6px;text-align:center;min-width:88px}
+.td-t{padding:4px 6px;border-bottom:1px solid #e2e8f0;border-right:2px solid #bfdbfe;text-align:center;font-weight:700;font-size:.68rem;color:var(--navy);position:sticky;left:0;z-index:10;white-space:nowrap}
+.td-r{padding:2px;border-bottom:1px solid #e2e8f0;border-right:1px solid #e2e8f0;cursor:pointer;height:38px;vertical-align:top;min-width:88px;transition:opacity .1s}
+.td-r:hover{opacity:.85}
+.td-r.active-session{box-shadow:inset 0 0 0 2px rgba(255,255,255,.5)}
+.bk-card{padding:2px 4px;height:100%;display:flex;flex-direction:column;justify-content:space-between}
+.bk-name{font-size:.62rem;font-weight:800;color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk-sub{font-size:.55rem;color:rgba(255,255,255,.85);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bk-foot{display:flex;justify-content:space-between;align-items:center;margin-top:1px}
+.bk-badge{font-size:.5rem;background:rgba(255,255,255,.25);border-radius:2px;padding:1px 3px;color:#fff}
+.bk-timer{font-size:.5rem;color:#fff;background:rgba(0,0,0,.25);border-radius:2px;padding:1px 3px;animation:pulse 1s infinite}
 
 /* LIST */
-.list-wrap{padding:0 14px;margin-bottom:90px}
-.list-item{background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;cursor:pointer;display:flex;gap:12px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.list-avatar{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:.82rem;flex-shrink:0}
+.list-wrap{padding:0 12px;margin-bottom:86px}
+.li-item{background:#fff;border-radius:12px;padding:11px 12px;margin-bottom:8px;cursor:pointer;display:flex;gap:10px;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+.li-av{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:.78rem;flex-shrink:0}
 
 /* REKAP */
-.rekap-wrap{padding:0 14px;margin-bottom:90px}
-.rekap-card{background:#fff;border-radius:14px;padding:16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05)}
-.rekap-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.rekap-wrap{padding:0 12px;margin-bottom:86px}
+.rek-card{background:#fff;border-radius:12px;padding:14px;margin-bottom:8px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
+.rek-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 
 /* FILTER */
-.filter-bar{padding:0 14px 8px}
-.filter-row{display:flex;gap:8px;align-items:center}
-.search-wrap{flex:1;position:relative}
-.search-wrap span{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.85rem;pointer-events:none}
-.search-input{width:100%;padding:10px 12px 10px 36px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:.82rem;background:#f8fafc;outline:none}
-.filter-panel{margin-top:10px;background:#fff;border-radius:12px;padding:14px;box-shadow:0 4px 16px rgba(0,0,0,.08);display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fbar{padding:0 12px 8px}
+.frow{display:flex;gap:6px;align-items:center}
+.swrap{flex:1;position:relative}
+.swrap span{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.8rem;pointer-events:none}
+.sinput{width:100%;padding:9px 10px 9px 32px;border-radius:9px;border:1.5px solid #e2e8f0;font-size:.8rem;background:#f8fafc;outline:none}
+.fpanel{margin-top:8px;background:#fff;border-radius:10px;padding:12px;box-shadow:0 4px 14px rgba(0,0,0,.08);display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
 /* MODAL */
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:300;display:flex;align-items:flex-end;justify-content:center}
-.sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:540px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.3)}
-.handle-bar{width:40px;height:4px;border-radius:2px;background:#e2e8f0;margin:10px auto 0}
-.sheet-header{padding:10px 20px 12px;display:flex;justify-content:space-between;align-items:center}
-.sheet-title-sub{font-size:.62rem;color:#94a3b8;text-transform:uppercase;letter-spacing:1px}
-.sheet-title{font-size:1.05rem;font-weight:800;color:#0f172a}
-.close-btn{width:34px;height:34px;border-radius:50%;background:#f1f5f9;color:#64748b;font-size:1rem;display:flex;align-items:center;justify-content:center}
-.sheet-tabs{display:flex;padding:0 20px 12px;gap:8px}
-.sheet-tab{flex:1;padding:8px 4px;border-radius:10px;font-weight:700;font-size:.72rem;background:#f1f5f9;color:#64748b}
-.sheet-tab.active{background:var(--blue);color:#fff}
-.sheet-body{flex:1;overflow-y:auto;padding:0 20px 12px}
-.sheet-footer{padding:10px 20px 20px;border-top:1px solid #f1f5f9;display:flex;gap:10px}
+.sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-width:540px;max-height:93vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 -8px 40px rgba(0,0,0,.3)}
+.hbar{width:40px;height:4px;border-radius:2px;background:#e2e8f0;margin:9px auto 0}
+.shdr{padding:9px 18px 10px;display:flex;justify-content:space-between;align-items:center}
+.stitle-s{font-size:.6rem;color:#94a3b8;text-transform:uppercase;letter-spacing:1px}
+.stitle{font-size:1.02rem;font-weight:800;color:#0f172a}
+.cbtn{width:32px;height:32px;border-radius:50%;background:#f1f5f9;color:#64748b;font-size:.95rem;display:flex;align-items:center;justify-content:center}
+.stabs{display:flex;padding:0 18px 10px;gap:6px}
+.stab{flex:1;padding:7px 3px;border-radius:9px;font-weight:700;font-size:.68rem;background:#f1f5f9;color:#64748b}
+.stab.active{background:var(--blue);color:#fff}
+.sbody{flex:1;overflow-y:auto;padding:0 18px 10px}
+.sfooter{padding:9px 18px 18px;border-top:1px solid #f1f5f9;display:flex;gap:8px}
 
 /* FORM */
-.form-field{margin-bottom:14px}
-.form-label{display:block;font-size:.7rem;font-weight:700;color:#374151;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
-.form-input{width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:.88rem;color:#0f172a;background:#f8fafc;outline:none}
-.form-input:focus{border-color:var(--blue)}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.pick-btn{padding:10px 12px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.78rem;text-align:left;width:100%}
-.pick-btn.selected{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
-.pick-id{font-size:.6rem;opacity:.7;margin-bottom:1px}
-.room-btn{padding:12px 8px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.85rem;width:100%}
-.room-btn.selected{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
-.pay-btn{flex:1;padding:11px 6px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.72rem}
-.method-btn{padding:11px 14px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;color:#374151;font-weight:600;font-size:.85rem;text-align:left;width:100%;display:flex;align-items:center;gap:10px;margin-bottom:8px}
-.method-btn.selected{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
-.summary-box{background:#f8fafc;border-radius:12px;padding:14px}
-.summary-row{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:5px}
+.ff{margin-bottom:12px}
+.fl{display:block;font-size:.68rem;font-weight:700;color:#374151;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.fi{width:100%;padding:11px 12px;border-radius:9px;border:1.5px solid #e2e8f0;font-size:.85rem;color:#0f172a;background:#f8fafc;outline:none}
+.fi:focus{border-color:var(--blue)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.pb{padding:9px 10px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.75rem;text-align:left;width:100%}
+.pb.sel{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+.pb-id{font-size:.58rem;opacity:.7;margin-bottom:1px}
+.rb{padding:10px 6px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.8rem;width:100%}
+.rb.sel{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+.dur-btn{padding:9px 4px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.68rem;width:100%;text-align:center}
+.dur-btn.sel{border-color:var(--purple);background:#f3e8ff;color:var(--purple)}
+.payb{flex:1;padding:10px 4px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.68rem}
+.methb{padding:10px 12px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#374151;font-weight:600;font-size:.82rem;text-align:left;width:100%;display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.methb.sel{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+.sumbox{background:#f8fafc;border-radius:10px;padding:12px}
+.sumrow{display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px}
 
 /* BUTTONS */
-.btn-primary{background:var(--blue);color:#fff;border-radius:10px;padding:12px 16px;font-weight:700;font-size:.82rem}
-.btn-success{background:var(--green);color:#fff;border-radius:10px;padding:12px 16px;font-weight:700;font-size:.82rem}
-.btn-danger-outline{background:var(--red-l);color:var(--red);border:2px solid var(--red-l);border-radius:10px;padding:12px 16px;font-weight:700;font-size:.82rem}
-.btn-danger{background:var(--red);color:#fff;border-radius:10px;padding:12px 16px;font-weight:700;font-size:.82rem}
-.btn-ghost{background:#fff;color:#64748b;border:2px solid #e2e8f0;border-radius:10px;padding:12px 16px;font-weight:700;font-size:.82rem}
-.badge{font-weight:700;font-size:.72rem;padding:4px 12px;border-radius:20px}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.detail-box{background:#f8fafc;border-radius:10px;padding:10px 12px}
-.detail-lbl{font-size:.65rem;color:#94a3b8;margin-bottom:2px}
-.detail-val{font-size:.88rem;font-weight:700;color:#0f172a}
-.fab{position:fixed;bottom:24px;right:20px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;font-size:1.5rem;box-shadow:0 6px 24px rgba(37,99,235,.5);display:flex;align-items:center;justify-content:center;z-index:150}
+.btn-p{background:var(--blue);color:#fff;border-radius:9px;padding:11px 14px;font-weight:700;font-size:.8rem}
+.btn-g{background:var(--green);color:#fff;border-radius:9px;padding:11px 14px;font-weight:700;font-size:.8rem}
+.btn-r{background:var(--red);color:#fff;border-radius:9px;padding:11px 14px;font-weight:700;font-size:.8rem}
+.btn-ro{background:var(--red-l);color:var(--red);border:2px solid var(--red-l);border-radius:9px;padding:11px 14px;font-weight:700;font-size:.8rem}
+.btn-o{background:#fff;color:#64748b;border:2px solid #e2e8f0;border-radius:9px;padding:11px 14px;font-weight:700;font-size:.8rem}
+.badge{font-weight:700;font-size:.7rem;padding:3px 10px;border-radius:18px}
+
+/* DETAIL */
+.det-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.dbox{background:#f8fafc;border-radius:9px;padding:9px 11px}
+.dlbl{font-size:.62rem;color:#94a3b8;margin-bottom:2px}
+.dval{font-size:.85rem;font-weight:700;color:#0f172a}
+
+/* SETTINGS */
+.set-section{margin-bottom:14px}
+.set-title{font-size:.72rem;font-weight:800;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #f1f5f9}
+.set-item{background:#f8fafc;border-radius:9px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.set-item-info{flex:1;min-width:0}
+.set-item-name{font-weight:700;font-size:.82rem;color:#0f172a}
+.set-item-sub{font-size:.65rem;color:#94a3b8}
+.set-actions{display:flex;gap:5px}
+.set-btn-sm{padding:5px 10px;border-radius:6px;font-weight:700;font-size:.65rem;border:1.5px solid}
+.color-dot{width:24px;height:24px;border-radius:6px;flex-shrink:0;border:2px solid rgba(0,0,0,.1)}
+.toggle-wrap{display:flex;align-items:center;gap:6px;font-size:.75rem;color:#374151}
+.toggle{width:34px;height:20px;border-radius:10px;background:#e2e8f0;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--green)}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:2px;left:2px;transition:left .2s}
+.toggle.on::after{left:16px}
+
+/* FAB */
+.fab{position:fixed;bottom:22px;right:18px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;font-size:1.4rem;box-shadow:0 6px 20px rgba(37,99,235,.5);display:flex;align-items:center;justify-content:center;z-index:150}
 </style>
 </head>
 <body>
 
-<!-- SETUP SCREEN -->
-<div id="setup-screen" class="full-screen hidden">
-  <div class="auth-card">
-    <div class="auth-logo"><div class="auth-logo-icon">⚙️</div><div class="auth-logo-title">Konfigurasi Supabase</div><div class="auth-logo-sub">Lakukan sekali saja — data tersimpan di browser</div></div>
-    <div class="step-box">
-      <div class="step-box-title">📋 Cara mendapatkan URL & Key:</div>
-      <div class="step-item"><span class="step-num">1</span>Buka <b>supabase.com</b> → pilih project Anda</div>
-      <div class="step-item"><span class="step-num">2</span>Klik <b>Settings → API</b></div>
-      <div class="step-item"><span class="step-num">3</span>Copy <b>Project URL</b> dan <b>anon public key</b></div>
-    </div>
-    <div class="auth-field"><label class="auth-label">Project URL</label><input class="auth-input" id="sb-url" placeholder="https://xxxxxxxxxxxx.supabase.co"></div>
-    <div class="auth-field"><label class="auth-label">Anon Public Key</label><input class="auth-input" id="sb-key" placeholder="eyJhbGciOiJIUzI1NiIs..." type="password"><div class="auth-hint">Aman digunakan di frontend — bukan service_role key</div></div>
-    <div id="setup-err" class="auth-err hidden"></div>
-    <button class="auth-btn" onclick="saveSetup()">💾 Simpan & Lanjut</button>
-    <button class="auth-btn-ghost" onclick="useLocalMode()">Lewati — Mode Offline (localStorage)</button>
-  </div>
-</div>
-
-<!-- LOGIN SCREEN -->
-<div id="login-screen" class="full-screen hidden">
-  <div class="auth-card">
-    <div class="auth-logo"><div class="auth-logo-icon">🏥</div><div class="auth-logo-title">TAPA JIVA</div><div class="auth-logo-sub">Sistem Booking Digital</div></div>
-    <div class="auth-field"><label class="auth-label">Email</label><input class="auth-input" id="login-email" type="email" placeholder="admin@klinik.com"></div>
-    <div class="auth-field"><label class="auth-label">Password</label><input class="auth-input" id="login-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div id="login-err" class="auth-err hidden"></div>
-    <button class="auth-btn" onclick="doLogin()" id="login-btn">Masuk →</button>
-    <div style="text-align:center;margin-top:12px"><span onclick="showScreen('setup')" style="font-size:0.68rem;color:#94a3b8;cursor:pointer;text-decoration:underline">Ubah konfigurasi Supabase</span></div>
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="login-logo"><div class="l-icon">🏥</div><div class="l-title">Klinik Terapi</div><div class="l-sub">Sistem Booking Digital</div></div>
+    <div class="lf"><label class="ll">Email</label><input class="li" id="lg-email" type="email" placeholder="admin@klinik.com"></div>
+    <div class="lf"><label class="ll">Password</label><input class="li" id="lg-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <div id="lg-err" class="lerr hidden"></div>
+    <button class="lb" id="lg-btn" onclick="doLogin()">Masuk →</button>
   </div>
 </div>
 
 <!-- APP -->
 <div id="app" class="hidden">
+
 <div class="header">
   <div class="header-top">
-    <div><div style="font-size:.6rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:2px">Admin Panel</div><div style="font-size:1rem;font-weight:900;color:#fff">🏥 Booking Klinik</div></div>
-    <div style="display:flex;gap:6px;align-items:center">
-      <div style="display:flex;align-items:center;font-size:.65rem;color:rgba(255,255,255,.8)"><span class="rt-dot" id="rt-dot"></span><span id="rt-label">-</span></div>
-      <button class="btn-header" onclick="openSheets()">📊</button>
-      <button class="btn-header" onclick="openExport()">📤</button>
-      <button class="btn-header" onclick="doLogout()">🚪</button>
+    <div><div style="font-size:.58rem;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:2px">Admin</div><div style="font-size:.95rem;font-weight:900;color:#fff">🏥 Booking Klinik</div></div>
+    <div style="display:flex;gap:5px;align-items:center">
+      <span style="font-size:.62rem;color:rgba(255,255,255,.8);display:flex;align-items:center"><span class="rt-dot rt-off" id="rt-dot"></span><span id="rt-lbl">-</span></span>
+      <button class="btn-h" onclick="openModal('modal-settings')">⚙️</button>
+      <button class="btn-h" onclick="openModal('modal-sheets')">📊</button>
+      <button class="btn-h" onclick="openModal('modal-export')">📤</button>
+      <button class="btn-h" onclick="doLogout()">🚪</button>
     </div>
   </div>
   <div class="date-nav">
-    <button class="date-nav-btn" onclick="changeDate(-1)">‹</button>
-    <div class="date-label" id="date-label"></div>
-    <button class="date-nav-btn" onclick="changeDate(1)">›</button>
+    <button class="dn-btn" onclick="changeDate(-1)">‹</button>
+    <div class="dn-lbl" id="date-lbl"></div>
+    <button class="dn-btn" onclick="changeDate(1)">›</button>
   </div>
 </div>
+
 <div class="stats">
-  <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-val" id="stat-total" style="color:var(--blue)">0</div><div class="stat-lbl">Total Booking</div></div>
-  <div class="stat-card"><div class="stat-icon">🚪</div><div class="stat-val" id="stat-room" style="color:var(--orange)">0/6</div><div class="stat-lbl">Room Terpakai</div></div>
-  <div class="stat-card"><div class="stat-icon">👨‍⚕️</div><div class="stat-val" id="stat-th" style="color:var(--green)">0/6</div><div class="stat-lbl">Terapis Aktif</div></div>
+  <div class="sc"><div class="si">📅</div><div class="sv" id="st-total" style="color:var(--blue)">0</div><div class="sl">Total Booking</div></div>
+  <div class="sc"><div class="si">🚪</div><div class="sv" id="st-room" style="color:var(--orange)">0/6</div><div class="sl">Room Terpakai</div></div>
+  <div class="sc"><div class="si">👨‍⚕️</div><div class="sv" id="st-th" style="color:var(--green)">0/6</div><div class="sl">Terapis Aktif</div></div>
 </div>
+
 <div class="tabs">
   <button class="tab-btn active" onclick="switchTab('jadwal',this)">📋 Jadwal</button>
   <button class="tab-btn" onclick="switchTab('daftar',this)">📃 Daftar</button>
   <button class="tab-btn" onclick="switchTab('rekap',this)">📊 Rekap</button>
 </div>
+
+<!-- TAB JADWAL -->
 <div id="tab-jadwal">
   <div class="grid-wrap">
-    <div class="grid-header-bar"><span style="font-weight:800;color:#0f172a;font-size:.88rem">📋 Jadwal Harian</span><span style="font-size:.65rem;color:#94a3b8">Geser → semua room</span></div>
-    <div class="grid-scroll"><table id="schedule-table"><thead></thead><tbody></tbody></table></div>
+    <div class="g-header">📋 Jadwal Harian <span style="font-size:.62rem;color:#94a3b8;font-weight:400">Geser → lihat semua room</span></div>
+    <div class="g-scroll"><table id="sched-table"><thead></thead><tbody></tbody></table></div>
   </div>
 </div>
+
+<!-- TAB DAFTAR -->
 <div id="tab-daftar" class="hidden">
-  <div class="filter-bar">
-    <div class="filter-row">
-      <div class="search-wrap"><span>🔍</span><input class="search-input" id="search-input" placeholder="Cari nama pasien..." oninput="renderList()"></div>
-      <button style="padding:10px 14px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.75rem" onclick="document.getElementById('filter-panel').classList.toggle('hidden')">🎯 Filter</button>
+  <div class="fbar">
+    <div class="frow">
+      <div class="swrap"><span>🔍</span><input class="sinput" id="s-input" placeholder="Cari nama pasien..." oninput="renderList()"></div>
+      <button style="padding:9px 12px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.72rem" onclick="document.getElementById('fpanel').classList.toggle('hidden')">🎯 Filter</button>
     </div>
-    <div class="filter-panel hidden" id="filter-panel">
-      <div><label class="form-label">Ruangan</label><select class="form-input" id="f-room-filter" onchange="renderList()" style="padding:8px;font-size:.78rem"><option value="">Semua</option></select></div>
-      <div><label class="form-label">Terapis</label><select class="form-input" id="f-th-filter" onchange="renderList()" style="padding:8px;font-size:.78rem"><option value="">Semua</option></select></div>
-      <div><label class="form-label">Status Bayar</label><select class="form-input" id="f-pay-filter" onchange="renderList()" style="padding:8px;font-size:.78rem"><option value="">Semua</option><option>Belum Bayar</option><option>DP</option><option>Lunas</option></select></div>
-      <div style="display:flex;align-items:flex-end"><button onclick="resetFilter()" style="width:100%;padding:9px;border-radius:10px;border:2px solid var(--red);background:#fff;color:var(--red);font-weight:700;font-size:.75rem">🗑 Reset</button></div>
+    <div class="fpanel hidden" id="fpanel">
+      <div><label class="fl">Ruangan</label><select class="fi" id="fr-filter" onchange="renderList()" style="padding:7px;font-size:.75rem"><option value="">Semua</option></select></div>
+      <div><label class="fl">Terapis</label><select class="fi" id="ft-filter" onchange="renderList()" style="padding:7px;font-size:.75rem"><option value="">Semua</option></select></div>
+      <div><label class="fl">Status Bayar</label><select class="fi" id="fp-filter" onchange="renderList()" style="padding:7px;font-size:.75rem"><option value="">Semua</option><option>Belum Bayar</option><option>DP</option><option>Lunas</option></select></div>
+      <div style="display:flex;align-items:flex-end"><button onclick="resetFilter()" style="width:100%;padding:8px;border-radius:9px;border:2px solid var(--red);background:#fff;color:var(--red);font-weight:700;font-size:.72rem">🗑 Reset</button></div>
     </div>
   </div>
-  <div class="list-wrap" id="list-container"></div>
+  <div class="list-wrap" id="list-cont"></div>
 </div>
+
+<!-- TAB REKAP -->
 <div id="tab-rekap" class="hidden">
   <div class="rekap-wrap">
-    <div class="rekap-card"><div style="font-weight:800;font-size:.88rem;color:#0f172a;margin-bottom:12px">💳 Status Pembayaran</div><div id="rekap-pay"></div></div>
-    <div class="rekap-card"><div style="font-weight:800;font-size:.88rem;color:#0f172a;margin-bottom:12px">🚪 Kepadatan Room</div><div id="rekap-room"></div></div>
-    <div class="rekap-card"><div style="font-weight:800;font-size:.88rem;color:#0f172a;margin-bottom:12px">👥 Sesi per Terapis</div><div id="rekap-terapis"></div></div>
+    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:#0f172a;margin-bottom:10px">💳 Status Pembayaran</div><div id="rek-pay"></div></div>
+    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:#0f172a;margin-bottom:10px">🚪 Kepadatan Room</div><div id="rek-room"></div></div>
+    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:#0f172a;margin-bottom:10px">👥 Sesi per Terapis</div><div id="rek-th"></div></div>
   </div>
 </div>
+
 <button class="fab" onclick="openAdd()">+</button>
-</div>
+</div><!-- /#app -->
 
 <div id="toast"></div>
 
-<!-- MODAL FORM -->
-<div class="overlay hidden" id="modal-form" onclick="closeIfOverlay(event,'modal-form')">
+<!-- ═══ MODAL: BOOKING FORM ═══════════════════════════════════ -->
+<div class="overlay hidden" id="modal-form" onclick="closeOvr(event,'modal-form')">
   <div class="sheet">
-    <div class="handle-bar"></div>
-    <div class="sheet-header"><div><div class="sheet-title-sub">Formulir</div><div class="sheet-title" id="form-title">Booking Baru</div></div><button class="close-btn" onclick="closeModal('modal-form')">✕</button></div>
-    <div class="sheet-tabs"><button class="sheet-tab active" id="ftab-0" onclick="switchFormTab(0)">👤 Pasien</button><button class="sheet-tab" id="ftab-1" onclick="switchFormTab(1)">📅 Jadwal</button><button class="sheet-tab" id="ftab-2" onclick="switchFormTab(2)">💳 Bayar</button></div>
-    <div class="sheet-body">
+    <div class="hbar"></div>
+    <div class="shdr"><div><div class="stitle-s">Formulir</div><div class="stitle" id="form-ttl">Booking Baru</div></div><button class="cbtn" onclick="closeModal('modal-form')">✕</button></div>
+    <div class="stabs"><button class="stab active" id="ftab-0" onclick="fTab(0)">👤 Pasien</button><button class="stab" id="ftab-1" onclick="fTab(1)">📅 Jadwal</button><button class="stab" id="ftab-2" onclick="fTab(2)">💳 Bayar</button></div>
+    <div class="sbody">
       <div id="fpanel-0">
-        <div class="form-field"><label class="form-label">👤 Nama Pasien</label><input class="form-input" id="f-patient" placeholder="Nama lengkap..."></div>
-        <div class="form-field"><label class="form-label">📱 No. HP</label><input class="form-input" id="f-phone" type="tel" placeholder="08xxxxxxxxxx"></div>
-        <div class="form-field"><label class="form-label">💆 Layanan</label><select class="form-input" id="f-service"><option value="">-- Pilih --</option></select></div>
-        <div class="form-field"><label class="form-label">📝 Catatan</label><textarea class="form-input" id="f-catatan" rows="3" style="resize:none;line-height:1.5"></textarea></div>
+        <div class="ff"><label class="fl">👤 Nama Pasien</label><input class="fi" id="fp-patient" placeholder="Nama lengkap..."></div>
+        <div class="ff"><label class="fl">📱 No. HP</label><input class="fi" id="fp-phone" type="tel" placeholder="08xxxxxxxxxx"></div>
+        <div class="ff"><label class="fl">💆 Layanan</label><select class="fi" id="fp-service"><option value="">-- Pilih --</option></select></div>
+        <div class="ff"><label class="fl">📝 Catatan</label><textarea class="fi" id="fp-catatan" rows="3" style="resize:none;line-height:1.5"></textarea></div>
       </div>
       <div id="fpanel-1" class="hidden">
-        <div class="form-field"><label class="form-label">📆 Tanggal</label><input class="form-input" id="f-date" type="date"></div>
-        <div class="form-field"><label class="form-label">🕐 Jam Mulai</label><select class="form-input" id="f-start"></select></div>
-        <div class="form-field"><label class="form-label">👨‍⚕️ Terapis</label><div class="grid-2" id="f-th-grid"></div></div>
-        <div class="form-field"><label class="form-label">🚪 Ruangan</label><div class="grid-3" id="f-room-grid"></div></div>
+        <div class="ff"><label class="fl">📆 Tanggal</label><input class="fi" id="fp-date" type="date"></div>
+        <div class="g2" style="margin-bottom:12px">
+          <div><label class="fl">🕐 Jam Mulai</label><select class="fi" id="fp-start" style="padding:9px 8px"></select></div>
+          <div><label class="fl">⏱ Durasi</label><select class="fi" id="fp-dur" onchange="updateEndTime()" style="padding:9px 8px">
+            <option value="30">30 menit</option>
+            <option value="60" selected>1 jam</option>
+            <option value="90">1,5 jam</option>
+            <option value="120">2 jam</option>
+            <option value="150">2,5 jam</option>
+            <option value="180">3 jam</option>
+          </select></div>
+        </div>
+        <div class="ff" style="background:#f0f7ff;border-radius:9px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:.75rem;color:#374151;font-weight:600">⏰ Jam Selesai (otomatis)</span>
+          <span style="font-size:.88rem;font-weight:800;color:var(--blue)" id="fp-end-disp">–</span>
+        </div>
+        <div class="ff"><label class="fl">👨‍⚕️ Terapis</label><div class="g2" id="fp-th-grid"></div></div>
+        <div class="ff"><label class="fl">🚪 Ruangan</label><div class="g3" id="fp-room-grid"></div></div>
       </div>
       <div id="fpanel-2" class="hidden">
-        <div class="form-field"><label class="form-label">💳 Metode</label><div id="f-method-list"></div></div>
-        <div class="form-field"><label class="form-label">📊 Status Bayar</label><div style="display:flex;gap:8px" id="f-pay-list"></div></div>
-        <div class="summary-box"><div style="font-size:.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:10px">Ringkasan</div><div id="f-summary"></div></div>
+        <div class="ff"><label class="fl">💳 Metode Pembayaran</label><div id="fp-meth-list"></div></div>
+        <div class="ff"><label class="fl">📊 Status Bayar</label><div style="display:flex;gap:6px" id="fp-pay-list"></div></div>
+        <div class="sumbox"><div style="font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:8px">Ringkasan</div><div id="fp-sum"></div></div>
       </div>
     </div>
-    <div class="sheet-footer" id="form-footer"></div>
+    <div class="sfooter" id="form-footer"></div>
   </div>
 </div>
 
-<!-- MODAL DETAIL -->
-<div class="overlay hidden" id="modal-detail" onclick="closeIfOverlay(event,'modal-detail')">
-  <div class="sheet" style="max-height:80vh">
-    <div style="height:5px;border-radius:24px 24px 0 0" id="detail-bar"></div>
-    <div style="padding:16px 20px 20px;overflow-y:auto">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-        <div><div style="font-size:.65rem;color:#94a3b8;text-transform:uppercase;letter-spacing:1px">Detail Booking</div><div style="font-size:1.15rem;font-weight:800;color:#0f172a" id="det-name"></div><div style="font-size:.75rem;color:#94a3b8" id="det-sub"></div></div>
+<!-- ═══ MODAL: DETAIL ════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-detail" onclick="closeOvr(event,'modal-detail')">
+  <div class="sheet" style="max-height:82vh">
+    <div style="height:5px;border-radius:22px 22px 0 0" id="det-bar"></div>
+    <div style="padding:14px 18px 18px;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+        <div><div style="font-size:.62rem;color:#94a3b8;text-transform:uppercase;letter-spacing:1px">Detail Booking</div><div style="font-size:1.1rem;font-weight:800;color:#0f172a" id="det-name"></div><div style="font-size:.72rem;color:#94a3b8" id="det-sub"></div></div>
         <span class="badge" id="det-badge"></span>
       </div>
-      <div class="detail-grid">
-        <div class="detail-box"><div class="detail-lbl">💆 Layanan</div><div class="detail-val" id="det-service"></div></div>
-        <div class="detail-box"><div class="detail-lbl">🚪 Ruangan</div><div class="detail-val" id="det-room"></div></div>
-        <div class="detail-box"><div class="detail-lbl">🕐 Waktu</div><div class="detail-val" id="det-time"></div></div>
-        <div class="detail-box"><div class="detail-lbl">💳 Metode</div><div class="detail-val" id="det-method"></div></div>
+      <div class="det-grid">
+        <div class="dbox"><div class="dlbl">💆 Layanan</div><div class="dval" id="det-sv"></div></div>
+        <div class="dbox"><div class="dlbl">🚪 Ruangan</div><div class="dval" id="det-room"></div></div>
+        <div class="dbox"><div class="dlbl">🕐 Jam Mulai</div><div class="dval" id="det-start"></div></div>
+        <div class="dbox"><div class="dlbl">🏁 Jam Selesai</div><div class="dval" id="det-end"></div></div>
+        <div class="dbox"><div class="dlbl">⏱ Durasi</div><div class="dval" id="det-dur"></div></div>
+        <div class="dbox"><div class="dlbl">💳 Metode</div><div class="dval" id="det-meth"></div></div>
       </div>
-      <div style="border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:14px" id="det-th-box">
-        <div style="width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.82rem" id="det-th-av"></div>
-        <div><div style="font-size:.62rem;color:#94a3b8">Terapis</div><div style="font-weight:700;color:#0f172a;font-size:.9rem" id="det-th-name"></div></div>
+      <div style="border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:10px;margin-bottom:12px" id="det-th-box">
+        <div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.8rem" id="det-th-av"></div>
+        <div><div style="font-size:.6rem;color:#94a3b8">Terapis</div><div style="font-weight:700;color:#0f172a;font-size:.88rem" id="det-th-name"></div></div>
       </div>
       <div id="det-catatan"></div>
-      <div id="det-confirm" class="hidden" style="background:#fee2e2;border-radius:12px;padding:14px;margin-bottom:12px">
-        <div style="font-size:.82rem;font-weight:700;color:#dc2626;margin-bottom:10px">⚠️ Yakin hapus booking ini?</div>
-        <div style="display:flex;gap:8px"><button class="btn-ghost" onclick="document.getElementById('det-confirm').classList.add('hidden')">Batal</button><button class="btn-danger" style="flex:1" onclick="confirmDelete()">Ya, Hapus</button></div>
+      <!-- Active session countdown -->
+      <div id="det-countdown" class="hidden" style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:9px;padding:9px 12px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:.78rem;font-weight:700;color:#16a34a">🟢 Sesi Berlangsung</span>
+        <span style="font-size:.88rem;font-weight:800;color:#16a34a" id="det-remain"></span>
       </div>
-      <div style="display:flex;gap:8px">
-        <button class="btn-ghost" onclick="closeModal('modal-detail')">Tutup</button>
-        <button class="btn-primary" style="flex:1" onclick="editCurrent()">✏️ Edit</button>
-        <button class="btn-danger-outline" onclick="document.getElementById('det-confirm').classList.remove('hidden')">🗑</button>
+      <div id="det-confirm" class="hidden" style="background:#fee2e2;border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:.8rem;font-weight:700;color:#dc2626;margin-bottom:8px">⚠️ Yakin hapus booking ini?</div>
+        <div style="display:flex;gap:6px"><button class="btn-o" onclick="document.getElementById('det-confirm').classList.add('hidden')">Batal</button><button class="btn-r" style="flex:1" onclick="confirmDelete()">Ya, Hapus</button></div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-o" onclick="closeModal('modal-detail')">Tutup</button>
+        <button class="btn-p" style="flex:1" onclick="editCurrent()">✏️ Edit</button>
+        <button class="btn-ro" onclick="document.getElementById('det-confirm').classList.remove('hidden')">🗑</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL SHEETS -->
-<div class="overlay hidden" id="modal-sheets" onclick="closeIfOverlay(event,'modal-sheets')">
+<!-- ═══ MODAL: SETTINGS ══════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-settings" onclick="closeOvr(event,'modal-settings')">
   <div class="sheet">
-    <div class="handle-bar"></div>
-    <div class="sheet-header"><div><div class="sheet-title-sub">Integrasi</div><div class="sheet-title">📊 Google Sheets</div></div><button class="close-btn" onclick="closeModal('modal-sheets')">✕</button></div>
-    <div class="sheet-body">
-      <div class="form-field"><label class="form-label">🔗 URL Apps Script</label><input class="form-input" id="gs-url" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:.72rem"><div id="gs-last" style="font-size:.68rem;color:#94a3b8;margin-top:5px"></div></div>
-      <div id="gs-status"></div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn-ghost" style="font-size:.75rem" onclick="testConnection()">🔌 Test</button>
-        <button class="btn-success" style="flex:2" onclick="syncToSheets()">🔄 Sync <span id="sync-count">0</span> Data</button>
+    <div class="hbar"></div>
+    <div class="shdr"><div><div class="stitle-s">Konfigurasi</div><div class="stitle">⚙️ Pengaturan</div></div><button class="cbtn" onclick="closeModal('modal-settings')">✕</button></div>
+    <div class="stabs" id="set-tabs">
+      <button class="stab active" onclick="setTab(0,this)">👥 Terapis</button>
+      <button class="stab" onclick="setTab(1,this)">💆 Layanan</button>
+      <button class="stab" onclick="setTab(2,this)">🏷️ Diskon</button>
+      <button class="stab" onclick="setTab(3,this)">📦 Paket</button>
+    </div>
+    <div class="sbody">
+      <!-- TAB 0: TERAPIS -->
+      <div id="set-0">
+        <div style="display:flex;gap:6px;margin-bottom:12px">
+          <input class="fi" id="new-th-nama" placeholder="Nama terapis baru..." style="flex:1">
+          <button class="btn-g" style="padding:9px 14px;font-size:.78rem" onclick="addTerapis()">+ Tambah</button>
+        </div>
+        <div id="set-th-list"></div>
+      </div>
+      <!-- TAB 1: LAYANAN -->
+      <div id="set-1" class="hidden">
+        <div style="display:flex;gap:6px;margin-bottom:12px">
+          <input class="fi" id="new-sv-nama" placeholder="Nama layanan baru..." style="flex:1">
+          <button class="btn-g" style="padding:9px 14px;font-size:.78rem" onclick="addLayanan()">+ Tambah</button>
+        </div>
+        <div id="set-sv-list"></div>
+      </div>
+      <!-- TAB 2: DISKON -->
+      <div id="set-2" class="hidden">
+        <div style="background:#f8fafc;border-radius:9px;padding:12px;margin-bottom:12px">
+          <div class="ff"><label class="fl">Nama Diskon</label><input class="fi" id="dk-nama" placeholder="Contoh: Member, Lansia..."></div>
+          <div class="g2">
+            <div><label class="fl">Tipe</label><select class="fi" id="dk-tipe" style="padding:9px"><option value="persen">Persentase (%)</option><option value="nominal">Nominal (Rp)</option></select></div>
+            <div><label class="fl">Nilai</label><input class="fi" id="dk-nilai" type="number" placeholder="0"></div>
+          </div>
+          <button class="btn-g" style="width:100%;padding:10px;font-size:.82rem" onclick="addDiskon()">+ Tambah Diskon</button>
+        </div>
+        <div id="set-dk-list"></div>
+      </div>
+      <!-- TAB 3: PAKET -->
+      <div id="set-3" class="hidden">
+        <div style="background:#f8fafc;border-radius:9px;padding:12px;margin-bottom:12px">
+          <div class="ff"><label class="fl">Nama Paket</label><input class="fi" id="pk-nama" placeholder="Contoh: Paket 10 Sesi..."></div>
+          <div class="g2">
+            <div><label class="fl">Jumlah Sesi</label><input class="fi" id="pk-sesi" type="number" placeholder="10"></div>
+            <div><label class="fl">Harga (Rp)</label><input class="fi" id="pk-harga" type="number" placeholder="500000"></div>
+          </div>
+          <button class="btn-g" style="width:100%;padding:10px;font-size:.82rem" onclick="addPaket()">+ Tambah Paket</button>
+        </div>
+        <div id="set-pk-list"></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- MODAL EXPORT -->
-<div class="overlay hidden" id="modal-export" onclick="closeIfOverlay(event,'modal-export')">
-  <div class="sheet" style="max-height:45vh">
-    <div class="handle-bar"></div>
-    <div style="padding:16px 20px 24px">
-      <div style="font-weight:800;font-size:1rem;color:#0f172a;margin-bottom:16px">📤 Export Data</div>
-      <div style="display:flex;gap:10px">
-        <button class="btn-success" style="flex:1;font-size:.9rem;padding:14px" onclick="doExcel()">📊 Excel</button>
-        <button class="btn-danger" style="flex:1;font-size:.9rem;padding:14px" onclick="doPDF()">📄 PDF</button>
+<!-- ═══ MODAL: SHEETS ════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-sheets" onclick="closeOvr(event,'modal-sheets')">
+  <div class="sheet">
+    <div class="hbar"></div>
+    <div class="shdr"><div><div class="stitle-s">Integrasi</div><div class="stitle">📊 Google Sheets</div></div><button class="cbtn" onclick="closeModal('modal-sheets')">✕</button></div>
+    <div class="sbody">
+      <div class="ff"><label class="fl">🔗 URL Apps Script</label><input class="fi" id="gs-url" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:.72rem"><div id="gs-last" style="font-size:.65rem;color:#94a3b8;margin-top:4px"></div></div>
+      <div id="gs-status"></div>
+      <div style="display:flex;gap:6px;margin-top:8px">
+        <button class="btn-o" style="font-size:.72rem" onclick="testGS()">🔌 Test</button>
+        <button class="btn-g" style="flex:2" onclick="syncGS()">🔄 Sync <span id="gs-count">0</span> Data</button>
       </div>
-      <div style="margin-top:12px;font-size:.68rem;color:#94a3b8;text-align:center" id="export-info"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: EXPORT ════════════════════════════════════════ -->
+<div class="overlay hidden" id="modal-export" onclick="closeOvr(event,'modal-export')">
+  <div class="sheet" style="max-height:46vh">
+    <div class="hbar"></div>
+    <div style="padding:14px 18px 22px">
+      <div style="font-weight:800;font-size:.95rem;color:#0f172a;margin-bottom:14px">📤 Export Data</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-g" style="flex:1;font-size:.88rem;padding:13px" onclick="doExcel()">📊 Excel (.xlsx)</button>
+        <button class="btn-r" style="flex:1;font-size:.88rem;padding:13px" onclick="doPDF()">📄 PDF (cetak)</button>
+      </div>
+      <div style="margin-top:10px;font-size:.65rem;color:#94a3b8;text-align:center" id="exp-info"></div>
     </div>
   </div>
 </div>
 
 <script>
-// ── CONFIG ────────────────────────────────────────────────────
-const ROOMS=["R-01","R-02","R-03","R-04","R-05","R-06"];
-const METHODS=["💵 Tunai","🏦 Transfer Bank","📱 QRIS","💳 Kartu Debit","💳 Kartu Kredit"];
-const PAY_ST=["Belum Bayar","DP","Lunas"];
-const PAY_CLR={"Belum Bayar":["#dc2626","#fee2e2"],"DP":["#d97706","#fef3c7"],"Lunas":["#16a34a","#dcfce7"]};
-const DAYS=["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
-const MONTHS=["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"];
-const TIME_SLOTS=[];
-for(let h=8;h<21;h++) TIME_SLOTS.push(String(h).padStart(2,"0")+":00");
+// ═══ SUPABASE CONFIG (HARDCODED) ══════════════════════════════
+const SB_URL = "https://qtbogcfqiyyemnlfprjb.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF0Ym9nY2ZxaXl5ZW1ubGZwcmpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MzM0MTksImV4cCI6MjA5MTMwOTQxOX0.Atl34pTyFNwZTm1cD8CGnV-1Un2HX60GzySDYhepTLU";
 
-const DEFAULT_TH=[
-  {id:"T-01",nama:"Febri",warna:"#2563eb"},{id:"T-02",nama:"Aiman",warna:"#16a34a"},
-  {id:"T-03",nama:"Teh Dini",warna:"#9333ea"},{id:"T-04",nama:"Rere",warna:"#ea580c"},
-  {id:"T-05",nama:"Pak Yudi",warna:"#0891b2"},{id:"T-06",nama:"Dine",warna:"#be185d"},
+// ═══ CONSTANTS ════════════════════════════════════════════════
+const ROOMS   = ["R-01","R-02","R-03","R-04","R-05","R-06"];
+const METHODS = ["💵 Tunai","🏦 Transfer Bank","📱 QRIS","💳 Kartu Debit","💳 Kartu Kredit"];
+const PAY_ST  = ["Belum Bayar","DP","Lunas"];
+const PAY_CLR = {"Belum Bayar":["#dc2626","#fee2e2"],"DP":["#d97706","#fef3c7"],"Lunas":["#16a34a","#dcfce7"]};
+const DAYS    = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+const MONTHS  = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"];
+const DUR_OPT = [{v:30,l:"30 mnt"},{v:60,l:"1 jam"},{v:90,l:"1½ jam"},{v:120,l:"2 jam"},{v:150,l:"2½ jam"},{v:180,l:"3 jam"}];
+const TH_COLORS = ["#2563eb","#16a34a","#9333ea","#ea580c","#0891b2","#be185d","#ca8a04","#0d9488"];
+
+// Generate 30-min slots 08:00 - 20:30
+const TIME_SLOTS = [];
+for(let h=8;h<=20;h++){
+  TIME_SLOTS.push(String(h).padStart(2,"0")+":00");
+  TIME_SLOTS.push(String(h).padStart(2,"0")+":30");
+}
+
+const DEFAULT_TH = [
+  {id:"T-01",nama:"Febri",   warna:"#2563eb",insentif:20},
+  {id:"T-02",nama:"Aiman",   warna:"#16a34a",insentif:20},
+  {id:"T-03",nama:"Teh Dini",warna:"#9333ea",insentif:20},
+  {id:"T-04",nama:"Rere",    warna:"#ea580c",insentif:20},
+  {id:"T-05",nama:"Pak Yudi",warna:"#0891b2",insentif:20},
+  {id:"T-06",nama:"Dine",    warna:"#be185d",insentif:20},
 ];
-const DEFAULT_SV=["Bali","Totok","Aroma","Pengobatan","Fisioterapi","Wicara","Okupasi","Refleksi","Akupunktur"];
+const DEFAULT_SV = ["Bali","Totok","Aroma","Pengobatan","Fisioterapi","Wicara","Okupasi","Refleksi","Akupunktur"];
 
-// ── STATE ─────────────────────────────────────────────────────
-let db=null, localMode=false, bookings=[], THERAPISTS=[], SERVICES=[];
-let currentDate=new Date(), currentBk=null, formTab=0, formMode="add";
+// ═══ STATE ════════════════════════════════════════════════════
+let db=null, bookings=[], THERAPISTS=[], SERVICES=[];
+let currentDate = new Date();
+let currentBk=null, formTab=0, formMode="add";
 let formSel={therapist:"",room:"R-01",method:"Tunai",payStatus:"Belum Bayar"};
-let realtimeCh=null;
+let rtCh=null, countdownTimer=null;
 
-// ── HELPERS ───────────────────────────────────────────────────
-const fmtDate=d=>`${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-const fmtISO=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
-const genId=()=>"BK-"+Date.now().toString(36).toUpperCase();
-const getTh=id=>THERAPISTS.find(t=>t.id===id)||{id:"?",nama:"?",warna:"#94a3b8"};
+// Settings stored locally
+function getSettings(){return JSON.parse(localStorage.getItem("kl_settings")||'{"diskon":[],"paket":[]}')}
+function saveSettings(s){localStorage.setItem("kl_settings",JSON.stringify(s))}
 
-function toast(msg,dur=2500){const e=document.getElementById("toast");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),dur)}
-function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.classList.remove("hidden")}
-function hideErr(id){document.getElementById(id)?.classList.add("hidden")}
-function showScreen(n){["setup-screen","login-screen","app"].forEach(s=>document.getElementById(s)?.classList.add("hidden"));document.getElementById(n==="app"?"app":n+"-screen")?.classList.remove("hidden")}
+// ═══ HELPERS ══════════════════════════════════════════════════
+const fmtDate = d=>`${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+const fmtISO  = d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+const addDays = (d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const genId   = ()=>"BK-"+Date.now().toString(36).toUpperCase();
+const getTh   = id=>THERAPISTS.find(t=>t.id===id)||{id:"?",nama:"?",warna:"#94a3b8",insentif:0};
+const toMin   = t=>{const[h,m]=t.split(":").map(Number);return h*60+m};
+const fromMin = m=>String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
+const addMins = (t,m)=>fromMin(toMin(t)+m);
+const calcDur = (s,e)=>toMin(e)-toMin(s);
+
+function toast(msg,dur=2500){
+  const e=document.getElementById("toast");e.textContent=msg;e.classList.add("show");
+  clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove("show"),dur);
+}
+
 function openModal(id){document.getElementById(id).classList.remove("hidden")}
 function closeModal(id){document.getElementById(id).classList.add("hidden")}
-function closeIfOverlay(e,id){if(e.target===e.currentTarget)closeModal(id)}
+function closeOvr(e,id){if(e.target===e.currentTarget)closeModal(id)}
+function showErr(id,m){const e=document.getElementById(id);e.textContent=m;e.classList.remove("hidden")}
+function hideErr(id){document.getElementById(id)?.classList.add("hidden")}
 
-// ── INIT ──────────────────────────────────────────────────────
+// ═══ INIT ════════════════════════════════════════════════════
 window.onload=()=>{
-  const sbUrl=localStorage.getItem("sb_url"),sbKey=localStorage.getItem("sb_key");
-  localMode=localStorage.getItem("local_mode")==="1";
-  if(localMode){startLocal();return}
-  if(!sbUrl||!sbKey){showScreen("setup");return}
-  try{db=supabase.createClient(sbUrl,sbKey);checkSession()}catch(e){showScreen("setup")}
+  db = supabase.createClient(SB_URL,SB_KEY);
+  checkSession();
 };
 
 async function checkSession(){
   const{data:{session}}=await db.auth.getSession();
-  if(session)await afterLogin();else showScreen("login");
-}
-
-function saveSetup(){
-  const url=document.getElementById("sb-url").value.trim(),key=document.getElementById("sb-key").value.trim();
-  if(!url||!key){showErr("setup-err","URL dan Key wajib diisi");return}
-  if(!url.includes("supabase")){showErr("setup-err","URL tidak valid");return}
-  localStorage.setItem("sb_url",url);localStorage.setItem("sb_key",key);localStorage.removeItem("local_mode");
-  try{db=supabase.createClient(url,key);hideErr("setup-err");showScreen("login")}
-  catch(e){showErr("setup-err","Error: "+e.message)}
-}
-
-function useLocalMode(){localStorage.setItem("local_mode","1");localMode=true;startLocal()}
-
-function startLocal(){
-  THERAPISTS=DEFAULT_TH;SERVICES=DEFAULT_SV;
-  bookings=JSON.parse(localStorage.getItem("klinik_bookings")||"[]");
-  setRT(false);showScreen("app");initForm();renderAll();
+  if(session) await afterLogin();
+  else { document.getElementById("login-screen").classList.remove("hidden"); }
 }
 
 async function doLogin(){
-  const email=document.getElementById("login-email").value.trim(),pass=document.getElementById("login-pass").value;
-  if(!email||!pass){showErr("login-err","Email dan password wajib");return}
-  const btn=document.getElementById("login-btn");btn.textContent="⏳ Masuk...";btn.disabled=true;
-  hideErr("login-err");
+  const email=document.getElementById("lg-email").value.trim();
+  const pass=document.getElementById("lg-pass").value;
+  if(!email||!pass){showErr("lg-err","Email dan password wajib");return}
+  const btn=document.getElementById("lg-btn");btn.textContent="⏳ Masuk...";btn.disabled=true;
+  hideErr("lg-err");
   const{error}=await db.auth.signInWithPassword({email,password:pass});
   btn.textContent="Masuk →";btn.disabled=false;
-  if(error){showErr("login-err","Gagal: "+error.message);return}
+  if(error){showErr("lg-err","Gagal: "+error.message);return}
   await afterLogin();
 }
 
 async function afterLogin(){
-  showScreen("app");
+  document.getElementById("login-screen").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
   await loadMaster();
   initForm();
+  initSettingsLists();
   await loadBookings();
   subscribeRT();
-  renderAll();
+  startCountdownTimer();
 }
 
 async function doLogout(){
-  if(localMode){localStorage.removeItem("local_mode");location.reload();return}
+  if(rtCh)db.removeChannel(rtCh);
+  if(countdownTimer)clearInterval(countdownTimer);
   await db.auth.signOut();
-  if(realtimeCh)db.removeChannel(realtimeCh);
-  showScreen("login");
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("login-screen").classList.remove("hidden");
 }
 
-// ── MASTER DATA ───────────────────────────────────────────────
+// ═══ MASTER DATA ══════════════════════════════════════════════
 async function loadMaster(){
-  if(localMode)return;
   try{
     const{data:th}=await db.from("app_terapis").select("*").eq("aktif",true).order("id");
-    THERAPISTS=th?.length?th.map(t=>({id:t.id,nama:t.nama,warna:t.warna})):DEFAULT_TH;
-    const{data:lv}=await db.from("app_layanan").select("nama").eq("aktif",true);
+    THERAPISTS=th?.length?th.map(t=>({id:t.id,nama:t.nama,warna:t.warna||"#2563eb",insentif:t.insentif_persen||0})):DEFAULT_TH;
+    const{data:lv}=await db.from("app_layanan").select("nama").eq("aktif",true).order("id");
     SERVICES=lv?.length?lv.map(l=>l.nama):DEFAULT_SV;
   }catch(e){THERAPISTS=DEFAULT_TH;SERVICES=DEFAULT_SV}
 }
 
-// ── CRUD ──────────────────────────────────────────────────────
+// ═══ BOOKING CRUD ═════════════════════════════════════════════
 async function loadBookings(){
-  if(localMode){bookings=JSON.parse(localStorage.getItem("klinik_bookings")||"[]");renderAll();return}
   const{data,error}=await db.from("app_booking").select("*").eq("tanggal",fmtISO(currentDate)).order("start_time");
   if(error){toast("⚠️ "+error.message);return}
-  bookings=(data||[]).map(r=>({id:r.id,patient:r.patient,phone:r.phone||"",service:r.service||"",
-    therapist:r.therapist_id||"",therapistName:r.therapist_name||"",room:r.room||"",
-    start:r.start_time||"",end:r.end_time||"",method:r.method||"Tunai",
-    payStatus:r.pay_status||"Belum Bayar",catatan:r.catatan||""}));
+  bookings=(data||[]).map(r=>({
+    id:r.id,patient:r.patient,phone:r.phone||"",service:r.service||"",
+    therapist:r.therapist_id||"",therapistName:r.therapist_name||"",
+    room:r.room||"",start:r.start_time||"",end:r.end_time||"",
+    duration:r.duration_min||60,method:r.method||"Tunai",
+    payStatus:r.pay_status||"Belum Bayar",catatan:r.catatan||""
+  }));
   renderAll();
 }
 
-async function insertBK(bk){
-  if(localMode){bookings.push(bk);localStorage.setItem("klinik_bookings",JSON.stringify(bookings));renderAll();toast("✅ Disimpan");return}
-  const{error}=await db.from("app_booking").insert([{id:bk.id,tanggal:fmtISO(currentDate),patient:bk.patient,phone:bk.phone,service:bk.service,therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,start_time:bk.start,end_time:bk.end,method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan}]);
-  if(error)toast("❌ "+error.message);else toast("✅ Booking disimpan");
+async function insertBK(bk,tanggal){
+  const{error}=await db.from("app_booking").insert([{
+    id:bk.id,tanggal,patient:bk.patient,phone:bk.phone,service:bk.service,
+    therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,
+    start_time:bk.start,end_time:bk.end,duration_min:bk.duration,
+    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan
+  }]);
+  if(error)toast("❌ "+error.message);
+  else toast("✅ Booking disimpan");
 }
 
 async function updateBK(bk){
-  if(localMode){bookings=bookings.map(b=>b.id===bk.id?bk:b);localStorage.setItem("klinik_bookings",JSON.stringify(bookings));renderAll();toast("✅ Diupdate");return}
-  const{error}=await db.from("app_booking").update({patient:bk.patient,phone:bk.phone,service:bk.service,therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,start_time:bk.start,end_time:bk.end,method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan}).eq("id",bk.id);
-  if(error)toast("❌ "+error.message);else toast("✅ Booking diupdate");
+  const{error}=await db.from("app_booking").update({
+    patient:bk.patient,phone:bk.phone,service:bk.service,
+    therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,
+    start_time:bk.start,end_time:bk.end,duration_min:bk.duration,
+    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan
+  }).eq("id",bk.id);
+  if(error)toast("❌ "+error.message);
+  else toast("✅ Booking diupdate");
 }
 
 async function deleteBK(id){
-  if(localMode){bookings=bookings.filter(b=>b.id!==id);localStorage.setItem("klinik_bookings",JSON.stringify(bookings));renderAll();toast("🗑️ Dihapus");return}
   const{error}=await db.from("app_booking").delete().eq("id",id);
-  if(error)toast("❌ "+error.message);else toast("🗑️ Booking dihapus");
+  if(error)toast("❌ "+error.message);
+  else toast("🗑️ Booking dihapus");
 }
 
-// ── REALTIME ──────────────────────────────────────────────────
+// ═══ REALTIME ═════════════════════════════════════════════════
 function subscribeRT(){
-  if(localMode||!db)return;
-  realtimeCh=db.channel("booking_ch").on("postgres_changes",{event:"*",schema:"public",table:"app_booking"},()=>loadBookings()).subscribe(s=>setRT(s==="SUBSCRIBED"));
-}
-function setRT(on){
-  const d=document.getElementById("rt-dot"),l=document.getElementById("rt-label");
-  if(!d||!l)return;
-  d.className="rt-dot "+(on?"rt-online":"rt-offline");
-  l.textContent=on?"live":localMode?"offline":"connecting...";
+  rtCh=db.channel("bk_ch").on("postgres_changes",{event:"*",schema:"public",table:"app_booking"},()=>loadBookings()).subscribe(s=>{
+    const on=s==="SUBSCRIBED";
+    document.getElementById("rt-dot").className="rt-dot "+(on?"rt-on":"rt-off");
+    document.getElementById("rt-lbl").textContent=on?"live":"...";
+  });
 }
 
-// ── RENDER ────────────────────────────────────────────────────
+// ═══ COUNTDOWN TIMER ══════════════════════════════════════════
+function startCountdownTimer(){
+  updateCountdowns();
+  countdownTimer=setInterval(updateCountdowns,30000);
+}
+
+function updateCountdowns(){
+  const now=new Date();
+  const isToday=fmtISO(currentDate)===fmtISO(now);
+  if(!isToday)return;
+  const nowM=now.getHours()*60+now.getMinutes();
+  bookings.forEach(b=>{
+    const startM=toMin(b.start||"00:00");
+    const endM=toMin(b.end||"00:00");
+    const cell=document.querySelector(`[data-bk="${b.id}"]`);
+    if(!cell)return;
+    const timerEl=cell.querySelector(".bk-timer");
+    if(nowM>=startM&&nowM<endM){
+      cell.classList.add("active-session");
+      if(timerEl)timerEl.textContent="⏱"+(endM-nowM)+"m";
+    }else{
+      cell.classList.remove("active-session");
+      if(timerEl)timerEl.textContent="";
+    }
+  });
+}
+
+// ═══ RENDER ═══════════════════════════════════════════════════
 function renderAll(){
-  document.getElementById("date-label").textContent=fmtDate(currentDate);
-  document.getElementById("stat-total").textContent=bookings.length;
-  document.getElementById("stat-room").textContent=new Set(bookings.map(b=>b.room)).size+"/6";
-  document.getElementById("stat-th").textContent=new Set(bookings.map(b=>b.therapist)).size+"/"+THERAPISTS.length;
-  document.getElementById("sync-count").textContent=bookings.length;
-  document.getElementById("export-info").textContent=`${bookings.length} booking · ${fmtDate(currentDate)}`;
+  document.getElementById("date-lbl").textContent=fmtDate(currentDate);
+  document.getElementById("st-total").textContent=bookings.length;
+  document.getElementById("st-room").textContent=new Set(bookings.map(b=>b.room)).size+"/6";
+  document.getElementById("st-th").textContent=new Set(bookings.map(b=>b.therapist)).size+"/"+THERAPISTS.length;
+  document.getElementById("gs-count").textContent=bookings.length;
+  document.getElementById("exp-info").textContent=`${bookings.length} booking · ${fmtDate(currentDate)}`;
   renderGrid();renderList();renderRekap();
+  setTimeout(updateCountdowns,200);
 }
 
 function renderGrid(){
-  const bkMap={};bookings.forEach(b=>{bkMap[b.room+"|"+b.start]=b});
-  document.querySelector("#schedule-table thead").innerHTML=`<tr><th class="th-time">Waktu</th>${ROOMS.map(r=>`<th class="th-room">${r}</th>`).join("")}</tr>`;
-  document.querySelector("#schedule-table tbody").innerHTML=TIME_SLOTS.map((ts,ti)=>{
+  // Build start/skip maps for rowspan
+  const startMap={}, skipMap={};
+  bookings.forEach(b=>{
+    const dur=b.duration||60;
+    const spans=Math.max(1,Math.ceil(dur/30));
+    const startIdx=TIME_SLOTS.indexOf(b.start);
+    const actualSpans=startIdx>=0?Math.min(spans,TIME_SLOTS.length-startIdx):1;
+    startMap[b.room+"|"+b.start]={bk:b,spans:actualSpans};
+    for(let i=1;i<actualSpans;i++){
+      skipMap[b.room+"|"+addMins(b.start,i*30)]=true;
+    }
+  });
+
+  // Header
+  const thead=document.querySelector("#sched-table thead");
+  thead.innerHTML=`<tr><th class="th-t">Waktu</th>${ROOMS.map(r=>`<th class="th-r">${r}</th>`).join("")}</tr>`;
+
+  // Body
+  let html="";
+  TIME_SLOTS.forEach((ts,ti)=>{
     const bg=ti%2===0?"#f0f7ff":"#e8f4fd";
-    return`<tr><td class="td-time" style="background:${bg}">${ts}</td>${ROOMS.map(room=>{
-      const bk=bkMap[room+"|"+ts];
-      if(bk){const th=getTh(bk.therapist);return`<td class="td-room" style="background:${th.warna}" onclick="openDetail('${bk.id}')"><div class="bk-card"><div class="bk-name">${bk.patient}</div><div class="bk-sub">${bk.service||th.nama}</div><div class="bk-badge">${bk.payStatus}</div></div></td>`}
-      return`<td class="td-room" style="background:${ti%2===0?"#fff":"#fafafa"}" onclick="openAddSlot('${room}','${ts}')"></td>`;
-    }).join("")}</tr>`;
-  }).join("");
+    const isHalfHour=ts.endsWith(":30");
+    html+=`<tr><td class="td-t" style="background:${bg};color:${isHalfHour?"#94a3b8":""}">${ts}</td>`;
+
+    ROOMS.forEach(room=>{
+      const key=room+"|"+ts;
+      if(skipMap[key])return; // skip — covered by rowspan
+      const entry=startMap[key];
+      if(entry){
+        const{bk,spans}=entry;
+        const th=getTh(bk.therapist);
+        const cellH=spans*38;
+        html+=`<td class="td-r" rowspan="${spans}" style="background:${th.warna};height:${cellH}px" data-bk="${bk.id}" onclick="openDetail('${bk.id}')">
+          <div class="bk-card">
+            <div class="bk-name">${bk.patient}</div>
+            <div class="bk-sub">${bk.service||th.nama} · ${bk.start}–${bk.end}</div>
+            <div class="bk-foot"><span class="bk-badge">${bk.payStatus}</span><span class="bk-timer"></span></div>
+          </div></td>`;
+      }else{
+        html+=`<td class="td-r" style="background:${ti%2===0?"#fff":"#fafafa"}" onclick="openAddSlot('${room}','${ts}')"></td>`;
+      }
+    });
+    html+="</tr>";
+  });
+
+  document.querySelector("#sched-table tbody").innerHTML=html;
 }
 
 function renderList(){
-  const s=document.getElementById("search-input")?.value.toLowerCase()||"";
-  const fR=document.getElementById("f-room-filter")?.value||"";
-  const fT=document.getElementById("f-th-filter")?.value||"";
-  const fP=document.getElementById("f-pay-filter")?.value||"";
+  const s=document.getElementById("s-input")?.value.toLowerCase()||"";
+  const fR=document.getElementById("fr-filter")?.value||"";
+  const fT=document.getElementById("ft-filter")?.value||"";
+  const fP=document.getElementById("fp-filter")?.value||"";
   const fl=bookings.filter(b=>(!s||b.patient.toLowerCase().includes(s))&&(!fR||b.room===fR)&&(!fT||b.therapist===fT)&&(!fP||b.payStatus===fP));
-  const c=document.getElementById("list-container");if(!c)return;
+  const c=document.getElementById("list-cont");if(!c)return;
   if(!fl.length){c.innerHTML=`<div style="text-align:center;padding:40px;color:#94a3b8"><div style="font-size:2rem;margin-bottom:8px">📭</div><div style="font-weight:700">Tidak ada booking</div></div>`;return}
-  c.innerHTML=fl.map(b=>{const th=getTh(b.therapist);const[cl,bg]=PAY_CLR[b.payStatus]||["#94a3b8","#f1f5f9"];return`<div class="list-item" onclick="openDetail('${b.id}')"><div class="list-avatar" style="background:${th.warna}">${b.patient.slice(0,2).toUpperCase()}</div><div style="flex:1;min-width:0"><div style="font-weight:800;color:#0f172a;font-size:.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</div><div style="font-size:.7rem;color:#64748b">${b.service||"-"} · ${b.room} · ${b.start}</div></div><span class="badge" style="background:${bg};color:${cl}">${b.payStatus}</span></div>`}).join("");
+  c.innerHTML=fl.map(b=>{
+    const th=getTh(b.therapist);const[cl,bg]=PAY_CLR[b.payStatus]||["#94a3b8","#f1f5f9"];
+    const dur=b.duration||calcDur(b.start,b.end)||60;
+    return`<div class="li-item" onclick="openDetail('${b.id}')"><div class="li-av" style="background:${th.warna}">${b.patient.slice(0,2).toUpperCase()}</div><div style="flex:1;min-width:0"><div style="font-weight:800;color:#0f172a;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</div><div style="font-size:.68rem;color:#64748b">${b.service||"-"} · ${b.room} · ${b.start} (${dur}mnt)</div></div><span class="badge" style="background:${bg};color:${cl}">${b.payStatus}</span></div>`;
+  }).join("");
 }
 
 function renderRekap(){
   const t=bookings.length||1;
-  document.getElementById("rekap-pay").innerHTML=PAY_ST.map(s=>{const c=bookings.filter(b=>b.payStatus===s).length;const[cl]=PAY_CLR[s];return`<div class="rekap-row"><div style="width:10px;height:10px;border-radius:50%;background:${cl};flex-shrink:0"></div><div style="flex:1;font-size:.82rem">${s}</div><div style="font-weight:800;color:${cl}">${c}</div><div style="width:80px;height:8px;background:#f1f5f9;border-radius:4px"><div style="width:${c/t*100}%;height:100%;border-radius:4px;background:${cl}"></div></div></div>`}).join("");
-  document.getElementById("rekap-room").innerHTML=ROOMS.map(r=>{const c=bookings.filter(b=>b.room===r).length;return`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:.78rem;margin-bottom:4px"><span style="font-weight:700">${r}</span><span style="color:#64748b">${c} sesi</span></div><div style="height:8px;background:#f1f5f9;border-radius:4px"><div style="width:${Math.min(c/TIME_SLOTS.length*100,100)}%;height:100%;border-radius:4px;background:var(--blue)"></div></div></div>`}).join("");
-  document.getElementById("rekap-terapis").innerHTML=THERAPISTS.map(th=>{const c=bookings.filter(b=>b.therapist===th.id).length;return`<div class="rekap-row"><div style="width:10px;height:10px;border-radius:3px;background:${th.warna};flex-shrink:0"></div><div style="flex:1;font-size:.82rem;font-weight:600">${th.nama}</div><div style="font-weight:800;color:${th.warna}">${c}</div><div style="width:80px;height:8px;background:#f1f5f9;border-radius:4px"><div style="width:${c/t*100}%;height:100%;border-radius:4px;background:${th.warna}"></div></div></div>`}).join("");
+  document.getElementById("rek-pay").innerHTML=PAY_ST.map(s=>{
+    const c=bookings.filter(b=>b.payStatus===s).length;const[cl]=PAY_CLR[s];
+    return`<div class="rek-row"><div style="width:9px;height:9px;border-radius:50%;background:${cl};flex-shrink:0"></div><div style="flex:1;font-size:.8rem">${s}</div><div style="font-weight:800;color:${cl}">${c}</div><div style="width:70px;height:7px;background:#f1f5f9;border-radius:3px"><div style="width:${c/t*100}%;height:100%;border-radius:3px;background:${cl}"></div></div></div>`;
+  }).join("");
+  document.getElementById("rek-room").innerHTML=ROOMS.map(r=>{
+    const c=bookings.filter(b=>b.room===r).length;
+    return`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:3px"><span style="font-weight:700">${r}</span><span style="color:#64748b">${c} sesi</span></div><div style="height:7px;background:#f1f5f9;border-radius:3px"><div style="width:${Math.min(c/TIME_SLOTS.length*100,100)}%;height:100%;border-radius:3px;background:var(--blue)"></div></div></div>`;
+  }).join("");
+  document.getElementById("rek-th").innerHTML=THERAPISTS.map(th=>{
+    const c=bookings.filter(b=>b.therapist===th.id).length;
+    return`<div class="rek-row"><div style="width:9px;height:9px;border-radius:3px;background:${th.warna};flex-shrink:0"></div><div style="flex:1;font-size:.8rem;font-weight:600">${th.nama}</div><div style="font-weight:800;color:${th.warna}">${c}</div><div style="width:70px;height:7px;background:#f1f5f9;border-radius:3px"><div style="width:${c/t*100}%;height:100%;border-radius:3px;background:${th.warna}"></div></div></div>`;
+  }).join("");
 }
 
-// ── NAV ───────────────────────────────────────────────────────
-function changeDate(n){currentDate=addDays(currentDate,n);document.getElementById("f-date").value=fmtISO(currentDate);loadBookings()}
+// ═══ NAVIGATION ═══════════════════════════════════════════════
+function changeDate(n){currentDate=addDays(currentDate,n);document.getElementById("fp-date").value=fmtISO(currentDate);loadBookings()}
 function switchTab(n,btn){["jadwal","daftar","rekap"].forEach(t=>document.getElementById("tab-"+t).classList.add("hidden"));document.getElementById("tab-"+n).classList.remove("hidden");document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active")}
-function resetFilter(){["search-input","f-room-filter","f-th-filter","f-pay-filter"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});document.getElementById("filter-panel").classList.add("hidden");renderList()}
+function resetFilter(){["s-input","fr-filter","ft-filter","fp-filter"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});document.getElementById("fpanel").classList.add("hidden");renderList()}
 
-// ── FORM ──────────────────────────────────────────────────────
+// ═══ FORM ═════════════════════════════════════════════════════
 function initForm(){
   // Time slots
-  const sel=document.getElementById("f-start");sel.innerHTML="";
+  const sel=document.getElementById("fp-start");sel.innerHTML="";
   TIME_SLOTS.forEach(t=>{const o=document.createElement("option");o.value=o.text=t;sel.appendChild(o)});
+  sel.addEventListener("change",updateEndTime);
+
   // Services
-  const sv=document.getElementById("f-service");sv.innerHTML="<option value=''>-- Pilih --</option>";
+  const sv=document.getElementById("fp-service");sv.innerHTML="<option value=''>-- Pilih --</option>";
   SERVICES.forEach(s=>{const o=document.createElement("option");o.value=o.text=s;sv.appendChild(o)});
+
   // Therapist buttons
-  const thG=document.getElementById("f-th-grid");thG.innerHTML="";
-  THERAPISTS.forEach((t,i)=>{const b=document.createElement("button");b.className="pick-btn"+(i===0?" selected":"");b.id="th-btn-"+t.id;b.innerHTML=`<div class="pick-id">${t.id}</div>${t.nama}`;b.onclick=()=>selTh(t.id);thG.appendChild(b)});
+  const tG=document.getElementById("fp-th-grid");tG.innerHTML="";
+  THERAPISTS.forEach((t,i)=>{const b=document.createElement("button");b.className="pb"+(i===0?" sel":"");b.id="thb-"+t.id;b.innerHTML=`<div class="pb-id">${t.id}</div>${t.nama}`;b.onclick=()=>selTh(t.id);tG.appendChild(b)});
   if(THERAPISTS.length)formSel.therapist=THERAPISTS[0].id;
+
   // Room buttons
-  const rG=document.getElementById("f-room-grid");rG.innerHTML="";
-  ROOMS.forEach((r,i)=>{const b=document.createElement("button");b.className="room-btn"+(i===0?" selected":"");b.id="r-btn-"+r;b.textContent=r;b.onclick=()=>selRoom(r);rG.appendChild(b)});
+  const rG=document.getElementById("fp-room-grid");rG.innerHTML="";
+  ROOMS.forEach((r,i)=>{const b=document.createElement("button");b.className="rb"+(i===0?" sel":"");b.id="rb-"+r;b.textContent=r;b.onclick=()=>selRoom(r);rG.appendChild(b)});
+
   // Methods
-  const mL=document.getElementById("f-method-list");mL.innerHTML="";
-  METHODS.forEach(m=>{const cl=m.replace(/^[^\s]+ /,""),ic=m.split(" ")[0];const b=document.createElement("button");b.className="method-btn"+(cl==="Tunai"?" selected":"");b.id="mb-"+cl;b.innerHTML=`${ic} <span>${cl}</span>${cl==="Tunai"?'<span style="margin-left:auto">✓</span>':""}`;b.onclick=()=>selMethod(cl);mL.appendChild(b)});
+  const mL=document.getElementById("fp-meth-list");mL.innerHTML="";
+  METHODS.forEach(m=>{const cl=m.replace(/^[^\s]+ /,""),ic=m.split(" ")[0];const b=document.createElement("button");b.className="methb"+(cl==="Tunai"?" sel":"");b.id="mb-"+cl;b.innerHTML=`${ic} <span>${cl}</span>${cl==="Tunai"?'<span style="margin-left:auto">✓</span>':""}`;b.onclick=()=>selMeth(cl);mL.appendChild(b)});
+
   // Pay status
-  const pL=document.getElementById("f-pay-list");pL.innerHTML="";
-  PAY_ST.forEach(s=>{const[c,bg]=PAY_CLR[s];const b=document.createElement("button");b.className="pay-btn"+(s==="Belum Bayar"?" selected":"");b.id="pb-"+s;b.style.cssText=s==="Belum Bayar"?`border-color:${c};background:${bg};color:${c}`:"";b.textContent=s;b.onclick=()=>selPay(s);pL.appendChild(b)});
+  const pL=document.getElementById("fp-pay-list");pL.innerHTML="";
+  PAY_ST.forEach(s=>{const[c,bg]=PAY_CLR[s];const b=document.createElement("button");b.className="payb"+(s==="Belum Bayar"?" sel":"");b.id="pb-"+s;b.style.cssText=s==="Belum Bayar"?`border-color:${c};background:${bg};color:${c}`:"";b.textContent=s;b.onclick=()=>selPay(s);pL.appendChild(b)});
+
   // Filters
-  const fR=document.getElementById("f-room-filter");if(fR){fR.innerHTML="<option value=''>Semua</option>";ROOMS.forEach(r=>{const o=document.createElement("option");o.value=o.text=r;fR.appendChild(o)})}
-  const fT=document.getElementById("f-th-filter");if(fT){fT.innerHTML="<option value=''>Semua</option>";THERAPISTS.forEach(t=>{const o=document.createElement("option");o.value=t.id;o.text=t.nama;fT.appendChild(o)})}
-  document.getElementById("f-date").value=fmtISO(currentDate);
+  const fR=document.getElementById("fr-filter");if(fR){fR.innerHTML="<option value=''>Semua</option>";ROOMS.forEach(r=>{const o=document.createElement("option");o.value=o.text=r;fR.appendChild(o)})}
+  const fT=document.getElementById("ft-filter");if(fT){fT.innerHTML="<option value=''>Semua</option>";THERAPISTS.forEach(t=>{const o=document.createElement("option");o.value=t.id;o.text=t.nama;fT.appendChild(o)})}
+
+  document.getElementById("fp-date").value=fmtISO(currentDate);
+  updateEndTime();
 }
 
-function openAdd(){formMode="add";currentBk=null;resetForm();document.getElementById("form-title").textContent="➕ Booking Baru";switchFormTab(0);openModal("modal-form")}
-function openAddSlot(room,start){openAdd();selRoom(room);document.getElementById("f-start").value=start}
-function resetForm(){["f-patient","f-phone","f-catatan"].forEach(id=>document.getElementById(id).value="");document.getElementById("f-service").value="";document.getElementById("f-date").value=fmtISO(currentDate);document.getElementById("f-start").value=TIME_SLOTS[0]||"08:00";const ft=THERAPISTS[0]?.id||"T-01";formSel={therapist:ft,room:"R-01",method:"Tunai",payStatus:"Belum Bayar"};selTh(ft);selRoom("R-01");selMethod("Tunai");selPay("Belum Bayar")}
-function fillForm(bk){document.getElementById("f-patient").value=bk.patient||"";document.getElementById("f-phone").value=bk.phone||"";document.getElementById("f-service").value=bk.service||"";document.getElementById("f-catatan").value=bk.catatan||"";document.getElementById("f-date").value=fmtISO(currentDate);document.getElementById("f-start").value=bk.start||"08:00";formSel={therapist:bk.therapist,room:bk.room,method:bk.method||"Tunai",payStatus:bk.payStatus||"Belum Bayar"};selTh(formSel.therapist);selRoom(formSel.room);selMethod(formSel.method);selPay(formSel.payStatus)}
+function updateEndTime(){
+  const start=document.getElementById("fp-start")?.value||"08:00";
+  const dur=parseInt(document.getElementById("fp-dur")?.value||60);
+  const end=addMins(start,dur);
+  document.getElementById("fp-end-disp").textContent=end;
+}
 
-function switchFormTab(n){formTab=n;[0,1,2].forEach(i=>{document.getElementById("fpanel-"+i).classList.toggle("hidden",i!==n);document.getElementById("ftab-"+i).classList.toggle("active",i===n)});if(n===2)updateSummary();renderFooter()}
-function renderFooter(){const f=document.getElementById("form-footer");const back=formTab>0?`<button class="btn-ghost" onclick="switchFormTab(${formTab-1})">← Kembali</button>`:"";const next=formTab<2?`<button class="btn-primary" style="flex:2" onclick="switchFormTab(${formTab+1})">Lanjut →</button>`:`<button class="btn-success" style="flex:2" onclick="submitForm()">✓ Simpan</button>`;f.innerHTML=back+next}
-function updateSummary(){const th=getTh(formSel.therapist);document.getElementById("f-summary").innerHTML=[["Pasien",document.getElementById("f-patient").value||"-"],["Layanan",document.getElementById("f-service").value||"-"],["Terapis",th.nama],["Ruangan",formSel.room],["Jam",document.getElementById("f-start").value],["Metode",formSel.method]].map(([k,v])=>`<div class="summary-row"><span style="color:#64748b">${k}</span><span style="font-weight:700">${v}</span></div>`).join("")}
+function openAdd(){formMode="add";currentBk=null;resetForm();document.getElementById("form-ttl").textContent="➕ Booking Baru";fTab(0);openModal("modal-form")}
+function openAddSlot(room,start){openAdd();selRoom(room);document.getElementById("fp-start").value=start;updateEndTime()}
+
+function resetForm(){
+  ["fp-patient","fp-phone","fp-catatan"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("fp-service").value="";
+  document.getElementById("fp-date").value=fmtISO(currentDate);
+  document.getElementById("fp-start").value=TIME_SLOTS[0]||"08:00";
+  document.getElementById("fp-dur").value="60";
+  updateEndTime();
+  const ft=THERAPISTS[0]?.id||"T-01";
+  formSel={therapist:ft,room:"R-01",method:"Tunai",payStatus:"Belum Bayar"};
+  selTh(ft);selRoom("R-01");selMeth("Tunai");selPay("Belum Bayar");
+}
+
+function fillForm(bk){
+  document.getElementById("fp-patient").value=bk.patient||"";
+  document.getElementById("fp-phone").value=bk.phone||"";
+  document.getElementById("fp-service").value=bk.service||"";
+  document.getElementById("fp-catatan").value=bk.catatan||"";
+  document.getElementById("fp-date").value=fmtISO(currentDate);
+  document.getElementById("fp-start").value=bk.start||"08:00";
+  document.getElementById("fp-dur").value=String(bk.duration||60);
+  updateEndTime();
+  formSel={therapist:bk.therapist,room:bk.room,method:bk.method||"Tunai",payStatus:bk.payStatus||"Belum Bayar"};
+  selTh(formSel.therapist);selRoom(formSel.room);selMeth(formSel.method);selPay(formSel.payStatus);
+}
+
+function fTab(n){
+  formTab=n;
+  [0,1,2].forEach(i=>{document.getElementById("fpanel-"+i).classList.toggle("hidden",i!==n);document.getElementById("ftab-"+i).classList.toggle("active",i===n)});
+  if(n===2)updateSummary();
+  renderFoot();
+}
+function renderFoot(){
+  const f=document.getElementById("form-footer");
+  const back=formTab>0?`<button class="btn-o" onclick="fTab(${formTab-1})">← Kembali</button>`:"";
+  const next=formTab<2?`<button class="btn-p" style="flex:2" onclick="fTab(${formTab+1})">Lanjut →</button>`:`<button class="btn-g" style="flex:2" onclick="submitForm()">✓ Simpan</button>`;
+  f.innerHTML=back+next;
+}
+function updateSummary(){
+  const th=getTh(formSel.therapist);
+  const dur=parseInt(document.getElementById("fp-dur")?.value||60);
+  document.getElementById("fp-sum").innerHTML=[
+    ["Pasien",document.getElementById("fp-patient").value||"-"],
+    ["Layanan",document.getElementById("fp-service").value||"-"],
+    ["Terapis",th.nama],["Ruangan",formSel.room],
+    ["Jam",document.getElementById("fp-start").value+" → "+document.getElementById("fp-end-disp").textContent],
+    ["Durasi",DUR_OPT.find(d=>d.v===dur)?.l||dur+"mnt"],
+    ["Metode",formSel.method],
+  ].map(([k,v])=>`<div class="sumrow"><span style="color:#64748b">${k}</span><span style="font-weight:700">${v}</span></div>`).join("");
+}
 
 async function submitForm(){
-  const patient=document.getElementById("f-patient").value.trim();
-  if(!patient){alert("Nama pasien wajib diisi!");switchFormTab(0);return}
-  const start=document.getElementById("f-start").value;
-  const bk={id:formMode==="edit"?currentBk.id:genId(),patient,phone:document.getElementById("f-phone").value,service:document.getElementById("f-service").value,catatan:document.getElementById("f-catatan").value,therapist:formSel.therapist,therapistName:getTh(formSel.therapist).nama,room:formSel.room,start,end:String(parseInt(start)+1).padStart(2,"0")+":00",method:formSel.method,payStatus:formSel.payStatus};
+  const patient=document.getElementById("fp-patient").value.trim();
+  if(!patient){alert("Nama pasien wajib diisi!");fTab(0);return}
+  const start=document.getElementById("fp-start").value;
+  const dur=parseInt(document.getElementById("fp-dur").value);
+  const end=addMins(start,dur);
+  const tanggal=document.getElementById("fp-date").value; // ← use form date!
+  const bk={
+    id:formMode==="edit"?currentBk.id:genId(),
+    patient,phone:document.getElementById("fp-phone").value,
+    service:document.getElementById("fp-service").value,
+    catatan:document.getElementById("fp-catatan").value,
+    therapist:formSel.therapist,therapistName:getTh(formSel.therapist).nama,
+    room:formSel.room,start,end,duration:dur,
+    method:formSel.method,payStatus:formSel.payStatus
+  };
   closeModal("modal-form");
-  if(formMode==="edit")await updateBK(bk);else await insertBK(bk);
-  if(localMode)renderAll();
+  if(formMode==="edit") await updateBK(bk);
+  else await insertBK(bk,tanggal);
+  // If saved date == currentDate, reload; else show message
+  if(tanggal===fmtISO(currentDate)) await loadBookings();
+  else toast("✅ Booking tersimpan untuk "+tanggal);
 }
 
-function selTh(id){formSel.therapist=id;THERAPISTS.forEach(t=>{const b=document.getElementById("th-btn-"+t.id);if(b)b.className="pick-btn"+(t.id===id?" selected":"")})}
-function selRoom(r){formSel.room=r;ROOMS.forEach(rm=>{const b=document.getElementById("r-btn-"+rm);if(b)b.className="room-btn"+(rm===r?" selected":"")})}
-function selMethod(m){formSel.method=m;METHODS.forEach(mt=>{const cl=mt.replace(/^[^\s]+ /,""),ic=mt.split(" ")[0];const b=document.getElementById("mb-"+cl);if(!b)return;b.className="method-btn"+(cl===m?" selected":"");b.innerHTML=`${ic} <span>${cl}</span>${cl===m?'<span style="margin-left:auto">✓</span>':""}` })}
-function selPay(s){formSel.payStatus=s;PAY_ST.forEach(ps=>{const b=document.getElementById("pb-"+ps);if(!b)return;const[c,bg]=PAY_CLR[ps];b.className="pay-btn"+(ps===s?" selected":"");b.style.cssText=ps===s?`border-color:${c};background:${bg};color:${c}`:""})}
+function selTh(id){formSel.therapist=id;THERAPISTS.forEach(t=>{const b=document.getElementById("thb-"+t.id);if(b)b.className="pb"+(t.id===id?" sel":"")})}
+function selRoom(r){formSel.room=r;ROOMS.forEach(rm=>{const b=document.getElementById("rb-"+rm);if(b)b.className="rb"+(rm===r?" sel":"")})}
+function selMeth(m){formSel.method=m;METHODS.forEach(mt=>{const cl=mt.replace(/^[^\s]+ /,""),ic=mt.split(" ")[0];const b=document.getElementById("mb-"+cl);if(!b)return;b.className="methb"+(cl===m?" sel":"");b.innerHTML=`${ic} <span>${cl}</span>${cl===m?'<span style="margin-left:auto">✓</span>':""}`})}
+function selPay(s){formSel.payStatus=s;PAY_ST.forEach(ps=>{const b=document.getElementById("pb-"+ps);if(!b)return;const[c,bg]=PAY_CLR[ps];b.className="payb"+(ps===s?" sel":"");b.style.cssText=ps===s?`border-color:${c};background:${bg};color:${c}`:""})}
 
-// ── DETAIL ────────────────────────────────────────────────────
+// ═══ DETAIL ═══════════════════════════════════════════════════
 function openDetail(id){
-  const bk=bookings.find(b=>b.id===id);if(!bk)return;currentBk=bk;
+  const bk=bookings.find(b=>b.id===id);if(!bk)return;
+  currentBk=bk;
   const th=getTh(bk.therapist);const[c,bg]=PAY_CLR[bk.payStatus]||["#94a3b8","#f1f5f9"];
-  document.getElementById("detail-bar").style.background=th.warna;
+  const dur=bk.duration||calcDur(bk.start,bk.end)||60;
+  document.getElementById("det-bar").style.background=th.warna;
   document.getElementById("det-name").textContent=bk.patient;
   document.getElementById("det-sub").textContent=(bk.phone||"No HP")+" · "+bk.id;
   document.getElementById("det-badge").style.cssText=`background:${bg};color:${c}`;
   document.getElementById("det-badge").textContent=bk.payStatus;
-  document.getElementById("det-service").textContent=bk.service||"-";
+  document.getElementById("det-sv").textContent=bk.service||"-";
   document.getElementById("det-room").textContent=bk.room;
-  document.getElementById("det-time").textContent=bk.start+"–"+(bk.end||"?");
-  document.getElementById("det-method").textContent=bk.method||"-";
+  document.getElementById("det-start").textContent=bk.start;
+  document.getElementById("det-end").textContent=bk.end||"-";
+  document.getElementById("det-dur").textContent=DUR_OPT.find(d=>d.v===dur)?.l||dur+"mnt";
+  document.getElementById("det-meth").textContent=bk.method||"-";
   document.getElementById("det-th-box").style.background=th.warna+"22";
   document.getElementById("det-th-av").style.background=th.warna;
   document.getElementById("det-th-av").textContent=(bk.therapistName||th.nama).slice(0,2).toUpperCase();
   document.getElementById("det-th-name").textContent=(bk.therapistName||th.nama)+" · "+bk.therapist;
-  document.getElementById("det-catatan").innerHTML=bk.catatan?`<div style="background:#fef9c3;border-radius:10px;padding:10px 14px;font-size:.78rem;color:#713f12;margin-bottom:14px">📝 ${bk.catatan}</div>`:"";
+  document.getElementById("det-catatan").innerHTML=bk.catatan?`<div style="background:#fef9c3;border-radius:9px;padding:9px 12px;font-size:.75rem;color:#713f12;margin-bottom:12px">📝 ${bk.catatan}</div>`:"";
+  // Check if session is active
+  const now=new Date();
+  const isToday=fmtISO(currentDate)===fmtISO(now);
+  const nowM=now.getHours()*60+now.getMinutes();
+  const startM=toMin(bk.start||"00:00");
+  const endM=toMin(bk.end||"00:00");
+  const countdown=document.getElementById("det-countdown");
+  if(isToday&&nowM>=startM&&nowM<endM){
+    countdown.classList.remove("hidden");
+    document.getElementById("det-remain").textContent=(endM-nowM)+" mnt tersisa";
+  }else countdown.classList.add("hidden");
   document.getElementById("det-confirm").classList.add("hidden");
   openModal("modal-detail");
 }
-function editCurrent(){closeModal("modal-detail");formMode="edit";document.getElementById("form-title").textContent="✏️ Edit Booking";fillForm(currentBk);switchFormTab(0);openModal("modal-form")}
-async function confirmDelete(){await deleteBK(currentBk.id);closeModal("modal-detail");if(localMode)renderAll()}
+function editCurrent(){closeModal("modal-detail");formMode="edit";document.getElementById("form-ttl").textContent="✏️ Edit Booking";fillForm(currentBk);fTab(0);openModal("modal-form")}
+async function confirmDelete(){await deleteBK(currentBk.id);closeModal("modal-detail");await loadBookings()}
 
-// ── GOOGLE SHEETS ─────────────────────────────────────────────
-function openSheets(){const s=localStorage.getItem("gs_url");if(s)document.getElementById("gs-url").value=s;const l=localStorage.getItem("gs_last");if(l)document.getElementById("gs-last").textContent="🕐 Terakhir: "+l;document.getElementById("gs-status").innerHTML="";openModal("modal-sheets")}
-async function gsReq(url,method,payload){try{const r=await fetch(method==="GET"?url+"?action="+payload.action:url,method==="GET"?{}:{method:"POST",body:JSON.stringify(payload)});return await r.json()}catch(e){return{error:e.message}}}
-function setGsStatus(t,m){document.getElementById("gs-status").innerHTML=`<div style="margin:12px 0;padding:10px 14px;border-radius:10px;background:${t==="success"?"#dcfce7":t==="error"?"#fee2e2":"#f1f5f9"};color:${t==="success"?"#16a34a":t==="error"?"#dc2626":"#64748b"};font-size:.78rem;font-weight:600">${t==="loading"?"⏳ ":""}${m}</div>`}
-async function testConnection(){const url=document.getElementById("gs-url").value.trim();if(!url){alert("Masukkan URL");return}localStorage.setItem("gs_url",url);setGsStatus("loading","Testing...");const r=await gsReq(url,"GET",{action:"ping"});r.status==="ok"?setGsStatus("success","✅ Koneksi berhasil!"):setGsStatus("error","❌ "+(r.error||"Gagal"))}
-async function syncToSheets(){const url=document.getElementById("gs-url").value.trim();if(!url){alert("Masukkan URL");return}localStorage.setItem("gs_url",url);setGsStatus("loading","Menyinkronkan...");const r=await gsReq(url,"POST",{action:"sync",data:bookings.map(b=>({...b,tanggal:fmtISO(currentDate),therapistName:getTh(b.therapist).nama}))});if(r.error)setGsStatus("error","❌ "+r.error);else{const t=new Date().toLocaleString("id-ID");setGsStatus("success","✅ "+(r.message||"Berhasil"));localStorage.setItem("gs_last",t);document.getElementById("gs-last").textContent="🕐 Terakhir: "+t}}
+// ═══ SETTINGS ═════════════════════════════════════════════════
+let setTabIdx=0;
+function setTab(n,btn){
+  setTabIdx=n;
+  [0,1,2,3].forEach(i=>document.getElementById("set-"+i).classList.toggle("hidden",i!==n));
+  document.querySelectorAll("#set-tabs .stab").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  if(n===0)renderThList();
+  if(n===1)renderSvList();
+  if(n===2)renderDkList();
+  if(n===3)renderPkList();
+}
 
-// ── EXPORT ────────────────────────────────────────────────────
-function openExport(){document.getElementById("export-info").textContent=`${bookings.length} booking · ${fmtDate(currentDate)}`;openModal("modal-export")}
-function doExcel(){const rows=bookings.map(b=>({"ID":b.id,"Pasien":b.patient,"No HP":b.phone||"","Layanan":b.service||"","Terapis":getTh(b.therapist).nama,"Ruangan":b.room,"Jam Mulai":b.start,"Jam Selesai":b.end||"","Metode":b.method||"","Status Bayar":b.payStatus,"Catatan":b.catatan||""}));const ws=XLSX.utils.json_to_sheet(rows);ws["!cols"]=Array(11).fill({wch:18});const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Booking");XLSX.writeFile(wb,`Booking_${fmtISO(currentDate)}.xlsx`);closeModal("modal-export")}
-function doPDF(){const rows=bookings.map((b,i)=>`<tr><td>${i+1}</td><td><b>${b.patient}</b><br><small>${b.phone||""}</small></td><td>${b.service||"-"}</td><td>${getTh(b.therapist).nama}</td><td>${b.room}</td><td>${b.start}</td><td>${b.method||"-"}</td><td style="color:${(PAY_CLR[b.payStatus]||["#94a3b8"])[0]};font-weight:700">${b.payStatus}</td></tr>`).join("");const w=window.open("","_blank","width=900,height=650");w.document.write(`<!DOCTYPE html><html><head><title>Laporan</title><style>body{font-family:Arial,sans-serif;padding:20px;font-size:11px}h2{font-size:15px}p{color:#64748b;font-size:10px;margin-bottom:14px}table{width:100%;border-collapse:collapse}th{background:#1e3a5f;color:#fff;padding:7px 8px;text-align:left;font-size:10px}td{padding:6px 8px;border-bottom:1px solid #e2e8f0}tr:nth-child(even)td{background:#f8fafc}@media print{body{padding:8px}}</style></head><body><h2>🏥 TAPA JIVA — Laporan Booking</h2><p>${fmtDate(currentDate)} · ${bookings.length} sesi · ${new Date().toLocaleString("id-ID")}</p><table><thead><tr><th>#</th><th>Pasien</th><th>Layanan</th><th>Terapis</th><th>Room</th><th>Jam</th><th>Metode</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></body></html>`);w.document.close();setTimeout(()=>w.print(),500);closeModal("modal-export")}
+function initSettingsLists(){renderThList();renderSvList();renderDkList();renderPkList()}
+
+// TERAPIS
+function renderThList(){
+  document.getElementById("set-th-list").innerHTML=THERAPISTS.map(t=>`
+    <div class="set-item">
+      <div class="color-dot" style="background:${t.warna}"></div>
+      <div class="set-item-info"><div class="set-item-name">${t.nama}</div><div class="set-item-sub">${t.id} · Insentif: ${t.insentif||0}%</div></div>
+      <div class="set-actions">
+        <button class="set-btn-sm" style="border-color:var(--blue);color:var(--blue)" onclick="editTh('${t.id}')">Edit</button>
+        <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteTh('${t.id}')">Hapus</button>
+      </div>
+    </div>`).join("");
+}
+async function addTerapis(){
+  const nama=document.getElementById("new-th-nama").value.trim();
+  if(!nama)return;
+  const newId="T-"+String(THERAPISTS.length+1).padStart(2,"0");
+  const warna=TH_COLORS[THERAPISTS.length%TH_COLORS.length];
+  const{error}=await db.from("app_terapis").insert([{id:newId,nama,warna,aktif:true,insentif_persen:0}]);
+  if(error){toast("❌ "+error.message);return}
+  document.getElementById("new-th-nama").value="";
+  await loadMaster();initForm();renderThList();toast("✅ Terapis ditambahkan");
+}
+function editTh(id){
+  const t=THERAPISTS.find(x=>x.id===id);if(!t)return;
+  const nama=prompt("Nama terapis:",t.nama);if(!nama)return;
+  const insentif=parseFloat(prompt("Insentif %:",t.insentif||0)||0);
+  db.from("app_terapis").update({nama,insentif_persen:insentif}).eq("id",id).then(({error})=>{
+    if(error)toast("❌ "+error.message);
+    else{loadMaster().then(()=>{initForm();renderThList();toast("✅ Diupdate")})}
+  });
+}
+async function deleteTh(id){
+  if(!confirm("Hapus terapis ini?"))return;
+  const{error}=await db.from("app_terapis").update({aktif:false}).eq("id",id);
+  if(error){toast("❌ "+error.message);return}
+  await loadMaster();initForm();renderThList();toast("🗑️ Terapis dihapus");
+}
+
+// LAYANAN
+function renderSvList(){
+  document.getElementById("set-sv-list").innerHTML=SERVICES.map(s=>`
+    <div class="set-item"><div class="set-item-info"><div class="set-item-name">💆 ${s}</div></div>
+      <div class="set-actions"><button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteSv('${s}')">Hapus</button></div>
+    </div>`).join("");
+}
+async function addLayanan(){
+  const nama=document.getElementById("new-sv-nama").value.trim();
+  if(!nama)return;
+  const{error}=await db.from("app_layanan").insert([{nama,aktif:true}]);
+  if(error){toast("❌ "+error.message);return}
+  document.getElementById("new-sv-nama").value="";
+  await loadMaster();initForm();renderSvList();toast("✅ Layanan ditambahkan");
+}
+async function deleteSv(nama){
+  if(!confirm("Hapus layanan '"+nama+"'?"))return;
+  const{error}=await db.from("app_layanan").update({aktif:false}).eq("nama",nama);
+  if(error){toast("❌ "+error.message);return}
+  await loadMaster();initForm();renderSvList();toast("🗑️ Layanan dihapus");
+}
+
+// DISKON
+function renderDkList(){
+  const s=getSettings();
+  document.getElementById("set-dk-list").innerHTML=s.diskon.length?s.diskon.map((d,i)=>`
+    <div class="set-item"><div class="set-item-info"><div class="set-item-name">🏷️ ${d.nama}</div><div class="set-item-sub">${d.tipe==="persen"?d.nilai+"%":"Rp "+Number(d.nilai).toLocaleString("id-ID")}</div></div>
+      <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteDk(${i})">Hapus</button></div>`).join(""):
+    '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.78rem">Belum ada diskon</div>';
+}
+function addDiskon(){
+  const nama=document.getElementById("dk-nama").value.trim();
+  const tipe=document.getElementById("dk-tipe").value;
+  const nilai=parseFloat(document.getElementById("dk-nilai").value||0);
+  if(!nama){toast("⚠️ Nama diskon wajib");return}
+  const s=getSettings();s.diskon.push({nama,tipe,nilai});saveSettings(s);
+  ["dk-nama","dk-nilai"].forEach(id=>document.getElementById(id).value="");
+  renderDkList();toast("✅ Diskon ditambahkan");
+}
+function deleteDk(i){const s=getSettings();s.diskon.splice(i,1);saveSettings(s);renderDkList()}
+
+// PAKET
+function renderPkList(){
+  const s=getSettings();
+  document.getElementById("set-pk-list").innerHTML=s.paket.length?s.paket.map((p,i)=>`
+    <div class="set-item"><div class="set-item-info"><div class="set-item-name">📦 ${p.nama}</div><div class="set-item-sub">${p.sesi} sesi · Rp ${Number(p.harga).toLocaleString("id-ID")} · Rp ${Math.round(p.harga/p.sesi).toLocaleString("id-ID")}/sesi</div></div>
+      <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deletePk(${i})">Hapus</button></div>`).join(""):
+    '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.78rem">Belum ada paket</div>';
+}
+function addPaket(){
+  const nama=document.getElementById("pk-nama").value.trim();
+  const sesi=parseInt(document.getElementById("pk-sesi").value||1);
+  const harga=parseFloat(document.getElementById("pk-harga").value||0);
+  if(!nama){toast("⚠️ Nama paket wajib");return}
+  const s=getSettings();s.paket.push({nama,sesi,harga});saveSettings(s);
+  ["pk-nama","pk-sesi","pk-harga"].forEach(id=>document.getElementById(id).value="");
+  renderPkList();toast("✅ Paket ditambahkan");
+}
+function deletePk(i){const s=getSettings();s.paket.splice(i,1);saveSettings(s);renderPkList()}
+
+// ═══ EXPORT (MOBILE-FIXED) ════════════════════════════════════
+function dlBlob(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.style.display="none";a.href=url;a.download=filename;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},1500);
+}
+
+function doExcel(){
+  const rows=bookings.map(b=>({
+    "ID":b.id,"Tanggal":fmtISO(currentDate),"Pasien":b.patient,"No HP":b.phone||"",
+    "Layanan":b.service||"","Terapis":getTh(b.therapist).nama,"Ruangan":b.room,
+    "Jam Mulai":b.start,"Jam Selesai":b.end||"","Durasi (mnt)":b.duration||60,
+    "Metode":b.method||"","Status Bayar":b.payStatus,"Catatan":b.catatan||""
+  }));
+  const ws=XLSX.utils.json_to_sheet(rows);
+  ws["!cols"]=Array(13).fill({wch:16});
+  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Booking");
+  const wbout=XLSX.write(wb,{bookType:"xlsx",type:"array"});
+  dlBlob(new Blob([wbout],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),`Booking_${fmtISO(currentDate)}.xlsx`);
+  closeModal("modal-export");toast("📥 File Excel didownload");
+}
+
+function doPDF(){
+  const rows=bookings.map((b,i)=>`<tr><td>${i+1}</td><td><b>${b.patient}</b><br><small>${b.phone||""}</small></td><td>${b.service||"-"}</td><td>${getTh(b.therapist).nama}</td><td>${b.room}</td><td>${b.start}–${b.end||""}</td><td>${b.duration||60}mnt</td><td>${b.method||"-"}</td><td style="color:${(PAY_CLR[b.payStatus]||["#94a3b8"])[0]};font-weight:700">${b.payStatus}</td></tr>`).join("");
+  const html=`<!DOCTYPE html><html><head><title>Laporan Booking</title><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;padding:16px;font-size:11px}h2{font-size:14px;margin:0 0 3px}p{color:#64748b;font-size:10px;margin:0 0 12px}table{width:100%;border-collapse:collapse}th{background:#1e3a5f;color:#fff;padding:6px 7px;text-align:left;font-size:9px}td{padding:5px 7px;border-bottom:1px solid #e2e8f0}tr:nth-child(even)td{background:#f8fafc}footer{margin-top:16px;font-size:9px;color:#94a3b8;text-align:center;border-top:1px solid #e2e8f0;padding-top:8px}@media print{body{padding:6px}button{display:none}}</style></head>
+  <body><h2>🏥 Klinik Terapi — Laporan Booking Harian</h2><p>Tanggal: ${fmtDate(currentDate)} &nbsp;·&nbsp; Total: ${bookings.length} sesi &nbsp;·&nbsp; Dicetak: ${new Date().toLocaleString("id-ID")}</p>
+  <button onclick="window.print()" style="margin-bottom:10px;padding:8px 16px;background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12px">🖨️ Print / Save as PDF</button>
+  <table><thead><tr><th>#</th><th>Pasien</th><th>Layanan</th><th>Terapis</th><th>Room</th><th>Jam</th><th>Durasi</th><th>Metode</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>
+  <footer>Klinik Terapi · Sistem Booking Digital</footer></body></html>`;
+  dlBlob(new Blob([html],{type:"text/html;charset=utf-8"}),`Laporan_${fmtISO(currentDate)}.html`);
+  closeModal("modal-export");
+  toast("📥 File HTML didownload — buka lalu pilih Print→PDF",3500);
+}
+
+// ═══ GOOGLE SHEETS ════════════════════════════════════════════
+function openSheets(){
+  const s=localStorage.getItem("gs_url");if(s)document.getElementById("gs-url").value=s;
+  const l=localStorage.getItem("gs_last");if(l)document.getElementById("gs-last").textContent="🕐 Terakhir: "+l;
+  document.getElementById("gs-status").innerHTML="";
+  openModal("modal-sheets");
+}
+async function gsReq(url,method,payload){
+  try{const r=await fetch(method==="GET"?url+"?action="+payload.action:url,method==="GET"?{}:{method:"POST",body:JSON.stringify(payload)});return await r.json()}
+  catch(e){return{error:e.message}}
+}
+function setGsStatus(t,m){document.getElementById("gs-status").innerHTML=`<div style="margin:10px 0;padding:9px 12px;border-radius:9px;background:${t==="success"?"#dcfce7":t==="error"?"#fee2e2":"#f1f5f9"};color:${t==="success"?"#16a34a":t==="error"?"#dc2626":"#64748b"};font-size:.75rem;font-weight:600">${t==="loading"?"⏳ ":""}${m}</div>`}
+async function testGS(){const url=document.getElementById("gs-url").value.trim();if(!url)return;localStorage.setItem("gs_url",url);setGsStatus("loading","Testing...");const r=await gsReq(url,"GET",{action:"ping"});r.status==="ok"?setGsStatus("success","✅ Koneksi berhasil!"):setGsStatus("error","❌ "+(r.error||"Gagal"))}
+async function syncGS(){const url=document.getElementById("gs-url").value.trim();if(!url)return;localStorage.setItem("gs_url",url);setGsStatus("loading","Menyinkronkan...");const r=await gsReq(url,"POST",{action:"sync",data:bookings.map(b=>({...b,tanggal:fmtISO(currentDate),therapistName:getTh(b.therapist).nama}))});if(r.error)setGsStatus("error","❌ "+r.error);else{const t=new Date().toLocaleString("id-ID");setGsStatus("success","✅ "+(r.message||"Berhasil"));localStorage.setItem("gs_last",t);document.getElementById("gs-last").textContent="🕐 Terakhir: "+t}}
 </script>
 </body>
 </html>
