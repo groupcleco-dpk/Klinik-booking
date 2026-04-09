@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Booking Klinik Terapi</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; min-height: 100vh; }
+  :root {
+    --blue: #2563eb; --blue-l: #dbeafe;
+    --green: #16a34a; --green-l: #dcfce7;
+    --red: #dc2626; --red-l: #fee2e2;
+    --orange: #d97706; --orange-l: #fef3c7;
+    --navy: #1e3a5f;
+  }
+  input, select, textarea, button { font-family: inherit; }
+  button { cursor: pointer; border: none; outline: none; }
+
+  /* HEADER */
+  .header { background: linear-gradient(135deg, var(--navy), var(--blue)); padding: 14px 16px 12px; position: sticky; top: 0; z-index: 100; }
+  .header-top { display: flex; justify-content: space-between; align-items: center; }
+  .header-title { font-size: 1rem; font-weight: 900; color: #fff; }
+  .header-sub { font-size: 0.6rem; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 2px; }
+  .header-actions { display: flex; gap: 6px; align-items: center; }
+  .btn-header { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 9px; padding: 6px 10px; color: #fff; font-weight: 700; font-size: 0.68rem; display: flex; align-items: center; gap: 4px; }
+  .date-nav { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+  .date-nav-btn { background: rgba(255,255,255,0.2); border: none; color: #fff; border-radius: 8px; padding: 5px 14px; font-weight: 700; font-size: 1rem; }
+  .date-label { flex: 1; text-align: center; color: #fff; font-weight: 700; font-size: 0.8rem; }
+
+  /* STATS */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px 14px 8px; }
+  .stat-card { background: #fff; border-radius: 14px; padding: 11px 8px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+  .stat-icon { font-size: 1.3rem; margin-bottom: 3px; }
+  .stat-val { font-size: 1.5rem; font-weight: 900; line-height: 1; }
+  .stat-lbl { font-size: 0.58rem; color: #94a3b8; margin-top: 3px; font-weight: 600; line-height: 1.3; }
+
+  /* TABS */
+  .tabs { display: flex; gap: 8px; padding: 4px 14px 8px; }
+  .tab-btn { flex: 1; padding: 9px 4px; border-radius: 10px; font-weight: 700; font-size: 0.72rem; background: #fff; color: #64748b; transition: all 0.15s; }
+  .tab-btn.active { background: var(--blue); color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
+
+  /* GRID */
+  .grid-wrap { margin: 0 14px; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 90px; }
+  .grid-header-bar { padding: 10px 14px 8px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+  .grid-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  table { border-collapse: collapse; min-width: 600px; width: 100%; }
+  .th-time { background: var(--navy); color: #fff; font-weight: 800; font-size: 0.72rem; padding: 10px 8px; text-align: center; min-width: 80px; position: sticky; left: 0; z-index: 20; }
+  .th-room { background: var(--navy); color: #fff; font-weight: 800; font-size: 0.72rem; padding: 10px 8px; text-align: center; min-width: 95px; }
+  .td-time { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; border-right: 2px solid #bfdbfe; text-align: center; font-weight: 800; font-size: 0.72rem; color: var(--navy); position: sticky; left: 0; z-index: 10; white-space: nowrap; }
+  .td-room { padding: 3px; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; cursor: pointer; height: 48px; vertical-align: top; min-width: 95px; transition: opacity 0.1s; }
+  .td-room:hover { opacity: 0.85; }
+  .td-room.empty:hover { background: #f0f9ff !important; }
+  .bk-card { padding: 3px 5px; height: 100%; }
+  .bk-name { font-size: 0.65rem; font-weight: 800; color: #fff; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bk-sub  { font-size: 0.58rem; color: rgba(255,255,255,0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bk-badge { font-size: 0.5rem; background: rgba(255,255,255,0.25); border-radius: 2px; padding: 1px 3px; display: inline-block; color: #fff; margin-top: 1px; }
+
+  /* LIST VIEW */
+  .list-wrap { padding: 0 14px; margin-bottom: 90px; }
+  .list-item { background: #fff; border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; cursor: pointer; display: flex; gap: 12px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .list-avatar { width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-size: 0.82rem; flex-shrink: 0; }
+  .list-info { flex: 1; min-width: 0; }
+  .list-name { font-weight: 800; color: #0f172a; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .list-sub { font-size: 0.7rem; color: #64748b; }
+
+  /* REKAP */
+  .rekap-wrap { padding: 0 14px; margin-bottom: 90px; }
+  .rekap-card { background: #fff; border-radius: 14px; padding: 16px; margin-bottom: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+  .rekap-title { font-weight: 800; font-size: 0.88rem; color: #0f172a; margin-bottom: 12px; }
+  .rekap-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .rekap-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .rekap-bar-bg { width: 80px; height: 8px; background: #f1f5f9; border-radius: 4px; flex-shrink: 0; }
+  .rekap-bar { height: 100%; border-radius: 4px; transition: width 0.3s; }
+
+  /* FILTER */
+  .filter-bar { padding: 0 14px 8px; }
+  .filter-row { display: flex; gap: 8px; align-items: center; }
+  .search-wrap { flex: 1; position: relative; }
+  .search-wrap span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 0.85rem; pointer-events: none; }
+  .search-input { width: 100%; padding: 10px 12px 10px 36px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 0.82rem; background: #f8fafc; outline: none; }
+  .filter-panel { margin-top: 10px; background: #fff; border-radius: 12px; padding: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.08); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* MODAL OVERLAY */
+  .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 300; display: flex; align-items: flex-end; justify-content: center; }
+  .sheet { background: #fff; border-radius: 24px 24px 0 0; width: 100%; max-width: 540px; max-height: 92vh; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 -8px 40px rgba(0,0,0,0.3); }
+  .sheet-handle { display: flex; justify-content: center; padding: 10px 0 0; }
+  .handle-bar { width: 40px; height: 4px; border-radius: 2px; background: #e2e8f0; }
+  .sheet-header { padding: 10px 20px 12px; display: flex; justify-content: space-between; align-items: center; }
+  .sheet-title-sub { font-size: 0.62rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+  .sheet-title { font-size: 1.05rem; font-weight: 800; color: #0f172a; }
+  .close-btn { width: 34px; height: 34px; border-radius: 50%; background: #f1f5f9; color: #64748b; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+  .sheet-tabs { display: flex; padding: 0 20px 12px; gap: 8px; }
+  .sheet-tab { flex: 1; padding: 8px 4px; border-radius: 10px; font-weight: 700; font-size: 0.72rem; background: #f1f5f9; color: #64748b; }
+  .sheet-tab.active { background: var(--blue); color: #fff; }
+  .sheet-body { flex: 1; overflow-y: auto; padding: 0 20px 12px; }
+  .sheet-footer { padding: 10px 20px 20px; border-top: 1px solid #f1f5f9; display: flex; gap: 10px; }
+
+  /* FORM */
+  .form-field { margin-bottom: 14px; }
+  .form-label { display: block; font-size: 0.7rem; font-weight: 700; color: #374151; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .form-input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 0.88rem; color: #0f172a; background: #f8fafc; outline: none; }
+  .form-input:focus { border-color: var(--blue); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .pick-btn { padding: 10px 8px; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; color: #64748b; font-weight: 700; font-size: 0.78rem; text-align: left; width: 100%; }
+  .pick-btn.selected { border-color: var(--blue); background: var(--blue-l); color: var(--blue); }
+  .pick-id { font-size: 0.6rem; opacity: 0.7; margin-bottom: 1px; }
+  .room-btn { padding: 12px 8px; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; color: #64748b; font-weight: 700; font-size: 0.85rem; width: 100%; }
+  .room-btn.selected { border-color: var(--blue); background: var(--blue-l); color: var(--blue); }
+  .pay-btn { flex: 1; padding: 11px 6px; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; color: #64748b; font-weight: 700; font-size: 0.72rem; }
+  .method-btn { padding: 11px 14px; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; color: #374151; font-weight: 600; font-size: 0.85rem; text-align: left; width: 100%; display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .method-btn.selected { border-color: var(--blue); background: var(--blue-l); color: var(--blue); }
+  .summary-box { background: #f8fafc; border-radius: 12px; padding: 14px; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 5px; }
+
+  /* BUTTONS */
+  .btn-primary { background: var(--blue); color: #fff; border-radius: 10px; padding: 12px 16px; font-weight: 700; font-size: 0.82rem; }
+  .btn-success { background: var(--green); color: #fff; border-radius: 10px; padding: 12px 16px; font-weight: 700; font-size: 0.82rem; }
+  .btn-danger  { background: var(--red-l); color: var(--red); border: 2px solid var(--red-l); border-radius: 10px; padding: 12px 16px; font-weight: 700; font-size: 0.82rem; }
+  .btn-ghost   { background: #fff; color: #64748b; border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; font-weight: 700; font-size: 0.82rem; }
+  .btn-sheets  { background: var(--green); color: #fff; border-radius: 10px; padding: 12px 16px; font-weight: 700; font-size: 0.82rem; flex: 2; }
+
+  /* DETAIL */
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .detail-box { background: #f8fafc; border-radius: 10px; padding: 10px 12px; }
+  .detail-lbl { font-size: 0.65rem; color: #94a3b8; margin-bottom: 2px; }
+  .detail-val { font-size: 0.88rem; font-weight: 700; color: #0f172a; }
+  .therapist-box { border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .th-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 800; font-size: 0.82rem; }
+  .confirm-box { background: var(--red-l); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+  .confirm-text { font-size: 0.82rem; font-weight: 700; color: var(--red); margin-bottom: 10px; }
+
+  /* STATUS BADGE */
+  .badge { font-weight: 700; font-size: 0.72rem; padding: 4px 12px; border-radius: 20px; }
+
+  /* SHEETS MODAL */
+  .step-list { display: flex; flex-direction: column; gap: 6px; }
+  .step-item { display: flex; gap: 8px; align-items: flex-start; font-size: 0.72rem; color: #374151; }
+  .step-num { background: var(--blue); color: #fff; border-radius: 50%; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-weight: 800; flex-shrink: 0; font-size: 0.62rem; margin-top: 1px; }
+  .status-msg { margin: 12px 0; padding: 10px 14px; border-radius: 10px; font-size: 0.78rem; font-weight: 600; }
+  .status-loading { background: #f1f5f9; color: #64748b; }
+  .status-success { background: var(--green-l); color: var(--green); }
+  .status-error   { background: var(--red-l); color: var(--red); }
+
+  /* FAB */
+  .fab { position: fixed; bottom: 24px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), #1d4ed8); color: #fff; font-size: 1.5rem; box-shadow: 0 6px 24px rgba(37,99,235,0.5); display: flex; align-items: center; justify-content: center; z-index: 150; }
+
+  /* HIDDEN */
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-sub">Admin Panel</div>
+      <div class="header-title">🏥 Booking Klinik</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-header" onclick="openSheets()">
+        📊 Sheets <span id="sync-dot" class="hidden" style="width:7px;height:7px;border-radius:50%;background:#4ade80;display:inline-block"></span>
+      </button>
+      <button class="btn-header" onclick="openExport()">📤 Export</button>
+    </div>
+  </div>
+  <div class="date-nav">
+    <button class="date-nav-btn" onclick="changeDate(-1)">‹</button>
+    <div class="date-label" id="date-label"></div>
+    <button class="date-nav-btn" onclick="changeDate(1)">›</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="stats">
+  <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-val" id="stat-total" style="color:var(--blue)">0</div><div class="stat-lbl">Total Booking</div></div>
+  <div class="stat-card"><div class="stat-icon">🚪</div><div class="stat-val" id="stat-room" style="color:var(--orange)">0/6</div><div class="stat-lbl">Room Terpakai</div></div>
+  <div class="stat-card"><div class="stat-icon">👨‍⚕️</div><div class="stat-val" id="stat-th" style="color:var(--green)">0/6</div><div class="stat-lbl">Terapis Aktif</div></div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('jadwal',this)">📋 Jadwal</button>
+  <button class="tab-btn" onclick="switchTab('daftar',this)">📃 Daftar</button>
+  <button class="tab-btn" onclick="switchTab('rekap',this)">📊 Rekap</button>
+</div>
+
+<!-- TAB: JADWAL -->
+<div id="tab-jadwal">
+  <div class="grid-wrap">
+    <div class="grid-header-bar">
+      <span style="font-weight:800;color:#0f172a;font-size:0.88rem">📋 Jadwal Harian</span>
+      <span style="font-size:0.65rem;color:#94a3b8">Geser → semua room</span>
+    </div>
+    <div class="grid-scroll">
+      <table id="schedule-table"><thead></thead><tbody></tbody></table>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: DAFTAR -->
+<div id="tab-daftar" class="hidden">
+  <div class="filter-bar">
+    <div class="filter-row">
+      <div class="search-wrap"><span>🔍</span><input class="search-input" id="search-input" placeholder="Cari nama pasien..." oninput="renderList()"></div>
+      <button style="padding:10px 14px;border-radius:10px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:0.75rem;" onclick="toggleFilter()">🎯 Filter</button>
+    </div>
+    <div class="filter-panel hidden" id="filter-panel">
+      <div><label class="form-label">Ruangan</label><select class="form-input" id="f-room" onchange="renderList()" style="padding:8px 10px;font-size:0.78rem"><option value="">Semua</option></select></div>
+      <div><label class="form-label">Terapis</label><select class="form-input" id="f-therapist" onchange="renderList()" style="padding:8px 10px;font-size:0.78rem"><option value="">Semua</option></select></div>
+      <div><label class="form-label">Status Bayar</label><select class="form-input" id="f-pay" onchange="renderList()" style="padding:8px 10px;font-size:0.78rem"><option value="">Semua</option><option>Belum Bayar</option><option>DP</option><option>Lunas</option></select></div>
+      <div style="display:flex;align-items:flex-end"><button onclick="resetFilter()" style="width:100%;padding:9px 8px;border-radius:10px;border:2px solid var(--red);background:#fff;color:var(--red);font-weight:700;font-size:0.75rem">🗑 Reset</button></div>
+    </div>
+  </div>
+  <div class="list-wrap" id="list-container"></div>
+</div>
+
+<!-- TAB: REKAP -->
+<div id="tab-rekap" class="hidden">
+  <div class="rekap-wrap">
+    <div class="rekap-card">
+      <div class="rekap-title">💳 Status Pembayaran</div>
+      <div id="rekap-pay"></div>
+    </div>
+    <div class="rekap-card">
+      <div class="rekap-title">🚪 Kepadatan Room</div>
+      <div id="rekap-room"></div>
+    </div>
+    <div class="rekap-card">
+      <div class="rekap-title">👥 Sesi per Terapis</div>
+      <div id="rekap-terapis"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openAdd()">+</button>
+
+<!-- ══════════════════════════════════════════════════════ -->
+<!-- MODAL: BOOKING FORM -->
+<div class="overlay hidden" id="modal-form" onclick="closeIfOverlay(event,'modal-form')">
+  <div class="sheet">
+    <div class="sheet-handle"><div class="handle-bar"></div></div>
+    <div class="sheet-header">
+      <div><div class="sheet-title-sub">Formulir</div><div class="sheet-title" id="form-title">Booking Baru</div></div>
+      <button class="close-btn" onclick="closeModal('modal-form')">✕</button>
+    </div>
+    <div class="sheet-tabs">
+      <button class="sheet-tab active" id="ftab-0" onclick="switchFormTab(0)">👤 Pasien</button>
+      <button class="sheet-tab" id="ftab-1" onclick="switchFormTab(1)">📅 Jadwal</button>
+      <button class="sheet-tab" id="ftab-2" onclick="switchFormTab(2)">💳 Bayar</button>
+    </div>
+    <div class="sheet-body">
+      <!-- TAB 0: PASIEN -->
+      <div id="fpanel-0">
+        <div class="form-field"><label class="form-label">👤 Nama Pasien</label><input class="form-input" id="f-patient" placeholder="Nama lengkap pasien..."></div>
+        <div class="form-field"><label class="form-label">📱 No. HP / WhatsApp</label><input class="form-input" id="f-phone" placeholder="08xxxxxxxxxx" type="tel"></div>
+        <div class="form-field"><label class="form-label">💆 Jenis Layanan</label>
+          <select class="form-input" id="f-service">
+            <option value="">-- Pilih Layanan --</option>
+            <option>Bali</option><option>Totok</option><option>Aroma</option>
+            <option>Pengobatan</option><option>Fisioterapi</option><option>Wicara</option>
+            <option>Okupasi</option><option>Refleksi</option><option>Akupunktur</option>
+          </select>
+        </div>
+        <div class="form-field"><label class="form-label">📝 Catatan</label><textarea class="form-input" id="f-catatan" rows="3" placeholder="Catatan tambahan..." style="resize:none;line-height:1.5"></textarea></div>
+      </div>
+      <!-- TAB 1: JADWAL -->
+      <div id="fpanel-1" class="hidden">
+        <div class="form-field"><label class="form-label">📆 Tanggal</label><input class="form-input" id="f-date" type="date"></div>
+        <div class="form-field"><label class="form-label">🕐 Jam Mulai</label>
+          <select class="form-input" id="f-start"></select>
+        </div>
+        <div class="form-field"><label class="form-label">👨‍⚕️ Terapis</label><div class="grid-2" id="f-therapist-grid"></div></div>
+        <div class="form-field"><label class="form-label">🚪 Ruangan</label><div class="grid-3" id="f-room-grid"></div></div>
+      </div>
+      <!-- TAB 2: BAYAR -->
+      <div id="fpanel-2" class="hidden">
+        <div class="form-field"><label class="form-label">💳 Metode Pembayaran</label><div id="f-method-list"></div></div>
+        <div class="form-field"><label class="form-label">📊 Status Pembayaran</label><div style="display:flex;gap:8px" id="f-paystatus-list"></div></div>
+        <div class="summary-box">
+          <div style="font-size:0.68rem;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Ringkasan</div>
+          <div id="f-summary"></div>
+        </div>
+      </div>
+    </div>
+    <div class="sheet-footer" id="form-footer"></div>
+  </div>
+</div>
+
+<!-- MODAL: DETAIL -->
+<div class="overlay hidden" id="modal-detail" onclick="closeIfOverlay(event,'modal-detail')">
+  <div class="sheet" style="max-height:80vh">
+    <div style="height:5px;border-radius:24px 24px 0 0" id="detail-bar"></div>
+    <div style="padding:16px 20px 20px;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div>
+          <div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase;letter-spacing:1px">Detail Booking</div>
+          <div style="font-size:1.15rem;font-weight:800;color:#0f172a" id="det-name"></div>
+          <div style="font-size:0.75rem;color:#94a3b8" id="det-sub"></div>
+        </div>
+        <span class="badge" id="det-badge"></span>
+      </div>
+      <div class="detail-grid">
+        <div class="detail-box"><div class="detail-lbl">💆 Layanan</div><div class="detail-val" id="det-service"></div></div>
+        <div class="detail-box"><div class="detail-lbl">🚪 Ruangan</div><div class="detail-val" id="det-room"></div></div>
+        <div class="detail-box"><div class="detail-lbl">🕐 Waktu</div><div class="detail-val" id="det-time"></div></div>
+        <div class="detail-box"><div class="detail-lbl">💳 Metode</div><div class="detail-val" id="det-method"></div></div>
+      </div>
+      <div class="therapist-box" id="det-th-box">
+        <div class="th-avatar" id="det-th-avatar"></div>
+        <div><div style="font-size:0.62rem;color:#94a3b8">Terapis</div><div style="font-weight:700;color:#0f172a;font-size:0.9rem" id="det-th-name"></div></div>
+      </div>
+      <div id="det-catatan"></div>
+      <div id="det-confirm" class="hidden">
+        <div class="confirm-box">
+          <div class="confirm-text">⚠️ Yakin hapus booking ini?</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-ghost" onclick="document.getElementById('det-confirm').classList.add('hidden')">Batal</button>
+            <button class="btn-danger" style="flex:1" onclick="confirmDelete()">Ya, Hapus</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px" id="det-actions">
+        <button class="btn-ghost" onclick="closeModal('modal-detail')">Tutup</button>
+        <button class="btn-primary" style="flex:1" onclick="editCurrent()">✏️ Edit</button>
+        <button class="btn-danger" onclick="document.getElementById('det-confirm').classList.remove('hidden')">🗑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: GOOGLE SHEETS -->
+<div class="overlay hidden" id="modal-sheets" onclick="closeIfOverlay(event,'modal-sheets')">
+  <div class="sheet">
+    <div class="sheet-handle"><div class="handle-bar"></div></div>
+    <div class="sheet-header">
+      <div><div class="sheet-title-sub">Integrasi</div><div class="sheet-title">📊 Google Sheets Sync</div></div>
+      <button class="close-btn" onclick="closeModal('modal-sheets')">✕</button>
+    </div>
+    <div class="sheet-body">
+      <div style="background:#f0f7ff;border-radius:12px;padding:14px;margin-bottom:16px">
+        <div style="font-size:0.72rem;font-weight:800;color:var(--blue);margin-bottom:8px">📋 Cara Setup:</div>
+        <div class="step-list">
+          <div class="step-item"><span class="step-num">1</span>Buka Google Sheets baru → Extensions → Apps Script</div>
+          <div class="step-item"><span class="step-num">2</span>Hapus kode lama, paste isi file <b>google-apps-script.js</b>, Save</div>
+          <div class="step-item"><span class="step-num">3</span>Deploy → New Deployment → Web App → Execute as: Me, Access: Anyone</div>
+          <div class="step-item"><span class="step-num">4</span>Izinkan akses → Copy URL → paste di bawah</div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">🔗 URL Google Apps Script</label>
+        <input class="form-input" id="gs-url" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:0.72rem">
+        <div id="gs-last-sync" style="font-size:0.68rem;color:#94a3b8;margin-top:5px"></div>
+      </div>
+      <div id="gs-status"></div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn-ghost" style="font-size:0.75rem" onclick="testConnection()">🔌 Test Koneksi</button>
+        <button class="btn-sheets" onclick="syncToSheets()">🔄 Sync <span id="sync-count"></span> Booking</button>
+      </div>
+      <div style="margin-top:14px;font-size:0.68rem;color:#94a3b8;line-height:1.6">
+        💡 Data akan muncul di 3 sheet Google: <b>Booking · Rekap Harian · Log Aktivitas</b><br>
+        Jika Test Koneksi gagal, pastikan di Apps Script: Who has access = <b>Anyone</b>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: EXPORT -->
+<div class="overlay hidden" id="modal-export" onclick="closeIfOverlay(event,'modal-export')">
+  <div class="sheet" style="max-height:50vh">
+    <div class="sheet-handle"><div class="handle-bar"></div></div>
+    <div style="padding:16px 20px 24px">
+      <div style="font-weight:800;font-size:1rem;color:#0f172a;margin-bottom:16px">📤 Export Data</div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-success" style="flex:1;font-size:0.9rem;padding:14px" onclick="doExcel()">📊 Download Excel</button>
+        <button class="btn-danger"  style="flex:1;font-size:0.9rem;padding:14px;background:var(--red);color:#fff" onclick="doPDF()">📄 Cetak PDF</button>
+      </div>
+      <div style="margin-top:12px;font-size:0.68rem;color:#94a3b8;text-align:center" id="export-info"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const ROOMS = ["R-01","R-02","R-03","R-04","R-05","R-06"];
+const THERAPISTS = [
+  { id:"T-01", name:"Febri",    bg:"#2563eb" },
+  { id:"T-02", name:"Aiman",    bg:"#16a34a" },
+  { id:"T-03", name:"Teh Dini", bg:"#9333ea" },
+  { id:"T-04", name:"Rere",     bg:"#ea580c" },
+  { id:"T-05", name:"Pak Yudi", bg:"#0891b2" },
+  { id:"T-06", name:"Dine",     bg:"#be185d" },
+];
+const TIME_SLOTS = [];
+for(let h=8;h<21;h++) TIME_SLOTS.push(String(h).padStart(2,"0")+":00");
+
+const DAYS    = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+const MONTHS  = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agt","Sep","Okt","Nov","Des"];
+const METHODS = ["💵 Tunai","🏦 Transfer Bank","📱 QRIS","💳 Kartu Debit","💳 Kartu Kredit"];
+const PAY_ST  = ["Belum Bayar","DP","Lunas"];
+const PAY_CLR = { "Belum Bayar":["#dc2626","#fee2e2"], "DP":["#d97706","#fef3c7"], "Lunas":["#16a34a","#dcfce7"] };
+
+let currentDate = new Date(2026,3,9);
+let bookings = JSON.parse(localStorage.getItem("klinik_bookings")||"null") || [
+  {id:"BK-001",patient:"Budi Santoso",phone:"081234567890",therapist:"T-01",room:"R-01",start:"10:00",end:"11:00",service:"Bali",method:"Tunai",payStatus:"Lunas",catatan:""},
+  {id:"BK-002",patient:"Kone Saman",phone:"082345678901",therapist:"T-02",room:"R-03",start:"11:00",end:"12:00",service:"Wicara",method:"Tunai",payStatus:"Lunas",catatan:""},
+  {id:"BK-003",patient:"Suwi Tapav",phone:"084567890123",therapist:"T-04",room:"R-05",start:"10:00",end:"11:00",service:"Fisioterapi",method:"QRIS",payStatus:"Belum Bayar",catatan:""},
+  {id:"BK-004",patient:"Koma Senan",phone:"085678901234",therapist:"T-01",room:"R-03",start:"14:00",end:"15:00",service:"Aroma",method:"Tunai",payStatus:"Lunas",catatan:""},
+  {id:"BK-005",patient:"Rema Senan",phone:"087890123456",therapist:"T-03",room:"R-05",start:"14:00",end:"15:00",service:"Wicara",method:"Tunai",payStatus:"DP",catatan:""},
+];
+let currentBk = null;
+let formTab   = 0;
+let formMode  = "add"; // add | edit
+let formSel   = { therapist:"T-01", room:"R-01", method:"Tunai", payStatus:"Belum Bayar" };
+
+// ─── SAVE ─────────────────────────────────────────────────────────────────────
+function save() { localStorage.setItem("klinik_bookings", JSON.stringify(bookings)); renderAll(); }
+function genId() { return "BK-" + Date.now().toString(36).toUpperCase(); }
+function getTh(id) { return THERAPISTS.find(t=>t.id===id)||THERAPISTS[0]; }
+function fmtDate(d) { return `${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; }
+function fmtISO(d)  { return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`; }
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.onload = function() {
+  // Date input default
+  document.getElementById("f-date").value = fmtISO(currentDate);
+
+  // Time slots
+  const sel = document.getElementById("f-start");
+  TIME_SLOTS.forEach(t => { const o=document.createElement("option"); o.value=o.text=t; sel.appendChild(o); });
+
+  // Therapist grid
+  const thGrid = document.getElementById("f-therapist-grid");
+  THERAPISTS.forEach(t => {
+    const b = document.createElement("button");
+    b.className = "pick-btn" + (t.id==="T-01"?" selected":"");
+    b.id = "th-btn-"+t.id;
+    b.innerHTML = `<div class="pick-id">${t.id}</div>${t.name}`;
+    b.onclick = () => selTherapist(t.id);
+    thGrid.appendChild(b);
+  });
+
+  // Room grid
+  const rGrid = document.getElementById("f-room-grid");
+  ROOMS.forEach(r => {
+    const b = document.createElement("button");
+    b.className = "room-btn" + (r==="R-01"?" selected":"");
+    b.id = "r-btn-"+r;
+    b.textContent = r;
+    b.onclick = () => selRoom(r);
+    rGrid.appendChild(b);
+  });
+
+  // Method list
+  const mList = document.getElementById("f-method-list");
+  METHODS.forEach(m => {
+    const clean = m.replace(/^[^\s]+ /,"");
+    const b = document.createElement("button");
+    b.className = "method-btn" + (clean==="Tunai"?" selected":"");
+    b.id = "m-btn-"+clean;
+    b.innerHTML = `${m.split(" ")[0]} <span>${clean}</span>${clean==="Tunai"?'<span style="margin-left:auto">✓</span>':""}`;
+    b.onclick = () => selMethod(clean);
+    mList.appendChild(b);
+  });
+
+  // Pay status
+  const pList = document.getElementById("f-paystatus-list");
+  PAY_ST.forEach(s => {
+    const [c,bg] = PAY_CLR[s];
+    const b = document.createElement("button");
+    b.className = "pay-btn" + (s==="Belum Bayar"?" selected":"");
+    b.id = "pay-btn-"+s;
+    b.style.cssText = s==="Belum Bayar"?`border-color:${c};background:${bg};color:${c}`:"";
+    b.textContent = s;
+    b.onclick = () => selPayStatus(s);
+    pList.appendChild(b);
+  });
+
+  // Filter dropdowns
+  const fRoom = document.getElementById("f-room");
+  ROOMS.forEach(r => { const o=document.createElement("option"); o.value=o.text=r; fRoom.appendChild(o); });
+  const fTh = document.getElementById("f-therapist");
+  THERAPISTS.forEach(t => { const o=document.createElement("option"); o.value=t.id; o.text=t.name; fTh.appendChild(o); });
+
+  // GS URL
+  const saved = localStorage.getItem("gs_url");
+  if(saved) document.getElementById("gs-url").value = saved;
+  const ls = localStorage.getItem("gs_last");
+  if(ls) document.getElementById("gs-last-sync").textContent = "🕐 Terakhir sync: "+ls;
+  if(saved) document.getElementById("sync-dot").classList.remove("hidden");
+
+  renderAll();
+};
+
+// ─── RENDER ALL ───────────────────────────────────────────────────────────────
+function renderAll() {
+  renderStats();
+  renderGrid();
+  renderList();
+  renderRekap();
+  document.getElementById("sync-count").textContent = bookings.length;
+  document.getElementById("export-info").textContent = `Total ${bookings.length} booking · ${fmtDate(currentDate)}`;
+}
+
+function renderStats() {
+  document.getElementById("date-label").textContent = fmtDate(currentDate);
+  document.getElementById("stat-total").textContent = bookings.length;
+  document.getElementById("stat-room").textContent  = new Set(bookings.map(b=>b.room)).size + "/6";
+  document.getElementById("stat-th").textContent    = new Set(bookings.map(b=>b.therapist)).size + "/6";
+}
+
+function renderGrid() {
+  const thead = document.querySelector("#schedule-table thead");
+  const tbody = document.querySelector("#schedule-table tbody");
+  const bkMap = {};
+  bookings.forEach(b => { bkMap[b.room+"|"+b.start] = b; });
+
+  thead.innerHTML = `<tr><th class="th-time">Waktu</th>${ROOMS.map(r=>`<th class="th-room">${r}</th>`).join("")}</tr>`;
+
+  tbody.innerHTML = TIME_SLOTS.map((ts,ti) => {
+    const bg = ti%2===0?"#f0f7ff":"#e8f4fd";
+    const cells = ROOMS.map(room => {
+      const bk = bkMap[room+"|"+ts];
+      if(bk) {
+        const th = getTh(bk.therapist);
+        return `<td class="td-room" style="background:${th.bg}" onclick="openDetail('${bk.id}')">
+          <div class="bk-card"><div class="bk-name">${bk.patient}</div><div class="bk-sub">${bk.service||th.name}</div><div class="bk-badge">${bk.payStatus}</div></div></td>`;
+      }
+      return `<td class="td-room empty" style="background:${ti%2===0?"#fff":"#fafafa"}" onclick="openAddSlot('${room}','${ts}')"></td>`;
+    }).join("");
+    return `<tr><td class="td-time" style="background:${bg}">${ts}</td>${cells}</tr>`;
+  }).join("");
+}
+
+function renderList() {
+  const search = (document.getElementById("search-input")||{value:""}).value.toLowerCase();
+  const fRoom  = document.getElementById("f-room")?.value||"";
+  const fTh    = document.getElementById("f-therapist")?.value||"";
+  const fPay   = document.getElementById("f-pay")?.value||"";
+
+  const filtered = bookings.filter(b =>
+    (!search || b.patient.toLowerCase().includes(search)) &&
+    (!fRoom  || b.room===fRoom) &&
+    (!fTh    || b.therapist===fTh) &&
+    (!fPay   || b.payStatus===fPay)
+  );
+
+  const container = document.getElementById("list-container");
+  if(!container) return;
+
+  if(!filtered.length) {
+    container.innerHTML = `<div style="text-align:center;padding:40px 20px;color:#94a3b8"><div style="font-size:2rem;margin-bottom:8px">📭</div><div style="font-weight:700">Tidak ada booking ditemukan</div></div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(b => {
+    const th = getTh(b.therapist);
+    const [c,bg] = PAY_CLR[b.payStatus];
+    return `<div class="list-item" onclick="openDetail('${b.id}')">
+      <div class="list-avatar" style="background:${th.bg}">${b.patient.slice(0,2).toUpperCase()}</div>
+      <div class="list-info"><div class="list-name">${b.patient}</div><div class="list-sub">${b.service||"-"} · ${b.room} · ${b.start}</div></div>
+      <span class="badge" style="background:${bg};color:${c}">${b.payStatus}</span>
+    </div>`;
+  }).join("");
+}
+
+function renderRekap() {
+  const total = bookings.length||1;
+
+  document.getElementById("rekap-pay").innerHTML = PAY_ST.map(s => {
+    const count = bookings.filter(b=>b.payStatus===s).length;
+    const [c] = PAY_CLR[s];
+    return `<div class="rekap-row"><div class="rekap-dot" style="background:${c}"></div><div style="flex:1;font-size:0.82rem;color:#374151">${s}</div><div style="font-weight:800;color:${c};font-size:0.9rem">${count}</div><div class="rekap-bar-bg"><div class="rekap-bar" style="width:${count/total*100}%;background:${c}"></div></div></div>`;
+  }).join("");
+
+  document.getElementById("rekap-room").innerHTML = ROOMS.map(r => {
+    const count = bookings.filter(b=>b.room===r).length;
+    return `<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:0.78rem;color:#374151;margin-bottom:4px"><span style="font-weight:700">${r}</span><span style="color:#64748b">${count} sesi</span></div><div style="height:8px;background:#f1f5f9;border-radius:4px"><div style="width:${Math.min(count/TIME_SLOTS.length*100,100)}%;height:100%;border-radius:4px;background:var(--blue);transition:width 0.3s"></div></div></div>`;
+  }).join("");
+
+  document.getElementById("rekap-terapis").innerHTML = THERAPISTS.map(t => {
+    const count = bookings.filter(b=>b.therapist===t.id).length;
+    return `<div class="rekap-row"><div class="rekap-dot" style="background:${t.bg};border-radius:3px"></div><div style="flex:1;font-size:0.82rem;color:#374151;font-weight:600">${t.name}</div><div style="font-weight:800;color:${t.bg};font-size:0.9rem">${count}</div><div class="rekap-bar-bg"><div class="rekap-bar" style="width:${count/total*100}%;background:${t.bg}"></div></div></div>`;
+  }).join("");
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(name, btn) {
+  ["jadwal","daftar","rekap"].forEach(t => {
+    document.getElementById("tab-"+t).classList.add("hidden");
+  });
+  document.getElementById("tab-"+name).classList.remove("hidden");
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+function toggleFilter() {
+  document.getElementById("filter-panel").classList.toggle("hidden");
+}
+function resetFilter() {
+  document.getElementById("search-input").value="";
+  document.getElementById("f-room").value="";
+  document.getElementById("f-therapist").value="";
+  document.getElementById("f-pay").value="";
+  document.getElementById("filter-panel").classList.add("hidden");
+  renderList();
+}
+
+// ─── DATE ─────────────────────────────────────────────────────────────────────
+function changeDate(n) {
+  currentDate = new Date(currentDate);
+  currentDate.setDate(currentDate.getDate()+n);
+  document.getElementById("f-date").value = fmtISO(currentDate);
+  renderAll();
+}
+
+// ─── MODAL HELPERS ────────────────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.remove("hidden"); }
+function closeModal(id) { document.getElementById(id).classList.add("hidden"); }
+function closeIfOverlay(e, id) { if(e.target===e.currentTarget) closeModal(id); }
+
+// ─── FORM ─────────────────────────────────────────────────────────────────────
+function openAdd() {
+  formMode = "add"; currentBk = null;
+  resetForm();
+  document.getElementById("form-title").textContent = "➕ Booking Baru";
+  switchFormTab(0);
+  openModal("modal-form");
+}
+function openAddSlot(room, start) {
+  openAdd();
+  selRoom(room);
+  document.getElementById("f-start").value = start;
+}
+function resetForm() {
+  document.getElementById("f-patient").value = "";
+  document.getElementById("f-phone").value = "";
+  document.getElementById("f-service").value = "";
+  document.getElementById("f-catatan").value = "";
+  document.getElementById("f-date").value = fmtISO(currentDate);
+  document.getElementById("f-start").value = "09:00";
+  formSel = { therapist:"T-01", room:"R-01", method:"Tunai", payStatus:"Belum Bayar" };
+  selTherapist("T-01"); selRoom("R-01"); selMethod("Tunai"); selPayStatus("Belum Bayar");
+}
+function fillForm(bk) {
+  document.getElementById("f-patient").value = bk.patient||"";
+  document.getElementById("f-phone").value   = bk.phone||"";
+  document.getElementById("f-service").value = bk.service||"";
+  document.getElementById("f-catatan").value = bk.catatan||"";
+  document.getElementById("f-date").value    = bk.date||fmtISO(currentDate);
+  document.getElementById("f-start").value   = bk.start||"09:00";
+  formSel = { therapist:bk.therapist||"T-01", room:bk.room||"R-01", method:bk.method||"Tunai", payStatus:bk.payStatus||"Belum Bayar" };
+  selTherapist(formSel.therapist); selRoom(formSel.room); selMethod(formSel.method); selPayStatus(formSel.payStatus);
+}
+
+function switchFormTab(n) {
+  formTab = n;
+  [0,1,2].forEach(i => {
+    document.getElementById("fpanel-"+i).classList.toggle("hidden", i!==n);
+    document.getElementById("ftab-"+i).classList.toggle("active", i===n);
+  });
+  if(n===2) updateSummary();
+  renderFormFooter();
+}
+function renderFormFooter() {
+  const footer = document.getElementById("form-footer");
+  const back = formTab>0 ? `<button class="btn-ghost" onclick="switchFormTab(${formTab-1})">← Kembali</button>` : "";
+  const next = formTab<2
+    ? `<button class="btn-primary" style="flex:2" onclick="switchFormTab(${formTab+1})">Lanjut →</button>`
+    : `<button class="btn-success" style="flex:2" onclick="submitForm()">✓ Simpan</button>`;
+  footer.innerHTML = back + next;
+}
+
+function updateSummary() {
+  const th = getTh(formSel.therapist);
+  document.getElementById("f-summary").innerHTML = [
+    ["Pasien", document.getElementById("f-patient").value||"-"],
+    ["Layanan",document.getElementById("f-service").value||"-"],
+    ["Terapis",th.name],["Ruangan",formSel.room],
+    ["Jam",document.getElementById("f-start").value],
+    ["Metode",formSel.method],
+  ].map(([k,v])=>`<div class="summary-row"><span style="color:#64748b">${k}</span><span style="font-weight:700">${v}</span></div>`).join("");
+}
+
+function submitForm() {
+  const patient = document.getElementById("f-patient").value.trim();
+  if(!patient) { alert("Nama pasien wajib diisi!"); switchFormTab(0); return; }
+  const start = document.getElementById("f-start").value;
+  const endH  = parseInt(start)+1;
+  const end   = String(endH).padStart(2,"0")+":00";
+  const bk = {
+    id: formMode==="edit" ? currentBk.id : genId(),
+    patient, phone: document.getElementById("f-phone").value,
+    service: document.getElementById("f-service").value,
+    catatan: document.getElementById("f-catatan").value,
+    date: document.getElementById("f-date").value,
+    start, end,
+    therapist: formSel.therapist, therapistName: getTh(formSel.therapist).name,
+    room: formSel.room, method: formSel.method, payStatus: formSel.payStatus,
+  };
+  if(formMode==="edit") {
+    bookings = bookings.map(b => b.id===bk.id ? bk : b);
+  } else {
+    bookings.push(bk);
+  }
+  save();
+  closeModal("modal-form");
+  // Auto sync if URL saved
+  const gsUrl = localStorage.getItem("gs_url");
+  if(gsUrl) autoSync(bk, formMode==="edit"?"update":"create");
+}
+
+// ─── FORM SELECTORS ───────────────────────────────────────────────────────────
+function selTherapist(id) {
+  formSel.therapist = id;
+  THERAPISTS.forEach(t => {
+    const b = document.getElementById("th-btn-"+t.id);
+    if(!b) return;
+    b.className = "pick-btn" + (t.id===id?" selected":"");
+  });
+}
+function selRoom(r) {
+  formSel.room = r;
+  ROOMS.forEach(room => {
+    const b = document.getElementById("r-btn-"+room);
+    if(!b) return;
+    b.className = "room-btn" + (room===r?" selected":"");
+  });
+}
+function selMethod(m) {
+  formSel.method = m;
+  METHODS.forEach(method => {
+    const clean = method.replace(/^[^\s]+ /,"");
+    const b = document.getElementById("m-btn-"+clean);
+    if(!b) return;
+    const ico = method.split(" ")[0];
+    b.className = "method-btn" + (clean===m?" selected":"");
+    b.innerHTML = `${ico} <span>${clean}</span>${clean===m?'<span style="margin-left:auto">✓</span>':""}`;
+  });
+}
+function selPayStatus(s) {
+  formSel.payStatus = s;
+  PAY_ST.forEach(ps => {
+    const b = document.getElementById("pay-btn-"+ps);
+    if(!b) return;
+    const [c,bg] = PAY_CLR[ps];
+    b.className = "pay-btn" + (ps===s?" selected":"");
+    b.style.cssText = ps===s ? `border-color:${c};background:${bg};color:${c}` : "";
+  });
+}
+
+// ─── DETAIL ───────────────────────────────────────────────────────────────────
+function openDetail(id) {
+  const bk = bookings.find(b=>b.id===id);
+  if(!bk) return;
+  currentBk = bk;
+  const th = getTh(bk.therapist);
+  const [c,bg] = PAY_CLR[bk.payStatus];
+
+  document.getElementById("detail-bar").style.background = th.bg;
+  document.getElementById("det-name").textContent = bk.patient;
+  document.getElementById("det-sub").textContent  = (bk.phone||"No HP"+" · ID: "+bk.id);
+  document.getElementById("det-badge").style.cssText = `background:${bg};color:${c}`;
+  document.getElementById("det-badge").textContent = bk.payStatus;
+  document.getElementById("det-service").textContent = bk.service||"-";
+  document.getElementById("det-room").textContent    = bk.room;
+  document.getElementById("det-time").textContent    = bk.start+"–"+(bk.end||"?");
+  document.getElementById("det-method").textContent  = bk.method||"-";
+  document.getElementById("det-th-box").style.background = th.bg+"22";
+  document.getElementById("det-th-avatar").style.background = th.bg;
+  document.getElementById("det-th-avatar").textContent = (bk.therapistName||getTh(bk.therapist).name).slice(0,2).toUpperCase();
+  document.getElementById("det-th-name").textContent = (bk.therapistName||getTh(bk.therapist).name)+" · "+bk.therapist;
+  document.getElementById("det-catatan").innerHTML = bk.catatan ? `<div style="background:#fef9c3;border-radius:10px;padding:10px 14px;font-size:0.78rem;color:#713f12;margin-bottom:14px">📝 ${bk.catatan}</div>` : "";
+  document.getElementById("det-confirm").classList.add("hidden");
+  openModal("modal-detail");
+}
+function editCurrent() {
+  closeModal("modal-detail");
+  formMode = "edit";
+  document.getElementById("form-title").textContent = "✏️ Edit Booking";
+  fillForm(currentBk);
+  switchFormTab(0);
+  openModal("modal-form");
+}
+function confirmDelete() {
+  const gsUrl = localStorage.getItem("gs_url");
+  if(gsUrl) autoSync({ id:currentBk.id }, "delete");
+  bookings = bookings.filter(b=>b.id!==currentBk.id);
+  save();
+  closeModal("modal-detail");
+}
+
+// ─── GOOGLE SHEETS ────────────────────────────────────────────────────────────
+async function gsReq(url, method, payload) {
+  try {
+    const opts = method==="GET"
+      ? { method:"GET" }
+      : { method:"POST", body:JSON.stringify(payload) };
+    const res  = await fetch(url, opts);
+    return await res.json();
+  } catch(e) { return { error: e.message }; }
+}
+
+function setGsStatus(type, msg) {
+  const el = document.getElementById("gs-status");
+  el.innerHTML = `<div class="status-msg status-${type}">${type==="loading"?"⏳ ":""}${msg}</div>`;
+}
+
+async function testConnection() {
+  const url = document.getElementById("gs-url").value.trim();
+  if(!url) { alert("Masukkan URL terlebih dahulu"); return; }
+  localStorage.setItem("gs_url", url);
+  setGsStatus("loading","Testing koneksi...");
+  const res = await gsReq(url+"?action=ping","GET",{});
+  if(res.status==="ok") { setGsStatus("success","✅ Koneksi berhasil! Google Sheets siap."); document.getElementById("sync-dot").classList.remove("hidden"); }
+  else setGsStatus("error","❌ Gagal: "+(res.error||"Cek URL dan deployment settings"));
+}
+
+async function syncToSheets() {
+  const url = document.getElementById("gs-url").value.trim();
+  if(!url) { alert("Masukkan URL Apps Script terlebih dahulu"); return; }
+  localStorage.setItem("gs_url", url);
+  setGsStatus("loading","Menghubungkan ke Google Sheets...");
+  const payload = { action:"sync", data: bookings.map(b=>({...b, tanggal:fmtISO(currentDate), therapistName:getTh(b.therapist).name})) };
+  const res = await gsReq(url, "POST", payload);
+  if(res.error) { setGsStatus("error","❌ Gagal: "+res.error); }
+  else {
+    const t = new Date().toLocaleString("id-ID");
+    setGsStatus("success","✅ "+(res.message||bookings.length+" data berhasil disinkronkan"));
+    localStorage.setItem("gs_last", t);
+    document.getElementById("gs-last-sync").textContent = "🕐 Terakhir sync: "+t;
+    document.getElementById("sync-dot").classList.remove("hidden");
+  }
+}
+
+async function autoSync(bk, action) {
+  const url = localStorage.getItem("gs_url");
+  if(!url) return;
+  const payload = { action, data:{...bk, tanggal:fmtISO(currentDate), therapistName:getTh(bk.therapist||"T-01").name}, id:bk.id };
+  await gsReq(url, "POST", payload);
+}
+
+// ─── EXPORT ───────────────────────────────────────────────────────────────────
+function openExport() {
+  document.getElementById("export-info").textContent = `Total ${bookings.length} booking · ${fmtDate(currentDate)}`;
+  openModal("modal-export");
+}
+function doExcel() {
+  const rows = bookings.map(b=>({ "ID":b.id,"Pasien":b.patient,"No HP":b.phone||"","Layanan":b.service||"","Terapis":getTh(b.therapist).name,"ID Terapis":b.therapist,"Ruangan":b.room,"Jam Mulai":b.start,"Jam Selesai":b.end||"","Metode":b.method||"","Status Bayar":b.payStatus,"Catatan":b.catatan||"" }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws["!cols"] = Array(12).fill({wch:18});
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Booking");
+  XLSX.writeFile(wb, `Booking_${fmtISO(currentDate)}.xlsx`);
+  closeModal("modal-export");
+}
+function doPDF() {
+  const rows = bookings.map((b,i)=>`<tr><td>${i+1}</td><td><b>${b.patient}</b><br><small>${b.phone||""}</small></td><td>${b.service||"-"}</td><td>${getTh(b.therapist).name}</td><td>${b.room}</td><td>${b.start}</td><td>${b.method||"-"}</td><td style="color:${PAY_CLR[b.payStatus][0]};font-weight:700">${b.payStatus}</td></tr>`).join("");
+  const w = window.open("","_blank","width=900,height=650");
+  w.document.write(`<!DOCTYPE html><html><head><title>Laporan</title><style>body{font-family:Arial,sans-serif;padding:20px;font-size:11px}h2{font-size:15px;margin:0 0 4px}p{margin:0 0 14px;color:#64748b;font-size:10px}table{width:100%;border-collapse:collapse}th{background:#1e3a5f;color:#fff;padding:7px 8px;text-align:left;font-size:10px}td{padding:6px 8px;border-bottom:1px solid #e2e8f0}tr:nth-child(even)td{background:#f8fafc}footer{margin-top:20px;font-size:9px;color:#94a3b8;text-align:center;border-top:1px solid #e2e8f0;padding-top:10px}@media print{body{padding:8px}}</style></head><body><h2>🏥 Klinik Terapi — Laporan Booking Harian</h2><p>Tanggal: ${fmtDate(currentDate)} &nbsp;·&nbsp; Total: ${bookings.length} sesi &nbsp;·&nbsp; Dicetak: ${new Date().toLocaleString("id-ID")}</p><table><thead><tr><th>#</th><th>Pasien</th><th>Layanan</th><th>Terapis</th><th>Room</th><th>Jam</th><th>Metode</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table><footer>Klinik Terapi · Sistem Booking Digital</footer></body></html>`);
+  w.document.close(); setTimeout(()=>w.print(),500);
+  closeModal("modal-export");
+}
+
+// ─── GOOGLE SHEETS MODAL ──────────────────────────────────────────────────────
+function openSheets() {
+  document.getElementById("gs-status").innerHTML = "";
+  document.getElementById("sync-count").textContent = bookings.length;
+  openModal("modal-sheets");
+}
+</script>
+</body>
+</html>
