@@ -118,9 +118,13 @@ table{border-collapse:collapse;min-width:560px;width:100%}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 .pb{padding:9px 10px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.75rem;text-align:left;width:100%}
 .pb.sel{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+.pb.busy{border-color:#e2e8f0!important;background:#f8fafc!important;color:#cbd5e1!important;cursor:not-allowed!important;position:relative}
+.pb.busy::after{content:"Terisi";position:absolute;top:2px;right:3px;font-size:.5rem;background:#ef4444;color:#fff;border-radius:3px;padding:1px 4px;font-weight:700}
 .pb-id{font-size:.58rem;opacity:.7;margin-bottom:1px}
 .rb{padding:10px 6px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.8rem;width:100%}
 .rb.sel{border-color:var(--blue);background:var(--blue-l);color:var(--blue)}
+.rb.busy{border-color:#e2e8f0!important;background:#f8fafc!important;color:#cbd5e1!important;cursor:not-allowed!important;position:relative}
+.rb.busy::after{content:"Terisi";position:absolute;top:1px;right:2px;font-size:.5rem;background:#ef4444;color:#fff;border-radius:3px;padding:1px 3px;font-weight:700}
 .dur-btn{padding:9px 4px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.68rem;width:100%;text-align:center}
 .dur-btn.sel{border-color:var(--purple);background:#f3e8ff;color:var(--purple)}
 .payb{flex:1;padding:10px 4px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.68rem}
@@ -466,6 +470,8 @@ let db=null, bookings=[], THERAPISTS=[], SERVICES=[];
 let currentDate = new Date();
 let currentBk=null, formTab=0, formMode="add";
 let formSel={therapist:"",room:"R-01",method:"Tunai",payStatus:"Belum Bayar"};
+let busyTherapists=new Set(); // Therapists busy at selected time
+let busyRooms=new Set();      // Rooms busy at selected time
 let rtCh=null, countdownTimer=null;
 
 // Settings stored locally
@@ -757,6 +763,10 @@ function initForm(){
   const fT=document.getElementById("ft-filter");if(fT){fT.innerHTML="<option value=''>Semua</option>";THERAPISTS.forEach(t=>{const o=document.createElement("option");o.value=t.id;o.text=t.nama;fT.appendChild(o)})}
 
   document.getElementById("fp-date").value=fmtISO(currentDate);
+  // Trigger availability check when date changes
+  document.getElementById("fp-date").onchange = ()=>{
+    if(formTab===1) checkAndUpdateAvailability();
+  };
   updateEndTime();
 }
 
@@ -765,12 +775,115 @@ function updateEndTime(){
   const dur=parseInt(document.getElementById("fp-dur")?.value||60);
   const end=addMins(start,dur);
   document.getElementById("fp-end-disp").textContent=end;
+  // Re-check availability when time or duration changes
+  if(formTab===1) checkAndUpdateAvailability();
+}
+
+// ── AVAILABILITY CHECK ───────────────────────────────────────
+async function checkAndUpdateAvailability(){
+  const formDate = document.getElementById("fp-date")?.value || fmtISO(currentDate);
+  const formStart = document.getElementById("fp-start")?.value || "08:00";
+  const formDur = parseInt(document.getElementById("fp-dur")?.value || 60);
+  const excludeId = formMode==="edit" ? currentBk?.id : null;
+
+  // Fetch bookings for that date (use cached if same as current)
+  let dateBookings = [];
+  if(formDate === fmtISO(currentDate)){
+    dateBookings = bookings;
+  } else {
+    try{
+      const{data}=await db.from("app_booking")
+        .select("id,therapist_id,room,start_time,end_time,duration_min")
+        .eq("tanggal",formDate);
+      dateBookings=(data||[]).map(r=>({
+        id:r.id,therapist:r.therapist_id,room:r.room,
+        start:r.start_time||"00:00",end:r.end_time||"00:00",duration:r.duration_min||60
+      }));
+    }catch(e){ dateBookings=[]; }
+  }
+
+  const formStartM = toMin(formStart);
+  const formEndM   = formStartM + formDur;
+
+  busyTherapists = new Set();
+  busyRooms      = new Set();
+
+  dateBookings.forEach(b=>{
+    if(excludeId && b.id===excludeId) return; // skip self when editing
+    const bStartM = toMin(b.start||"00:00");
+    const bEndM   = toMin(b.end||"00:00") || (bStartM + (b.duration||60));
+    // Overlap check: intervals overlap if startA < endB AND endA > startB
+    if(formStartM < bEndM && formEndM > bStartM){
+      busyTherapists.add(b.therapist);
+      busyRooms.add(b.room);
+    }
+  });
+
+  updateAvailabilityUI();
+}
+
+function updateAvailabilityUI(){
+  // Update therapist buttons
+  THERAPISTS.forEach(t=>{
+    const b=document.getElementById("thb-"+t.id);
+    if(!b) return;
+    const isBusy = busyTherapists.has(t.id);
+    const isSel  = formSel.therapist === t.id;
+    if(isBusy && isSel){
+      // Current selection became busy - deselect and warn
+      formSel.therapist = "";
+      b.className="pb busy";
+      showAvailWarning("terapis","⚠️ "+t.nama+" sudah ada booking di jam ini. Pilih terapis lain.");
+    } else if(isBusy){
+      b.className="pb busy";
+    } else {
+      b.className="pb"+(isSel?" sel":"");
+    }
+  });
+
+  // Update room buttons
+  ROOMS.forEach(r=>{
+    const b=document.getElementById("rb-"+r);
+    if(!b) return;
+    const isBusy = busyRooms.has(r);
+    const isSel  = formSel.room === r;
+    if(isBusy && isSel){
+      formSel.room = "";
+      b.className="rb busy";
+      showAvailWarning("room","⚠️ "+r+" sudah terisi di jam ini. Pilih ruangan lain.");
+    } else if(isBusy){
+      b.className="rb busy";
+    } else {
+      b.className="rb"+(isSel?" sel":"");
+    }
+  });
+}
+
+let _availWarnTimer=null;
+function showAvailWarning(type,msg){
+  clearTimeout(_availWarnTimer);
+  const id="avail-warn-"+type;
+  let el=document.getElementById(id);
+  if(!el){
+    el=document.createElement("div");
+    el.id=id;
+    el.style.cssText="background:#fef2f2;border:1.5px solid #fca5a5;color:#dc2626;border-radius:8px;padding:8px 12px;font-size:.72rem;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px";
+    const grid=document.getElementById("fp-th-grid");
+    if(grid && type==="terapis") grid.parentNode.insertBefore(el,grid);
+    const rGrid=document.getElementById("fp-room-grid");
+    if(rGrid && type==="room") rGrid.parentNode.insertBefore(el,rGrid);
+  }
+  el.innerHTML="⛔ "+msg.replace("⚠️ ","");
+  el.classList.remove("hidden");
+  _availWarnTimer=setTimeout(()=>el.classList.add("hidden"),5000);
 }
 
 function openAdd(){formMode="add";currentBk=null;resetForm();document.getElementById("form-ttl").textContent="➕ Booking Baru";fTab(0);openModal("modal-form")}
 function openAddSlot(room,start){openAdd();selRoom(room);document.getElementById("fp-start").value=start;updateEndTime()}
 
 function resetForm(){
+  busyTherapists=new Set(); busyRooms=new Set(); // Clear conflict state
+  ["avail-warn-terapis","avail-warn-room"].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add("hidden")});
   ["fp-patient","fp-phone","fp-catatan"].forEach(id=>document.getElementById(id).value="");
   document.getElementById("fp-service").value="";
   document.getElementById("fp-date").value=fmtISO(currentDate);
@@ -799,7 +912,8 @@ function fillForm(bk){
 function fTab(n){
   formTab=n;
   [0,1,2].forEach(i=>{document.getElementById("fpanel-"+i).classList.toggle("hidden",i!==n);document.getElementById("ftab-"+i).classList.toggle("active",i===n)});
-  if(n===2)updateSummary();
+  if(n===1) checkAndUpdateAvailability(); // Check availability when entering schedule tab
+  if(n===2) updateSummary();
   renderFoot();
 }
 function renderFoot(){
@@ -848,8 +962,31 @@ async function submitForm(){
   }
 }
 
-function selTh(id){formSel.therapist=id;THERAPISTS.forEach(t=>{const b=document.getElementById("thb-"+t.id);if(b)b.className="pb"+(t.id===id?" sel":"")})}
-function selRoom(r){formSel.room=r;ROOMS.forEach(rm=>{const b=document.getElementById("rb-"+rm);if(b)b.className="rb"+(rm===r?" sel":"")})}
+function selTh(id){
+  if(busyTherapists.has(id)){
+    const th=getTh(id);
+    showAvailWarning("terapis",th.nama+" sedang menangani pasien lain di waktu ini. Silakan pilih terapis yang tersedia.");
+    return; // BLOCK selection
+  }
+  formSel.therapist=id;
+  THERAPISTS.forEach(t=>{
+    const b=document.getElementById("thb-"+t.id);
+    if(!b) return;
+    b.className="pb"+(busyTherapists.has(t.id)?"busy":(t.id===id?" sel":""));
+  });
+}
+function selRoom(r){
+  if(busyRooms.has(r)){
+    showAvailWarning("room",r+" sudah terisi di waktu ini. Silakan pilih ruangan lain yang tersedia.");
+    return; // BLOCK selection
+  }
+  formSel.room=r;
+  ROOMS.forEach(rm=>{
+    const b=document.getElementById("rb-"+rm);
+    if(!b) return;
+    b.className="rb"+(busyRooms.has(rm)?"busy":(rm===r?" sel":""));
+  });
+}
 function selMeth(m){formSel.method=m;METHODS.forEach(mt=>{const cl=mt.replace(/^[^\s]+ /,""),ic=mt.split(" ")[0];const b=document.getElementById("mb-"+cl);if(!b)return;b.className="methb"+(cl===m?" sel":"");b.innerHTML=`${ic} <span>${cl}</span>${cl===m?'<span style="margin-left:auto">✓</span>':""}`})}
 function selPay(s){formSel.payStatus=s;PAY_ST.forEach(ps=>{const b=document.getElementById("pb-"+ps);if(!b)return;const[c,bg]=PAY_CLR[ps];b.className="payb"+(ps===s?" sel":"");b.style.cssText=ps===s?`border-color:${c};background:${bg};color:${c}`:""})}
 
