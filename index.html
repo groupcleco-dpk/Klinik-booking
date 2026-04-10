@@ -175,6 +175,16 @@ table{border-collapse:collapse;min-width:560px;width:100%}
 .cell-belum{background:#dc2626!important}
 .cell-dp{background:#d97706!important}
 .cell-lunas{background:#16a34a!important}
+.pin-key{
+  padding:16px 8px;border-radius:12px;border:1.5px solid #e2e8f0;
+  background:#fff;color:#0f172a;font-size:1.3rem;font-weight:700;
+  cursor:pointer;transition:all .1s;width:100%;
+  -webkit-tap-highlight-color:transparent;
+}
+.pin-key:active{background:#dbeafe;border-color:#2563eb;transform:scale(.95)}
+.pin-dot-filled{background:#2563eb!important}
+.pin-dot-error{background:#dc2626!important}
+.pin-dot-ok{background:#16a34a!important}
 .fab{position:fixed;bottom:22px;right:18px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;font-size:1.4rem;box-shadow:0 6px 20px rgba(37,99,235,.5);display:flex;align-items:center;justify-content:center;z-index:150}
 </style>
 </head>
@@ -188,71 +198,75 @@ table{border-collapse:collapse;min-width:560px;width:100%}
       <div class="l-title">TAPA JIVA</div>
       <div class="l-sub">Klinik Terapi · Sistem Booking Digital</div>
     </div>
-    <div class="lf"><label class="ll">Username</label><input class="li" id="lg-user" placeholder="Masukkan username" onkeydown="if(event.key==='Enter')document.getElementById('lg-pass').focus()"></div>
-    <div class="lf"><label class="ll">Password</label><input class="fi" id="lg-pass" type="password" placeholder="••••••••" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #e2e8f0;font-size:.88rem" onkeydown="if(event.key==='Enter')doLogin()"></div>
-    <div id="lg-err" class="lerr hidden"></div>
-    <button class="lb" id="lg-btn" onclick="doLogin()">Masuk →</button>
-    <button onclick="showAddAccountModal()" style="width:100%;padding:11px;border-radius:10px;border:1.5px solid #2563eb;background:#fff;color:#2563eb;font-weight:700;font-size:.82rem;margin-top:8px;cursor:pointer">
-      ➕ Buat Akun Baru</button>
-    <div id="lg-hint" style="font-size:.62rem;color:#94a3b8;text-align:center;margin-top:10px;line-height:1.6">
-      Akun default: <b style="color:#374151">admin</b> / <b style="color:#374151">tapajiva123</b>
+    <!-- PIN Display -->
+    <div style="display:flex;justify-content:center;gap:12px;margin:18px 0 20px">
+      <div id="pin-d0" style="width:14px;height:14px;border-radius:50%;background:#e2e8f0;transition:all .2s"></div>
+      <div id="pin-d1" style="width:14px;height:14px;border-radius:50%;background:#e2e8f0;transition:all .2s"></div>
+      <div id="pin-d2" style="width:14px;height:14px;border-radius:50%;background:#e2e8f0;transition:all .2s"></div>
+      <div id="pin-d3" style="width:14px;height:14px;border-radius:50%;background:#e2e8f0;transition:all .2s"></div>
+      <div id="pin-d4" style="width:14px;height:14px;border-radius:50%;background:#e2e8f0;transition:all .2s"></div>
+      <div id="pin-d5" style="width:14px;height:14px;border-radius:50%;background:#e2e8f0;transition:all .2s"></div>
+    </div>
+    <div id="lg-err" class="lerr hidden" style="margin-bottom:12px"></div>
+    <!-- PIN Keypad -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px">
+      <button class="pin-key" onclick="pinPress('1')">1</button>
+      <button class="pin-key" onclick="pinPress('2')">2</button>
+      <button class="pin-key" onclick="pinPress('3')">3</button>
+      <button class="pin-key" onclick="pinPress('4')">4</button>
+      <button class="pin-key" onclick="pinPress('5')">5</button>
+      <button class="pin-key" onclick="pinPress('6')">6</button>
+      <button class="pin-key" onclick="pinPress('7')">7</button>
+      <button class="pin-key" onclick="pinPress('8')">8</button>
+      <button class="pin-key" onclick="pinPress('9')">9</button>
+      <button class="pin-key" onclick="pinClear()" style="background:#fee2e2;color:#dc2626;font-size:.8rem">Hapus</button>
+      <button class="pin-key" onclick="pinPress('0')">0</button>
+      <button class="pin-key" onclick="pinDelete()" style="font-size:1.1rem">⌫</button>
+    </div>
+    <div style="font-size:.65rem;color:#94a3b8;text-align:center;margin-top:4px">
+      PIN default: <b style="color:#2563eb;font-size:.75rem;letter-spacing:2px">123456</b>
+      &nbsp;·&nbsp;
+      <span onclick="showChangePinModal()" style="color:#2563eb;cursor:pointer;text-decoration:underline;font-weight:600">Ubah PIN</span>
     </div>
   </div>
 </div>
 
-<!-- MODAL TAMBAH AKUN (on login page) -->
-<div class="overlay hidden" id="modal-add-account" onclick="closeOvr(event,'modal-add-account')" style="z-index:1100">
+<!-- MODAL: GANTI PIN -->
+<div class="overlay hidden" id="modal-change-pin" onclick="closeOvr(event,'modal-change-pin')" style="z-index:1100">
   <div class="sheet" style="max-height:72vh">
     <div class="hbar"></div>
     <div class="shdr">
-      <div><div class="stitle-s">Manajemen Akun</div><div class="stitle">➕ Buat Akun Baru</div></div>
-      <button class="cbtn" onclick="closeModal('modal-add-account')">✕</button>
+      <div><div class="stitle-s">Keamanan</div><div class="stitle">🔐 Ubah PIN Klinik</div></div>
+      <button class="cbtn" onclick="closeModal('modal-change-pin')">✕</button>
     </div>
     <div class="sbody">
-      <div class="ff"><label class="fl">Username</label><input class="fi" id="new-acc-user" placeholder="Contoh: admin, kasir1, terapis1..."></div>
-      <div class="ff"><label class="fl">Password</label><input class="fi" id="new-acc-pass" type="password" placeholder="Minimal 6 karakter"></div>
-      <div class="ff"><label class="fl">Konfirmasi Password</label><input class="fi" id="new-acc-pass2" type="password" placeholder="Ulangi password"></div>
-      <div id="add-acc-err" class="lerr hidden" style="margin-bottom:10px"></div>
-      <div style="background:#f0fdf4;border-radius:9px;padding:9px 12px;font-size:.7rem;color:#166534;line-height:1.5">
-        ✅ Akun tersimpan di perangkat ini secara lokal.<br>
-        Untuk akses dari HP lain, buat akun di perangkat itu juga.<br>
-        Akun yang sudah ada: <b id="acc-list-count">-</b>
+      <div style="background:#dbeafe;border-radius:9px;padding:10px 14px;font-size:.72rem;color:#1e3a5f;margin-bottom:14px;line-height:1.5">
+        📌 PIN yang sama dipakai di <b>semua perangkat</b>. Catat baik-baik setelah diubah.
       </div>
+      <div class="ff">
+        <label class="fl">PIN Lama</label>
+        <input class="fi" id="cp-old" type="number" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Masukkan PIN lama" style="letter-spacing:4px;font-size:1.1rem;text-align:center">
+      </div>
+      <div class="ff">
+        <label class="fl">PIN Baru (6 digit)</label>
+        <input class="fi" id="cp-new" type="number" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="6 angka" style="letter-spacing:4px;font-size:1.1rem;text-align:center">
+      </div>
+      <div class="ff">
+        <label class="fl">Konfirmasi PIN Baru</label>
+        <input class="fi" id="cp-new2" type="number" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="Ulangi PIN baru" style="letter-spacing:4px;font-size:1.1rem;text-align:center">
+      </div>
+      <div id="cp-err" class="lerr hidden" style="margin-bottom:8px"></div>
     </div>
     <div class="sfooter">
-      <button class="btn-o" onclick="closeModal('modal-add-account')">Batal</button>
-      <button class="btn-g" style="flex:2" onclick="createLocalAccount()">✅ Buat Akun</button>
+      <button class="btn-o" onclick="closeModal('modal-change-pin')">Batal</button>
+      <button class="btn-p" style="flex:2" onclick="doChangePin()">🔐 Simpan PIN Baru</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL: MANAGE ACCOUNTS -->
-<div class="overlay hidden" id="modal-manage-accounts" onclick="closeOvr(event,'modal-manage-accounts')">
-  <div class="sheet" style="max-height:75vh">
-    <div class="hbar"></div>
-    <div class="shdr">
-      <div><div class="stitle-s">Pengaturan Sistem</div><div class="stitle">👤 Kelola Akun Pengguna</div></div>
-      <button class="cbtn" onclick="closeModal('modal-manage-accounts')">✕</button>
-    </div>
-    <div class="sbody">
-      <div style="background:#f8fafc;border-radius:9px;padding:10px 12px;margin-bottom:12px">
-        <div style="font-size:.7rem;font-weight:700;color:#374151;margin-bottom:8px">Tambah Akun Baru</div>
-        <div class="ff"><label class="fl">Username</label><input class="fi" id="ma-user" placeholder="Contoh: kasir1, terapis1..." style="font-size:.82rem"></div>
-        <div class="g2">
-          <div><label class="fl">Password</label><input class="fi" id="ma-pass" type="password" placeholder="Min. 6 karakter" style="font-size:.82rem"></div>
-          <div><label class="fl">Konfirmasi</label><input class="fi" id="ma-pass2" type="password" placeholder="Ulangi" style="font-size:.82rem"></div>
-        </div>
-        <div id="ma-err" class="lerr hidden" style="margin-bottom:8px"></div>
-        <button class="btn-g" style="width:100%;padding:9px;font-size:.8rem" onclick="addAccountFromSettings()">➕ Tambah Akun</button>
-      </div>
-      <div style="font-size:.7rem;font-weight:700;color:#374151;margin-bottom:6px">Daftar Akun</div>
-      <div id="manage-acc-list"></div>
-      <div style="margin-top:12px;padding:10px 12px;background:#fef3c7;border-radius:9px;font-size:.68rem;color:#92400e;line-height:1.5">
-        ⚠️ Akun tersimpan lokal di perangkat ini. Tidak sync antar perangkat.
-      </div>
-    </div>
-  </div>
-</div>
+
+
+
 
 <!-- APP -->
 <div id="app" class="hidden">
@@ -271,8 +285,7 @@ table{border-collapse:collapse;min-width:560px;width:100%}
       <button class="btn-h" onclick="openModal('modal-settings')">⚙️</button>
       <button class="btn-h" onclick="openModal('modal-sheets')">📊</button>
       <button class="btn-h" onclick="openModal('modal-export')">📤</button>
-      <span id="current-user" style="font-size:.62rem;color:rgba(255,255,255,.7);max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-      <button class="btn-h" onclick="openManageAccounts()" title="Kelola Akun">👤</button>
+      <button class="btn-h" onclick="showChangePinModal()" title="Ubah PIN">🔐</button>
       <button class="btn-h" onclick="doLogout()" title="Keluar">🚪</button>
     </div>
   </div>
@@ -652,8 +665,29 @@ let busyRooms=new Set();      // Rooms busy at selected time
 let rtCh=null, countdownTimer=null;
 
 // Settings stored locally
-function getSettings(){return JSON.parse(localStorage.getItem("kl_settings")||'{"diskon":[],"paket":[]}')}
-function saveSettings(s){localStorage.setItem("kl_settings",JSON.stringify(s))}
+// Diskon & Paket — dari Supabase
+let _diskonCache=[], _paketCache=[];
+
+async function loadDiskonPaket(){
+  try{
+    const[dk,pk]=await Promise.all([
+      db.from("app_diskon").select("*").eq("aktif",true).order("id"),
+      db.from("app_paket").select("*").eq("aktif",true).order("id"),
+    ]);
+    _diskonCache=(dk.data||[]);
+    _paketCache=(pk.data||[]);
+  }catch(e){ console.warn("loadDiskonPaket failed:",e); }
+}
+
+function getSettings(){
+  // backward compat shim — returns structured object
+  return {
+    diskon: _diskonCache.map(d=>({nama:d.nama,tipe:d.tipe,nilai:d.nilai})),
+    paket:  _paketCache.map(p=>({nama:p.nama,sesi:p.sesi,harga:p.harga})),
+  };
+}
+// saveSettings no longer needed — use direct Supabase calls
+function saveSettings(s){ /* deprecated — data saved directly to Supabase */ }
 
 // ═══ HELPERS ══════════════════════════════════════════════════
 const fmtDate = d=>`${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
@@ -683,98 +717,190 @@ function hideErr(id){document.getElementById(id)?.classList.add("hidden")}
 // Password tersimpan aman di browser (hashed)
 // ══════════════════════════════════════════════════
 
-function hashPass(str){
-  // Simple deterministic hash (tidak butuh crypto API)
-  let h=5381;
-  for(let i=0;i<str.length;i++) h=((h<<5)+h)+str.charCodeAt(i);
-  return (h>>>0).toString(36)+"_klinik";
+// ══════════════════════════════════════════════
+// SISTEM PIN — berlaku di semua perangkat
+// PIN disimpan di Supabase agar sync lintas device
+// Default PIN: 123456
+// ══════════════════════════════════════════════
+const DEFAULT_PIN = "123456";
+let pinBuffer = "";
+let pinLocked = false;
+let pinAttempts = 0;
+
+// ── CONFIG DARI SUPABASE ─────────────────────────
+let _configCache = {}; // cache agar tidak terlalu sering fetch
+
+async function loadConfig(){
+  try{
+    const{data} = await db.from("app_config").select("key,value");
+    if(data) data.forEach(r=>{ _configCache[r.key]=r.value; });
+  }catch(e){ console.warn("loadConfig failed:",e); }
 }
 
-function getAccounts(){
-  return JSON.parse(localStorage.getItem("kl_accounts")||"null") || {
-    "admin": hashPass("tapajiva123") // akun default
-  };
+async function getConfig(key, fallback=""){
+  if(_configCache[key]!==undefined) return _configCache[key];
+  try{
+    const{data}=await db.from("app_config").select("value").eq("key",key).single();
+    if(data){ _configCache[key]=data.value; return data.value; }
+  }catch(e){}
+  return localStorage.getItem("kl_cfg_"+key) || fallback;
 }
-function saveAccounts(accs){ localStorage.setItem("kl_accounts",JSON.stringify(accs)); }
 
-window.onload=()=>{
-  db = supabase.createClient(SB_URL,SB_KEY);
-  // Check if already logged in locally
-  const sess=sessionStorage.getItem("kl_session");
-  if(sess){ afterLogin(); }
-  else { document.getElementById("login-screen").classList.remove("hidden"); }
-};
+async function setConfig(key, value){
+  _configCache[key]=value;
+  localStorage.setItem("kl_cfg_"+key, value); // fallback lokal
+  try{
+    await db.from("app_config").upsert({key, value, updated_at: new Date().toISOString()});
+  }catch(e){ console.warn("setConfig failed, saved locally only:",e); }
+}
 
-function doLogin(){
-  const user=document.getElementById("lg-user").value.trim().toLowerCase();
-  const pass=document.getElementById("lg-pass").value;
-  if(!user||!pass){showErr("lg-err","⚠️ Username dan password wajib diisi");return}
-  const btn=document.getElementById("lg-btn");
-  btn.textContent="⏳ Masuk...";btn.disabled=true;
+// PIN helpers — sekarang dari Supabase
+function getStoredPin(){
+  // Gunakan cache dulu (sudah di-load di afterLogin)
+  return _configCache["pin"] || localStorage.getItem("kl_cfg_pin") || DEFAULT_PIN;
+}
+async function savePin(pin){
+  await setConfig("pin", pin);
+}
+
+function pinPress(digit){
+  if(pinLocked) return;
+  if(pinBuffer.length >= 6) return;
+  pinBuffer += digit;
+  updatePinDots();
+  if(pinBuffer.length === 6) setTimeout(checkPin, 150);
+}
+
+function pinDelete(){
+  if(pinLocked) return;
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDots();
+}
+
+function pinClear(){
+  pinBuffer = "";
+  updatePinDots();
   hideErr("lg-err");
-
-  const accs=getAccounts();
-  if(!accs[user]){
-    btn.textContent="Masuk →";btn.disabled=false;
-    showErr("lg-err","❌ Username tidak ditemukan. Klik 'Buat Akun Baru' untuk mendaftar.");return;
-  }
-  if(accs[user]!==hashPass(pass)){
-    btn.textContent="Masuk →";btn.disabled=false;
-    showErr("lg-err","❌ Password salah. Coba lagi.");return;
-  }
-
-  // Login success
-  sessionStorage.setItem("kl_session",user);
-  sessionStorage.setItem("kl_user",user);
-  btn.textContent="Masuk →";btn.disabled=false;
-  afterLogin();
 }
 
-function showAddAccountModal(){
-  const accs=getAccounts();
-  const el=document.getElementById("acc-list-count");
-  if(el) el.textContent=Object.keys(accs).length+" akun";
-  ["new-acc-user","new-acc-pass","new-acc-pass2"].forEach(id=>{
-    const e=document.getElementById(id);if(e)e.value="";
+function updatePinDots(state){
+  for(let i=0;i<6;i++){
+    const d=document.getElementById("pin-d"+i);
+    if(!d) continue;
+    if(state==="error")       d.className="pin-dot-error" + " " + getDotBase();
+    else if(state==="ok")     d.className="pin-dot-ok"    + " " + getDotBase();
+    else if(i<pinBuffer.length) d.style.background="#2563eb";
+    else                        d.style.background="#e2e8f0";
+  }
+}
+function getDotBase(){ return ""; }
+function setDotsColor(color){
+  for(let i=0;i<6;i++){
+    const d=document.getElementById("pin-d"+i);
+    if(d) d.style.background=color;
+  }
+}
+
+async function checkPin(){
+  const entered = pinBuffer;
+  const correct = getStoredPin();
+  if(entered === correct){
+    // PIN benar
+    setDotsColor("#16a34a");
+    pinAttempts = 0;
+    setTimeout(async()=>{
+      sessionStorage.setItem("kl_session","1");
+      await afterLogin();
+    }, 300);
+  } else {
+    // PIN salah
+    pinAttempts++;
+    setDotsColor("#dc2626");
+    // Shake animation
+    const card = document.querySelector(".login-card");
+    if(card){ card.style.transform="translateX(8px)"; setTimeout(()=>card.style.transform="",100); }
+    setTimeout(()=>{
+      pinBuffer="";
+      updatePinDots();
+      if(pinAttempts >= 5){
+        pinLocked = true;
+        showErr("lg-err","❌ Terlalu banyak percobaan. Tunggu 30 detik.");
+        setTimeout(()=>{ pinLocked=false; pinAttempts=0; hideErr("lg-err"); }, 30000);
+      } else {
+        showErr("lg-err","❌ PIN salah. Sisa percobaan: "+(5-pinAttempts));
+        setTimeout(()=>hideErr("lg-err"),2000);
+      }
+    }, 500);
+  }
+}
+
+function showChangePinModal(){
+  ["cp-old","cp-new","cp-new2"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});
+  hideErr("cp-err");
+  openModal("modal-change-pin");
+}
+
+async function doChangePin(){
+  const oldPin  = document.getElementById("cp-old")?.value.trim();
+  const newPin  = document.getElementById("cp-new")?.value.trim();
+  const newPin2 = document.getElementById("cp-new2")?.value.trim();
+  hideErr("cp-err");
+  if(oldPin !== getStoredPin()){showErr("cp-err","❌ PIN lama salah");return}
+  if(!newPin || newPin.length !== 6 || !/^\d{6}$/.test(newPin)){showErr("cp-err","⚠️ PIN baru harus tepat 6 digit angka");return}
+  if(newPin !== newPin2){showErr("cp-err","⚠️ Konfirmasi PIN tidak cocok");return}
+  if(newPin === DEFAULT_PIN){showErr("cp-err","⚠️ Jangan gunakan PIN default. Pilih PIN unik.");return}
+  const btn=document.querySelector("#modal-change-pin .btn-p");
+  if(btn){btn.textContent="⏳ Menyimpan...";btn.disabled=true;}
+  await savePin(newPin);
+  if(btn){btn.textContent="🔐 Simpan PIN Baru";btn.disabled=false;}
+  closeModal("modal-change-pin");
+  toast("✅ PIN berhasil diubah & disimpan ke server! Berlaku di semua perangkat.",3500);
+}
+
+window.onload=async ()=>{
+  try{ db = supabase.createClient(SB_URL,SB_KEY); }catch(e){ console.error("Supabase init:",e); }
+  // Keyboard support untuk PIN
+  document.addEventListener("keydown", e=>{
+    if(document.getElementById("login-screen").classList.contains("hidden")) return;
+    if(e.key>="0"&&e.key<="9") pinPress(e.key);
+    else if(e.key==="Backspace") pinDelete();
+    else if(e.key==="Escape") pinClear();
   });
-  hideErr("add-acc-err");
-  openModal("modal-add-account");
-}
-
-function createLocalAccount(){
-  const user=document.getElementById("new-acc-user").value.trim().toLowerCase();
-  const pass=document.getElementById("new-acc-pass").value;
-  const pass2=document.getElementById("new-acc-pass2").value;
-  if(!user){showErr("add-acc-err","⚠️ Username wajib diisi");return}
-  if(user.length<3){showErr("add-acc-err","⚠️ Username minimal 3 karakter");return}
-  if(!/^[a-z0-9_]+$/.test(user)){showErr("add-acc-err","⚠️ Username hanya boleh huruf, angka, dan _");return}
-  if(!pass||pass.length<6){showErr("add-acc-err","⚠️ Password minimal 6 karakter");return}
-  if(pass!==pass2){showErr("add-acc-err","⚠️ Konfirmasi password tidak cocok");return}
-  const accs=getAccounts();
-  if(accs[user]){showErr("add-acc-err","⚠️ Username sudah digunakan");return}
-  accs[user]=hashPass(pass);
-  saveAccounts(accs);
-  closeModal("modal-add-account");
-  // Auto-fill username in login form
-  document.getElementById("lg-user").value=user;
-  document.getElementById("lg-pass").value="";
-  hideErr("lg-err");
-  toast("✅ Akun '"+user+"' berhasil dibuat! Silakan login.");
-}
+  const sess=sessionStorage.getItem("kl_session");
+  if(sess){
+    try{ await afterLogin(); }
+    catch(e){
+      sessionStorage.clear();
+      document.getElementById("login-screen").classList.remove("hidden");
+    }
+  }else{
+    document.getElementById("login-screen").classList.remove("hidden");
+  }
+};
 
 async function afterLogin(){
   document.getElementById("login-screen").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
-  // Show current user in header
-  const user=sessionStorage.getItem("kl_user")||"admin";
-  const userEl=document.getElementById("current-user");
-  if(userEl) userEl.textContent=user;
-  // Load data from Supabase
-  await loadMaster();
+  // Load konfigurasi global (PIN, GS URL, dll) dari Supabase
+  try{ await loadConfig(); }catch(e){ console.warn("loadConfig failed:",e); }
+  // Load master data (terapis, layanan) - fallback to defaults if Supabase unavailable
+  try{
+    await loadMaster();
+  }catch(e){
+    console.warn("loadMaster failed, using defaults:",e);
+    THERAPISTS=DEFAULT_TH; SERVICES=DEFAULT_SV;
+  }
   initForm();
+  // Load diskon & paket dari Supabase
+  try{ await loadDiskonPaket(); }catch(e){ console.warn("loadDiskonPaket failed:",e); }
   initSettingsLists();
-  await loadBookings();
-  subscribeRT();
+  try{
+    await loadBookings();
+  }catch(e){
+    console.warn("loadBookings failed:",e);
+    bookings=[]; renderAll();
+  }
+  try{ subscribeRT(); }catch(e){ console.warn("RT subscribe failed:",e); }
   startCountdownTimer();
 }
 
@@ -782,10 +908,11 @@ function doLogout(){
   if(rtCh)db.removeChannel(rtCh);
   if(countdownTimer)clearInterval(countdownTimer);
   sessionStorage.removeItem("kl_session");
-  sessionStorage.removeItem("kl_user");
+  pinBuffer=""; pinAttempts=0; pinLocked=false;
+  updatePinDots();
+  hideErr("lg-err");
   document.getElementById("app").classList.add("hidden");
   document.getElementById("login-screen").classList.remove("hidden");
-  document.getElementById("lg-pass").value="";
 }
 
 // ═══ MASTER DATA ══════════════════════════════════════════════
@@ -991,7 +1118,7 @@ function renderGrid(){
             <div class="bk-sub">${subLine}</div>
             <div class="bk-foot">
               <span class="bk-badge">${bk.harga>0?fmtRp(bk.harga):bk.payStatus}</span>
-              ${sisaText}`<span class="bk-timer" style="font-size:.48rem;background:rgba(0,0,0,.3)">${sisaText}</span>`:"<span class="bk-timer"></span>"}
+              ${sisaText?`<span class="bk-timer" style="font-size:.48rem;background:rgba(0,0,0,.3)">${sisaText}</span>`:"<span class="bk-timer"></span>"}
             </div>
           </div></td>`;
       }else{
@@ -1635,7 +1762,7 @@ function renderSvList(){
   });
   document.getElementById("set-sv-list").innerHTML=out;
 }
-async function addLayanan(){
+async async function addLayanan(){
   const nama=document.getElementById("sv-nama").value.trim();
   const kat =document.getElementById("sv-kat").value;
   const h30 =parseInt(document.getElementById("sv-h30").value||0);
@@ -1684,40 +1811,69 @@ async function deleteSv(nama){
 // DISKON
 function renderDkList(){
   const s=getSettings();
-  document.getElementById("set-dk-list").innerHTML=s.diskon.length?s.diskon.map((d,i)=>`
-    <div class="set-item"><div class="set-item-info"><div class="set-item-name">🏷️ ${d.nama}</div><div class="set-item-sub">${d.tipe==="persen"?d.nilai+"%":"Rp "+Number(d.nilai).toLocaleString("id-ID")}</div></div>
-      <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteDk(${i})">Hapus</button></div>`).join(""):
-    '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.78rem">Belum ada diskon</div>';
+  document.getElementById("set-dk-list").innerHTML=s.diskon.length?_diskonCache.map(d=>`
+    <div class="set-item"><div class="set-item-info">
+      <div class="set-item-name">🏷️ ${d.nama}</div>
+      <div class="set-item-sub">${d.tipe==="persen"?d.nilai+"%":"Rp "+Number(d.nilai).toLocaleString("id-ID")}</div>
+    </div>
+    <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteDk(${d.id})">🗑 Hapus</button></div>`).join(""):
+    '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.78rem">Belum ada diskon — tambahkan di atas</div>';
 }
-function addDiskon(){
+async function addDiskon(){
   const nama=document.getElementById("dk-nama").value.trim();
   const tipe=document.getElementById("dk-tipe").value;
   const nilai=parseFloat(document.getElementById("dk-nilai").value||0);
   if(!nama){toast("⚠️ Nama diskon wajib");return}
-  const s=getSettings();s.diskon.push({nama,tipe,nilai});saveSettings(s);
-  ["dk-nama","dk-nilai"].forEach(id=>document.getElementById(id).value="");
-  renderDkList();toast("✅ Diskon ditambahkan");
+  try{
+    const{error}=await db.from("app_diskon").insert([{nama,tipe,nilai,aktif:true}]);
+    if(error){toast("❌ "+error.message);return}
+    ["dk-nama","dk-nilai"].forEach(id=>document.getElementById(id).value="");
+    await loadDiskonPaket(); renderDkList(); renderPkList();
+    toast("✅ Diskon '"+nama+"' disimpan ke server");
+  }catch(e){toast("❌ "+e.message)}
 }
-function deleteDk(i){const s=getSettings();s.diskon.splice(i,1);saveSettings(s);renderDkList()}
+async function deleteDk(id){
+  if(!confirm("Hapus diskon ini?"))return;
+  try{
+    await db.from("app_diskon").update({aktif:false}).eq("id",id);
+    await loadDiskonPaket(); renderDkList();
+    toast("🗑️ Diskon dihapus");
+  }catch(e){toast("❌ "+e.message)}
+}
 
 // PAKET
 function renderPkList(){
-  const s=getSettings();
-  document.getElementById("set-pk-list").innerHTML=s.paket.length?s.paket.map((p,i)=>`
-    <div class="set-item"><div class="set-item-info"><div class="set-item-name">📦 ${p.nama}</div><div class="set-item-sub">${p.sesi} sesi · Rp ${Number(p.harga).toLocaleString("id-ID")} · Rp ${Math.round(p.harga/p.sesi).toLocaleString("id-ID")}/sesi</div></div>
-      <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deletePk(${i})">Hapus</button></div>`).join(""):
-    '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.78rem">Belum ada paket</div>';
+  document.getElementById("set-pk-list").innerHTML=_paketCache.length?_paketCache.map(p=>`
+    <div class="set-item"><div class="set-item-info">
+      <div class="set-item-name">📦 ${p.nama}</div>
+      <div class="set-item-sub">${p.sesi} sesi · Rp ${Number(p.harga).toLocaleString("id-ID")} · <b>Rp ${Math.round(p.harga/p.sesi).toLocaleString("id-ID")}/sesi</b></div>
+    </div>
+    <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deletePk(${p.id})">🗑 Hapus</button></div>`).join(""):
+    '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.78rem">Belum ada paket — tambahkan di atas</div>';
 }
-function addPaket(){
+async function addPaket(){
   const nama=document.getElementById("pk-nama").value.trim();
   const sesi=parseInt(document.getElementById("pk-sesi").value||1);
   const harga=parseFloat(document.getElementById("pk-harga").value||0);
   if(!nama){toast("⚠️ Nama paket wajib");return}
-  const s=getSettings();s.paket.push({nama,sesi,harga});saveSettings(s);
-  ["pk-nama","pk-sesi","pk-harga"].forEach(id=>document.getElementById(id).value="");
-  renderPkList();toast("✅ Paket ditambahkan");
+  if(sesi<1){toast("⚠️ Jumlah sesi minimal 1");return}
+  if(harga<=0){toast("⚠️ Harga harus diisi");return}
+  try{
+    const{error}=await db.from("app_paket").insert([{nama,sesi,harga,aktif:true}]);
+    if(error){toast("❌ "+error.message);return}
+    ["pk-nama","pk-sesi","pk-harga"].forEach(id=>document.getElementById(id).value="");
+    await loadDiskonPaket(); renderPkList(); renderDkList();
+    toast("✅ Paket '"+nama+"' disimpan ke server");
+  }catch(e){toast("❌ "+e.message)}
 }
-function deletePk(i){const s=getSettings();s.paket.splice(i,1);saveSettings(s);renderPkList()}
+async function deletePk(id){
+  if(!confirm("Hapus paket ini?"))return;
+  try{
+    await db.from("app_paket").update({aktif:false}).eq("id",id);
+    await loadDiskonPaket(); renderPkList();
+    toast("🗑️ Paket dihapus");
+  }catch(e){toast("❌ "+e.message)}
+}
 
 // ═══ EXPORT (MOBILE-FIXED) ════════════════════════════════════
 function dlBlob(blob,filename){
@@ -1759,7 +1915,7 @@ function doPDF(){
 // ═══ GOOGLE SHEETS ════════════════════════════════════════════
 // Auto sync to Google Sheets silently
 async function autoSyncGS(){
-  const url=localStorage.getItem("gs_url")||GS_URL;
+  const url=await getConfig("gs_url",GS_URL);
   if(!url)return;
   try{
     // Small delay to allow Supabase to commit first
@@ -1775,11 +1931,10 @@ async function loadBookingsRaw(){
   return(data||[]).map(r=>({id:r.id,patient:r.patient,phone:r.phone||"",service:r.service||"",therapist:r.therapist_id||"",therapistName:r.therapist_name||"",room:r.room||"",start:r.start_time||"",end:r.end_time||"",duration:r.duration_min||60,method:r.method||"Tunai",payStatus:r.pay_status||"Belum Bayar",catatan:r.catatan||""}));
 }
 
-function openSheets(){
-  // Auto-fill from hardcoded URL if not already saved
-  const savedUrl=localStorage.getItem("gs_url")||GS_URL;
+async function openSheets(){
+  // Ambil GS URL dari Supabase config
+  const savedUrl = await getConfig("gs_url", GS_URL);
   document.getElementById("gs-url").value=savedUrl;
-  localStorage.setItem("gs_url",savedUrl);
   const l=localStorage.getItem("gs_last");if(l)document.getElementById("gs-last").textContent="🕐 Terakhir: "+l;
   document.getElementById("gs-status").innerHTML="";
   openModal("modal-sheets");
@@ -1789,8 +1944,8 @@ async function gsReq(url,method,payload){
   catch(e){return{error:e.message}}
 }
 function setGsStatus(t,m){document.getElementById("gs-status").innerHTML=`<div style="margin:10px 0;padding:9px 12px;border-radius:9px;background:${t==="success"?"#dcfce7":t==="error"?"#fee2e2":"#f1f5f9"};color:${t==="success"?"#16a34a":t==="error"?"#dc2626":"#64748b"};font-size:.75rem;font-weight:600">${t==="loading"?"⏳ ":""}${m}</div>`}
-async function testGS(){const url=document.getElementById("gs-url").value.trim()||GS_URL;if(!url)return;localStorage.setItem("gs_url",url);document.getElementById("gs-url").value=url;setGsStatus("loading","Testing...");const r=await gsReq(url,"GET",{action:"ping"});r.status==="ok"?setGsStatus("success","✅ Koneksi berhasil!"):setGsStatus("error","❌ "+(r.error||"Gagal"))}
-async function syncGS(){const url=document.getElementById("gs-url").value.trim()||GS_URL;if(!url)return;localStorage.setItem("gs_url",url);document.getElementById("gs-url").value=url;setGsStatus("loading","Menyinkronkan...");const r=await gsReq(url,"POST",{action:"sync",data:bookings.map(b=>({...b,tanggal:fmtISO(currentDate),therapistName:getTh(b.therapist).nama}))});if(r.error)setGsStatus("error","❌ "+r.error);else{const t=new Date().toLocaleString("id-ID");setGsStatus("success","✅ "+(r.message||"Berhasil"));localStorage.setItem("gs_last",t);document.getElementById("gs-last").textContent="🕐 Terakhir: "+t}}
+async function testGS(){const url=document.getElementById("gs-url").value.trim()||GS_URL;if(!url)return;await setConfig("gs_url",url);document.getElementById("gs-url").value=url;setGsStatus("loading","Testing...");const r=await gsReq(url,"GET",{action:"ping"});r.status==="ok"?setGsStatus("success","✅ Koneksi berhasil!"):setGsStatus("error","❌ "+(r.error||"Gagal"))}
+async function syncGS(){const url=document.getElementById("gs-url").value.trim()||GS_URL;if(!url)return;await setConfig("gs_url",url);document.getElementById("gs-url").value=url;setGsStatus("loading","Menyinkronkan...");const r=await gsReq(url,"POST",{action:"sync",data:bookings.map(b=>({...b,tanggal:fmtISO(currentDate),therapistName:getTh(b.therapist).nama}))});if(r.error)setGsStatus("error","❌ "+r.error);else{const t=new Date().toLocaleString("id-ID");setGsStatus("success","✅ "+(r.message||"Berhasil"));localStorage.setItem("gs_last",t);document.getElementById("gs-last").textContent="🕐 Terakhir: "+t}}
 </script>
 </body>
 </html>
