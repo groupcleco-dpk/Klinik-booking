@@ -286,7 +286,7 @@ table{border-collapse:collapse;min-width:560px;width:100%}
         </div>
       </div></div>
     <div style="display:flex;gap:5px;align-items:center">
-      <span style="font-size:.62rem;color:rgba(255,255,255,.8);display:flex;align-items:center"><span class="rt-dot rt-off" id="rt-dot"></span><span id="rt-lbl">-</span></span>
+      <span style="font-size:.62rem;color:rgba(255,255,255,.8);display:flex;align-items:center"><span class="rt-dot" id="rt-dot" style="background:#94a3b8"></span><span id="rt-lbl" style="font-size:.58rem">sync</span></span>
       <button class="btn-h" onclick="openModal('modal-settings')">⚙️</button>
       <button class="btn-h" onclick="openModal('modal-sheets')">📊</button>
       <button class="btn-h" onclick="openModal('modal-export')">📤</button>
@@ -1333,8 +1333,7 @@ function renderGrid(){
             <div class="bk-name">${bk.patient}</div>
             <div class="bk-sub">${subLine}</div>
             <div class="bk-foot">
-              <span class="bk-badge">${bk.harga>0?fmtRp(bk.harga):bk.payStatus}</span>
-              ${sisaHtml}
+              <span class="bk-badge">${bk.payStatus==="DP"&&bk.sisa_bayar>0?"Sisa: "+fmtRp(bk.sisa_bayar):bk.payStatus}</span>
             </div>
           </div></td>`;
       }else{
@@ -1379,10 +1378,38 @@ function renderRekap(){
   const t=bookings.length||1;
   const totalRev=bookings.reduce((s,b)=>s+(b.harga||0),0);
   const revLunas=bookings.filter(b=>b.payStatus==="Lunas").reduce((s,b)=>s+(b.harga||0),0);
-  const revDP=bookings.filter(b=>b.payStatus==="DP").reduce((s,b)=>s+(b.harga||0),0);
+  // DP Masuk = total uang DP yang sudah dibayar (dp_amount)
+  const revDP=bookings.filter(b=>b.payStatus==="DP").reduce((s,b)=>s+(b.dp_amount||0),0);
+  // Piutang = sisa DP + semua yang belum bayar
+  const revSisaDP=bookings.filter(b=>b.payStatus==="DP").reduce((s,b)=>s+(b.sisa_bayar||Math.max((b.harga||0)-(b.dp_amount||0),0)),0);
   const revBelum=bookings.filter(b=>b.payStatus==="Belum Bayar").reduce((s,b)=>s+(b.harga||0),0);
+  const totalPiutang=revSisaDP+revBelum;
   const revEl=document.getElementById("rek-rev");
-  if(revEl) revEl.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px"><div style="background:#f0fdf4;border-radius:9px;padding:10px 12px;text-align:center"><div style="font-size:1rem;font-weight:900;color:#16a34a">${fmtRp(totalRev)}</div><div style="font-size:.6rem;color:#64748b;margin-top:2px">Total Potensi</div></div><div style="background:#dcfce7;border-radius:9px;padding:10px 12px;text-align:center"><div style="font-size:1rem;font-weight:900;color:#16a34a">${fmtRp(revLunas)}</div><div style="font-size:.6rem;color:#64748b;margin-top:2px">Sudah Lunas</div></div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div style="background:#fef3c7;border-radius:9px;padding:10px 12px;text-align:center"><div style="font-size:.9rem;font-weight:900;color:#d97706">${fmtRp(revDP)}</div><div style="font-size:.6rem;color:#64748b;margin-top:2px">DP Masuk</div></div><div style="background:#fee2e2;border-radius:9px;padding:10px 12px;text-align:center"><div style="font-size:.9rem;font-weight:900;color:#dc2626">${fmtRp(revBelum)}</div><div style="font-size:.6rem;color:#64748b;margin-top:2px">Belum Bayar</div></div></div>`;
+  if(revEl) revEl.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div style="background:#f0fdf4;border-radius:9px;padding:10px 12px;text-align:center">
+        <div style="font-size:1rem;font-weight:900;color:#16a34a">${fmtRp(totalRev)}</div>
+        <div style="font-size:.6rem;color:#64748b;margin-top:2px">💰 Total Potensi</div>
+      </div>
+      <div style="background:#dcfce7;border-radius:9px;padding:10px 12px;text-align:center">
+        <div style="font-size:1rem;font-weight:900;color:#16a34a">${fmtRp(revLunas)}</div>
+        <div style="font-size:.6rem;color:#64748b;margin-top:2px">✅ Sudah Lunas</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+      <div style="background:#fef3c7;border-radius:9px;padding:10px 12px;text-align:center">
+        <div style="font-size:.9rem;font-weight:900;color:#d97706">${fmtRp(revDP)}</div>
+        <div style="font-size:.6rem;color:#64748b;margin-top:2px">💵 DP Masuk</div>
+      </div>
+      <div style="background:#fee2e2;border-radius:9px;padding:10px 12px;text-align:center">
+        <div style="font-size:.9rem;font-weight:900;color:#dc2626">${fmtRp(totalPiutang)}</div>
+        <div style="font-size:.6rem;color:#64748b;margin-top:2px">🔴 Total Piutang</div>
+      </div>
+    </div>
+    <div style="background:#f8fafc;border-radius:9px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:.72rem;color:#374151">💳 Uang Masuk Hari Ini</span>
+      <span style="font-size:.88rem;font-weight:900;color:#2563eb">${fmtRp(revLunas+revDP)}</span>
+    </div>`;
   document.getElementById("rek-pay").innerHTML=PAY_ST.map(s=>{
     const c=bookings.filter(b=>b.payStatus===s).length;const[cl]=PAY_CLR[s];
     return`<div class="rek-row"><div style="width:9px;height:9px;border-radius:50%;background:${cl};flex-shrink:0"></div><div style="flex:1;font-size:.8rem">${s}</div><div style="font-weight:800;color:${cl}">${c}</div><div style="width:70px;height:7px;background:#f1f5f9;border-radius:3px"><div style="width:${c/t*100}%;height:100%;border-radius:3px;background:${cl}"></div></div></div>`;
@@ -1943,6 +1970,7 @@ async function addTerapis(){
 let _ethSelectedColor="";
 
 function openEditTh(id){
+  closeModal("modal-settings"); // Tutup settings dulu
   const t=THERAPISTS.find(x=>x.id===id);if(!t)return;
   document.getElementById("eth-id").value=id;
   document.getElementById("eth-nama").value=t.nama;
@@ -1979,13 +2007,16 @@ async function saveEditTh(){
     }).eq("id",id);
     if(error){showErr("eth-err","❌ "+error.message);return}
     closeModal("modal-edit-th");
-    await loadMaster();initForm();renderThList();
+    await loadMaster();initForm();
+    openModal("modal-settings"); setTab(0,document.querySelector("#set-tabs .stab"));
+    renderThList();
     toast("✅ Terapis '"+nama+"' berhasil diupdate");
   }catch(e){showErr("eth-err","❌ "+e.message)}
 }
 
 // ── EDIT LAYANAN ──────────────────────────────────
 function openEditSv(nama){
+  closeModal("modal-settings");
   const s=SERVICES.find(x=>(x.nama||x)===nama);if(!s)return;
   document.getElementById("esv-nama-ori").value=s.nama||s;
   document.getElementById("esv-nama").value=s.nama||s;
@@ -2026,13 +2057,18 @@ async function saveEditSv(){
     }).eq("nama",namaOri);
     if(error){showErr("esv-err","❌ "+error.message);return}
     closeModal("modal-edit-sv");
-    await loadMaster();initForm();renderSvList();
+    await loadMaster();initForm();
+    openModal("modal-settings");
+    const svTabBtn=document.querySelectorAll("#set-tabs .stab")[1];
+    if(svTabBtn) setTab(1,svTabBtn);
+    renderSvList();
     toast("✅ Layanan '"+nama+"' berhasil diupdate");
   }catch(e){showErr("esv-err","❌ "+e.message)}
 }
 
 // ── EDIT DISKON ───────────────────────────────────
 function openEditDk(id){
+  closeModal("modal-settings");
   const d=_diskonCache.find(x=>x.id===id);if(!d)return;
   document.getElementById("edk-id").value=id;
   document.getElementById("edk-nama").value=d.nama;
@@ -2053,13 +2089,18 @@ async function saveEditDk(){
     const{error}=await db.from("app_diskon").update({nama,tipe,nilai}).eq("id",id);
     if(error){showErr("edk-err","❌ "+error.message);return}
     closeModal("modal-edit-dk");
-    await loadDiskonPaket();renderDkList();
+    await loadDiskonPaket();
+    openModal("modal-settings");
+    const dkTabBtn=document.querySelectorAll("#set-tabs .stab")[2];
+    if(dkTabBtn) setTab(2,dkTabBtn);
+    renderDkList();
     toast("✅ Diskon '"+nama+"' berhasil diupdate");
   }catch(e){showErr("edk-err","❌ "+e.message)}
 }
 
 // ── EDIT PAKET ────────────────────────────────────
 function openEditPk(id){
+  closeModal("modal-settings");
   const p=_paketCache.find(x=>x.id===id);if(!p)return;
   document.getElementById("epk-id").value=id;
   document.getElementById("epk-nama").value=p.nama;
@@ -2089,11 +2130,16 @@ async function saveEditPk(){
     const{error}=await db.from("app_paket").update({nama,sesi,harga}).eq("id",id);
     if(error){showErr("epk-err","❌ "+error.message);return}
     closeModal("modal-edit-pk");
-    await loadDiskonPaket();renderPkList();
+    await loadDiskonPaket();
+    openModal("modal-settings");
+    const pkTabBtn=document.querySelectorAll("#set-tabs .stab")[3];
+    if(pkTabBtn) setTab(3,pkTabBtn);
+    renderPkList();
     toast("✅ Paket '"+nama+"' berhasil diupdate");
   }catch(e){showErr("epk-err","❌ "+e.message)}
 }
 async function deleteTh(id){
+  closeModal("modal-settings");
   if(!confirm("Hapus terapis ini?"))return;
   const{error}=await db.from("app_terapis").update({aktif:false}).eq("id",id);
   if(error){toast("❌ "+error.message);return}
