@@ -175,6 +175,11 @@ table{border-collapse:collapse;min-width:560px;width:100%}
 .cell-belum{background:#dc2626!important}
 .cell-dp{background:#d97706!important}
 .cell-lunas{background:#16a34a!important}
+.lp-range-btn{padding:7px 14px;border-radius:20px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.68rem;cursor:pointer;transition:all .15s}
+.lp-range-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.lp-th-card{background:#f8fafc;border-radius:11px;padding:11px 13px;margin-bottom:8px}
+.lp-sv-bar{height:7px;background:#f1f5f9;border-radius:3px;margin-top:4px}
+.lp-sv-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .4s}
 .pin-key{
   padding:16px 8px;border-radius:12px;border:1.5px solid #e2e8f0;
   background:#fff;color:#0f172a;font-size:1.3rem;font-weight:700;
@@ -310,6 +315,7 @@ table{border-collapse:collapse;min-width:560px;width:100%}
   <button class="tab-btn active" onclick="switchTab('jadwal',this)">📋 Jadwal</button>
   <button class="tab-btn" onclick="switchTab('daftar',this)">📃 Daftar</button>
   <button class="tab-btn" onclick="switchTab('rekap',this)">📊 Rekap</button>
+  <button class="tab-btn" onclick="switchTab('laporan',this)">💼 Laporan</button>
 </div>
 
 <!-- TAB JADWAL -->
@@ -347,7 +353,216 @@ table{border-collapse:collapse;min-width:560px;width:100%}
   </div>
 </div>
 
+<!-- TAB LAPORAN -->
+<div id="tab-laporan" class="hidden">
+  <div style="padding:0 12px;margin-bottom:86px">
+    <!-- Date Range Picker -->
+    <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+      <div style="font-weight:800;font-size:.82rem;color:#0f172a;margin-bottom:10px">📅 Periode Laporan</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="lp-range-btn active" onclick="setLapRange('today',this)">Hari Ini</button>
+        <button class="lp-range-btn" onclick="setLapRange('week',this)">Minggu Ini</button>
+        <button class="lp-range-btn" onclick="setLapRange('month',this)">Bulan Ini</button>
+        <button class="lp-range-btn" onclick="setLapRange('custom',this)">Custom</button>
+      </div>
+      <div id="lp-custom" class="hidden" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div><label style="font-size:.65rem;font-weight:700;color:#374151;display:block;margin-bottom:3px">DARI</label>
+          <input class="fi" type="date" id="lp-from" onchange="loadLaporan()" style="font-size:.8rem;padding:8px"></div>
+        <div><label style="font-size:.65rem;font-weight:700;color:#374151;display:block;margin-bottom:3px">SAMPAI</label>
+          <input class="fi" type="date" id="lp-to" onchange="loadLaporan()" style="font-size:.8rem;padding:8px"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span id="lp-range-lbl" style="font-size:.72rem;font-weight:700;color:#64748b"></span>
+        <button onclick="exportLaporan()" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:.72rem;font-weight:700;cursor:pointer">📊 Export Excel</button>
+      </div>
+    </div>
+    <!-- Summary Cards -->
+    <div id="lp-loading" class="hidden" style="text-align:center;padding:30px;color:#94a3b8">⏳ Memuat data...</div>
+    <div id="lp-content">
+      <!-- Revenue Summary -->
+      <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+        <div style="font-weight:800;font-size:.82rem;color:#0f172a;margin-bottom:10px">💰 Ringkasan Revenue</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px" id="lp-rev-cards"></div>
+        <div id="lp-rev-bar"></div>
+      </div>
+      <!-- Insentif & Penggajian Terapis -->
+      <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-weight:800;font-size:.82rem;color:#0f172a">👨‍⚕️ Insentif & Penggajian Terapis</div>
+          <span style="font-size:.62rem;color:#94a3b8;font-weight:600" id="lp-th-count"></span>
+        </div>
+        <div id="lp-terapis-list"></div>
+        <div style="margin-top:10px;padding:8px 10px;background:#f0fdf4;border-radius:9px;display:flex;justify-content:space-between">
+          <span style="font-size:.75rem;font-weight:700;color:#374151">Total Insentif Semua Terapis</span>
+          <span style="font-size:.82rem;font-weight:900;color:#16a34a" id="lp-total-insentif">Rp 0</span>
+        </div>
+      </div>
+      <!-- Top Layanan -->
+      <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+        <div style="font-weight:800;font-size:.82rem;color:#0f172a;margin-bottom:10px">🏆 Top Layanan</div>
+        <div id="lp-top-layanan"></div>
+      </div>
+      <!-- Detail per Booking -->
+      <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-weight:800;font-size:.82rem;color:#0f172a">📋 Detail Sesi</div>
+          <span style="font-size:.65rem;color:#94a3b8" id="lp-sesi-count"></span>
+        </div>
+        <div id="lp-detail-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <button class="fab" onclick="openAdd()">+</button>
+<!-- ─── MODAL EDIT TERAPIS ─── -->
+<div class="overlay hidden" id="modal-edit-th" onclick="closeOvr(event,'modal-edit-th')">
+  <div class="sheet" style="max-height:65vh">
+    <div class="hbar"></div>
+    <div class="shdr">
+      <div><div class="stitle-s">Pengaturan</div><div class="stitle">✏️ Edit Terapis</div></div>
+      <button class="cbtn" onclick="closeModal('modal-edit-th')">✕</button>
+    </div>
+    <div class="sbody">
+      <input type="hidden" id="eth-id">
+      <div class="ff"><label class="fl">Nama / Panggilan</label><input class="fi" id="eth-nama" placeholder="Nama terapis..."></div>
+      <div class="ff">
+        <label class="fl">🏆 Komisi (%)</label>
+        <div style="display:flex;align-items:center;gap:10px">
+          <input class="fi" id="eth-kom" type="number" min="0" max="100" step="0.5" placeholder="0" style="flex:1">
+          <span style="font-size:.85rem;font-weight:800;color:#d97706" id="eth-kom-preview">0%</span>
+        </div>
+        <div style="font-size:.65rem;color:#94a3b8;margin-top:4px">Persentase dari harga sesi yang menjadi insentif terapis</div>
+      </div>
+      <div class="ff">
+        <label class="fl">🎨 Warna Jadwal</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap" id="eth-colors">
+          <div style="width:28px;height:28px;border-radius:7px;background:#2563eb;cursor:pointer;border:3px solid transparent" onclick="selEthColor('#2563eb',this)"></div>
+          <div style="width:28px;height:28px;border-radius:7px;background:#16a34a;cursor:pointer;border:3px solid transparent" onclick="selEthColor('#16a34a',this)"></div>
+          <div style="width:28px;height:28px;border-radius:7px;background:#9333ea;cursor:pointer;border:3px solid transparent" onclick="selEthColor('#9333ea',this)"></div>
+          <div style="width:28px;height:28px;border-radius:7px;background:#ea580c;cursor:pointer;border:3px solid transparent" onclick="selEthColor('#ea580c',this)"></div>
+          <div style="width:28px;height:28px;border-radius:7px;background:#0891b2;cursor:pointer;border:3px solid transparent" onclick="selEthColor('#0891b2',this)"></div>
+          <div style="width:28px;height:28px;border-radius:7px;background:#be185d;cursor:pointer;border:3px solid transparent" onclick="selEthColor('#be185d',this)"></div>
+          <div style="width:28px;height:28px;border-radius:7px;background:#ca8a04;cursor:pointer;border:3px solid transparent" onclick="selEthColor('#ca8a04',this)"></div>
+          <div style="width:28px;height:28px;border-radius:7px;background:#0d9488;cursor:pointer;border:3px solid transparent" onclick="selEthColor('#0d9488',this)"></div>
+          <div style="width:28px;height:28px;border-radius:7px;background:#dc2626;cursor:pointer;border:3px solid transparent" onclick="selEthColor('#dc2626',this)"></div>
+        </div>
+      </div>
+      <div id="eth-err" class="lerr hidden" style="margin-bottom:8px"></div>
+    </div>
+    <div class="sfooter">
+      <button class="btn-o" onclick="closeModal('modal-edit-th')">Batal</button>
+      <button class="btn-g" style="flex:2" onclick="saveEditTh()">✅ Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL EDIT LAYANAN ─── -->
+<div class="overlay hidden" id="modal-edit-sv" onclick="closeOvr(event,'modal-edit-sv')">
+  <div class="sheet" style="max-height:88vh">
+    <div class="hbar"></div>
+    <div class="shdr">
+      <div><div class="stitle-s">Pengaturan</div><div class="stitle">✏️ Edit Layanan</div></div>
+      <button class="cbtn" onclick="closeModal('modal-edit-sv')">✕</button>
+    </div>
+    <div class="sbody">
+      <input type="hidden" id="esv-nama-ori">
+      <div class="ff"><label class="fl">Nama Layanan</label><input class="fi" id="esv-nama" placeholder="Nama layanan..."></div>
+      <div class="ff">
+        <label class="fl">Kategori</label>
+        <select class="fi" id="esv-kat" style="padding:9px">
+          <option value="Massage">Massage</option>
+          <option value="Reflexology">Reflexology</option>
+          <option value="Wajah">Wajah</option>
+          <option value="Body Treatment">Body Treatment</option>
+          <option value="Kecantikan">Kecantikan</option>
+          <option value="Lainnya">Lainnya</option>
+        </select>
+      </div>
+      <div class="ff">
+        <label class="fl">💰 Harga per Durasi</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:#94a3b8;font-weight:700">30mnt</span><input class="fi" id="esv-h30" type="number" placeholder="0" style="padding-left:46px"></div>
+          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:#94a3b8;font-weight:700">60mnt</span><input class="fi" id="esv-h60" type="number" placeholder="0" style="padding-left:46px"></div>
+          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:#94a3b8;font-weight:700">90mnt</span><input class="fi" id="esv-h90" type="number" placeholder="0" style="padding-left:46px"></div>
+          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:#94a3b8;font-weight:700">120mnt</span><input class="fi" id="esv-h120" type="number" placeholder="0" style="padding-left:52px"></div>
+        </div>
+        <div style="font-size:.62rem;color:#94a3b8;margin-top:3px">Isi 0 jika durasi tidak tersedia</div>
+      </div>
+      <div class="g2">
+        <div><label class="fl">🏆 Komisi (%)</label><input class="fi" id="esv-kom" type="number" min="0" max="100" placeholder="20"></div>
+        <div><label class="fl">⏱ Durasi Default</label>
+          <select class="fi" id="esv-dur" style="padding:9px">
+            <option value="30">30 menit</option>
+            <option value="60">60 menit</option>
+            <option value="90">90 menit</option>
+            <option value="120">120 menit</option>
+          </select>
+        </div>
+      </div>
+      <div id="esv-err" class="lerr hidden" style="margin-bottom:8px"></div>
+    </div>
+    <div class="sfooter">
+      <button class="btn-o" onclick="closeModal('modal-edit-sv')">Batal</button>
+      <button class="btn-g" style="flex:2" onclick="saveEditSv()">✅ Simpan Perubahan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL EDIT DISKON ─── -->
+<div class="overlay hidden" id="modal-edit-dk" onclick="closeOvr(event,'modal-edit-dk')">
+  <div class="sheet" style="max-height:60vh">
+    <div class="hbar"></div>
+    <div class="shdr">
+      <div><div class="stitle-s">Pengaturan</div><div class="stitle">✏️ Edit Diskon</div></div>
+      <button class="cbtn" onclick="closeModal('modal-edit-dk')">✕</button>
+    </div>
+    <div class="sbody">
+      <input type="hidden" id="edk-id">
+      <div class="ff"><label class="fl">Nama Diskon</label><input class="fi" id="edk-nama" placeholder="Nama diskon..."></div>
+      <div class="g2">
+        <div><label class="fl">Tipe</label>
+          <select class="fi" id="edk-tipe" style="padding:9px">
+            <option value="persen">Persentase (%)</option>
+            <option value="nominal">Nominal (Rp)</option>
+          </select>
+        </div>
+        <div><label class="fl">Nilai</label><input class="fi" id="edk-nilai" type="number" placeholder="0"></div>
+      </div>
+      <div id="edk-err" class="lerr hidden"></div>
+    </div>
+    <div class="sfooter">
+      <button class="btn-o" onclick="closeModal('modal-edit-dk')">Batal</button>
+      <button class="btn-g" style="flex:2" onclick="saveEditDk()">✅ Simpan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MODAL EDIT PAKET ─── -->
+<div class="overlay hidden" id="modal-edit-pk" onclick="closeOvr(event,'modal-edit-pk')">
+  <div class="sheet" style="max-height:60vh">
+    <div class="hbar"></div>
+    <div class="shdr">
+      <div><div class="stitle-s">Pengaturan</div><div class="stitle">✏️ Edit Paket</div></div>
+      <button class="cbtn" onclick="closeModal('modal-edit-pk')">✕</button>
+    </div>
+    <div class="sbody">
+      <input type="hidden" id="epk-id">
+      <div class="ff"><label class="fl">Nama Paket</label><input class="fi" id="epk-nama" placeholder="Nama paket..."></div>
+      <div class="g2">
+        <div><label class="fl">Jumlah Sesi</label><input class="fi" id="epk-sesi" type="number" min="1" placeholder="10"></div>
+        <div><label class="fl">Harga Total (Rp)</label><input class="fi" id="epk-harga" type="number" min="0" placeholder="500000"></div>
+      </div>
+      <div id="epk-preview" style="background:#f0fdf4;border-radius:9px;padding:8px 12px;font-size:.72rem;color:#16a34a;font-weight:700;margin-top:4px"></div>
+      <div id="epk-err" class="lerr hidden"></div>
+    </div>
+    <div class="sfooter">
+      <button class="btn-o" onclick="closeModal('modal-edit-pk')">Batal</button>
+      <button class="btn-g" style="flex:2" onclick="saveEditPk()">✅ Simpan</button>
+    </div>
+  </div>
+</div>
+
 </div><!-- /#app -->
 
 <div id="toast"></div>
@@ -902,6 +1117,7 @@ async function afterLogin(){
   }
   try{ subscribeRT(); }catch(e){ console.warn("RT subscribe failed:",e); }
   startCountdownTimer();
+  initLaporan();
 }
 
 function doLogout(){
@@ -1183,7 +1399,13 @@ function renderRekap(){
 
 // ═══ NAVIGATION ═══════════════════════════════════════════════
 function changeDate(n){currentDate=addDays(currentDate,n);document.getElementById("fp-date").value=fmtISO(currentDate);loadBookings()}
-function switchTab(n,btn){["jadwal","daftar","rekap"].forEach(t=>document.getElementById("tab-"+t).classList.add("hidden"));document.getElementById("tab-"+n).classList.remove("hidden");document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active")}
+function switchTab(n,btn){
+  ["jadwal","daftar","rekap","laporan"].forEach(t=>document.getElementById("tab-"+t).classList.add("hidden"));
+  document.getElementById("tab-"+n).classList.remove("hidden");
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  if(n==="laporan") loadLaporan();
+}
 function resetFilter(){["s-input","fr-filter","ft-filter","fp-filter"].forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});document.getElementById("fpanel").classList.add("hidden");renderList()}
 
 // ═══ FORM ═════════════════════════════════════════════════════
@@ -1699,10 +1921,10 @@ function renderThList(){
       <div style="width:34px;height:34px;border-radius:9px;background:${t.warna};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.75rem;flex-shrink:0">${t.nama.slice(0,2).toUpperCase()}</div>
       <div class="set-item-info">
         <div class="set-item-name">${t.nama}</div>
-        <div class="set-item-sub">${t.id} · <span style="color:#d97706;font-weight:700">🏆 Komisi ${t.insentif||0}%</span></div>
+        <div class="set-item-sub">${t.id} · <span style="color:#d97706;font-weight:700">🏆 ${t.insentif||0}% komisi</span></div>
       </div>
       <div class="set-actions">
-        <button class="set-btn-sm" style="border-color:var(--blue);color:var(--blue)" onclick="editTh('${t.id}')">✏️</button>
+        <button class="set-btn-sm" style="border-color:var(--blue);color:var(--blue);padding:5px 9px" onclick="openEditTh('${t.id}')">✏️ Edit</button>
         <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteTh('${t.id}')">🗑</button>
       </div>
     </div>`).join("");
@@ -1717,14 +1939,159 @@ async function addTerapis(){
   document.getElementById("new-th-nama").value="";
   await loadMaster();initForm();renderThList();toast("✅ Terapis ditambahkan");
 }
-function editTh(id){
+// ── EDIT TERAPIS ─────────────────────────────────
+let _ethSelectedColor="";
+
+function openEditTh(id){
   const t=THERAPISTS.find(x=>x.id===id);if(!t)return;
-  const nama=prompt("Nama terapis:",t.nama);if(!nama)return;
-  const insentif=parseFloat(prompt("Insentif %:",t.insentif||0)||0);
-  db.from("app_terapis").update({nama,insentif_persen:insentif}).eq("id",id).then(({error})=>{
-    if(error)toast("❌ "+error.message);
-    else{loadMaster().then(()=>{initForm();renderThList();toast("✅ Diupdate")})}
+  document.getElementById("eth-id").value=id;
+  document.getElementById("eth-nama").value=t.nama;
+  document.getElementById("eth-kom").value=t.insentif||0;
+  document.getElementById("eth-kom-preview").textContent=(t.insentif||0)+"%";
+  _ethSelectedColor=t.warna||"#2563eb";
+  // Highlight selected color
+  document.querySelectorAll("#eth-colors div").forEach(el=>{
+    el.style.border=el.style.background===_ethSelectedColor?"3px solid #0f172a":"3px solid transparent";
   });
+  hideErr("eth-err");
+  openModal("modal-edit-th");
+}
+// Live preview komisi
+document.addEventListener("input",e=>{
+  if(e.target.id==="eth-kom") document.getElementById("eth-kom-preview").textContent=(e.target.value||0)+"%";
+  if(e.target.id==="epk-sesi"||e.target.id==="epk-harga") updatePkPreview();
+});
+function selEthColor(color,el){
+  _ethSelectedColor=color;
+  document.querySelectorAll("#eth-colors div").forEach(d=>d.style.border="3px solid transparent");
+  el.style.border="3px solid #0f172a";
+}
+async function saveEditTh(){
+  const id=document.getElementById("eth-id").value;
+  const nama=document.getElementById("eth-nama").value.trim();
+  const kom=parseFloat(document.getElementById("eth-kom").value||0);
+  if(!nama){showErr("eth-err","⚠️ Nama wajib diisi");return}
+  if(kom<0||kom>100){showErr("eth-err","⚠️ Komisi harus antara 0-100%");return}
+  hideErr("eth-err");
+  try{
+    const{error}=await db.from("app_terapis").update({
+      nama, insentif_persen:kom, warna:_ethSelectedColor
+    }).eq("id",id);
+    if(error){showErr("eth-err","❌ "+error.message);return}
+    closeModal("modal-edit-th");
+    await loadMaster();initForm();renderThList();
+    toast("✅ Terapis '"+nama+"' berhasil diupdate");
+  }catch(e){showErr("eth-err","❌ "+e.message)}
+}
+
+// ── EDIT LAYANAN ──────────────────────────────────
+function openEditSv(nama){
+  const s=SERVICES.find(x=>(x.nama||x)===nama);if(!s)return;
+  document.getElementById("esv-nama-ori").value=s.nama||s;
+  document.getElementById("esv-nama").value=s.nama||s;
+  document.getElementById("esv-kat").value=s.kat||"Massage";
+  document.getElementById("esv-h30").value=s.harga?.["30"]||"";
+  document.getElementById("esv-h60").value=s.harga?.["60"]||"";
+  document.getElementById("esv-h90").value=s.harga?.["90"]||"";
+  document.getElementById("esv-h120").value=s.harga?.["120"]||"";
+  document.getElementById("esv-kom").value=s.komisi||0;
+  document.getElementById("esv-dur").value=String(s.dur||60);
+  hideErr("esv-err");
+  openModal("modal-edit-sv");
+}
+async function saveEditSv(){
+  const namaOri=document.getElementById("esv-nama-ori").value;
+  const nama=document.getElementById("esv-nama").value.trim();
+  const kat=document.getElementById("esv-kat").value;
+  const h30=parseInt(document.getElementById("esv-h30").value||0);
+  const h60=parseInt(document.getElementById("esv-h60").value||0);
+  const h90=parseInt(document.getElementById("esv-h90").value||0);
+  const h120=parseInt(document.getElementById("esv-h120").value||0);
+  const kom=parseFloat(document.getElementById("esv-kom").value||0);
+  const dur=parseInt(document.getElementById("esv-dur").value||60);
+  if(!nama){showErr("esv-err","⚠️ Nama layanan wajib diisi");return}
+  if(!h30&&!h60&&!h90&&!h120){showErr("esv-err","⚠️ Isi minimal satu harga durasi");return}
+  const hargaObj={};
+  if(h30>0) hargaObj["30"]=h30;
+  if(h60>0) hargaObj["60"]=h60;
+  if(h90>0) hargaObj["90"]=h90;
+  if(h120>0) hargaObj["120"]=h120;
+  hideErr("esv-err");
+  try{
+    const{error}=await db.from("app_layanan").update({
+      nama, kategori:kat,
+      harga_json:JSON.stringify(hargaObj),
+      durasi_default:dur,
+      insentif_persen:kom
+    }).eq("nama",namaOri);
+    if(error){showErr("esv-err","❌ "+error.message);return}
+    closeModal("modal-edit-sv");
+    await loadMaster();initForm();renderSvList();
+    toast("✅ Layanan '"+nama+"' berhasil diupdate");
+  }catch(e){showErr("esv-err","❌ "+e.message)}
+}
+
+// ── EDIT DISKON ───────────────────────────────────
+function openEditDk(id){
+  const d=_diskonCache.find(x=>x.id===id);if(!d)return;
+  document.getElementById("edk-id").value=id;
+  document.getElementById("edk-nama").value=d.nama;
+  document.getElementById("edk-tipe").value=d.tipe;
+  document.getElementById("edk-nilai").value=d.nilai;
+  hideErr("edk-err");
+  openModal("modal-edit-dk");
+}
+async function saveEditDk(){
+  const id=parseInt(document.getElementById("edk-id").value);
+  const nama=document.getElementById("edk-nama").value.trim();
+  const tipe=document.getElementById("edk-tipe").value;
+  const nilai=parseFloat(document.getElementById("edk-nilai").value||0);
+  if(!nama){showErr("edk-err","⚠️ Nama diskon wajib");return}
+  if(nilai<=0){showErr("edk-err","⚠️ Nilai diskon harus lebih dari 0");return}
+  hideErr("edk-err");
+  try{
+    const{error}=await db.from("app_diskon").update({nama,tipe,nilai}).eq("id",id);
+    if(error){showErr("edk-err","❌ "+error.message);return}
+    closeModal("modal-edit-dk");
+    await loadDiskonPaket();renderDkList();
+    toast("✅ Diskon '"+nama+"' berhasil diupdate");
+  }catch(e){showErr("edk-err","❌ "+e.message)}
+}
+
+// ── EDIT PAKET ────────────────────────────────────
+function openEditPk(id){
+  const p=_paketCache.find(x=>x.id===id);if(!p)return;
+  document.getElementById("epk-id").value=id;
+  document.getElementById("epk-nama").value=p.nama;
+  document.getElementById("epk-sesi").value=p.sesi;
+  document.getElementById("epk-harga").value=p.harga;
+  updatePkPreview();
+  hideErr("epk-err");
+  openModal("modal-edit-pk");
+}
+function updatePkPreview(){
+  const sesi=parseInt(document.getElementById("epk-sesi")?.value||0);
+  const harga=parseInt(document.getElementById("epk-harga")?.value||0);
+  const el=document.getElementById("epk-preview");
+  if(el&&sesi>0&&harga>0) el.textContent="≈ Rp "+Math.round(harga/sesi).toLocaleString("id-ID")+"/sesi";
+  else if(el) el.textContent="";
+}
+async function saveEditPk(){
+  const id=parseInt(document.getElementById("epk-id").value);
+  const nama=document.getElementById("epk-nama").value.trim();
+  const sesi=parseInt(document.getElementById("epk-sesi").value||1);
+  const harga=parseFloat(document.getElementById("epk-harga").value||0);
+  if(!nama){showErr("epk-err","⚠️ Nama paket wajib");return}
+  if(sesi<1){showErr("epk-err","⚠️ Jumlah sesi minimal 1");return}
+  if(harga<=0){showErr("epk-err","⚠️ Harga harus lebih dari 0");return}
+  hideErr("epk-err");
+  try{
+    const{error}=await db.from("app_paket").update({nama,sesi,harga}).eq("id",id);
+    if(error){showErr("epk-err","❌ "+error.message);return}
+    closeModal("modal-edit-pk");
+    await loadDiskonPaket();renderPkList();
+    toast("✅ Paket '"+nama+"' berhasil diupdate");
+  }catch(e){showErr("epk-err","❌ "+e.message)}
 }
 async function deleteTh(id){
   if(!confirm("Hapus terapis ini?"))return;
@@ -1754,7 +2121,10 @@ function renderSvList(){
       out+=`<div class="set-item" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
           <div class="set-item-name" style="font-size:.82rem">💆 ${s.nama}</div>
-          <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteSv('${s.nama}')">Hapus</button>
+          <div style="display:flex;gap:4px">
+            <button class="set-btn-sm" style="border-color:var(--blue);color:var(--blue);padding:4px 8px" onclick="openEditSv('${s.nama}')">✏️ Edit</button>
+            <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteSv('${s.nama}')">🗑</button>
+          </div>
         </div>
         <div>${hargaList||'<span style="font-size:.62rem;color:#94a3b8">Harga belum diset</span>'}</div>
       </div>`;
@@ -1816,7 +2186,10 @@ function renderDkList(){
       <div class="set-item-name">🏷️ ${d.nama}</div>
       <div class="set-item-sub">${d.tipe==="persen"?d.nilai+"%":"Rp "+Number(d.nilai).toLocaleString("id-ID")}</div>
     </div>
-    <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteDk(${d.id})">🗑 Hapus</button></div>`).join(""):
+    <div style="display:flex;gap:4px">
+      <button class="set-btn-sm" style="border-color:var(--blue);color:var(--blue);padding:4px 8px" onclick="openEditDk(${d.id})">✏️ Edit</button>
+      <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteDk(${d.id})">🗑</button>
+    </div></div>`).join(""):
     '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.78rem">Belum ada diskon — tambahkan di atas</div>';
 }
 async function addDiskon(){
@@ -1848,7 +2221,10 @@ function renderPkList(){
       <div class="set-item-name">📦 ${p.nama}</div>
       <div class="set-item-sub">${p.sesi} sesi · Rp ${Number(p.harga).toLocaleString("id-ID")} · <b>Rp ${Math.round(p.harga/p.sesi).toLocaleString("id-ID")}/sesi</b></div>
     </div>
-    <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deletePk(${p.id})">🗑 Hapus</button></div>`).join(""):
+    <div style="display:flex;gap:4px">
+      <button class="set-btn-sm" style="border-color:var(--blue);color:var(--blue);padding:4px 8px" onclick="openEditPk(${p.id})">✏️ Edit</button>
+      <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deletePk(${p.id})">🗑</button>
+    </div></div>`).join(""):
     '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.78rem">Belum ada paket — tambahkan di atas</div>';
 }
 async function addPaket(){
@@ -1946,6 +2322,260 @@ async function gsReq(url,method,payload){
 function setGsStatus(t,m){document.getElementById("gs-status").innerHTML=`<div style="margin:10px 0;padding:9px 12px;border-radius:9px;background:${t==="success"?"#dcfce7":t==="error"?"#fee2e2":"#f1f5f9"};color:${t==="success"?"#16a34a":t==="error"?"#dc2626":"#64748b"};font-size:.75rem;font-weight:600">${t==="loading"?"⏳ ":""}${m}</div>`}
 async function testGS(){const url=document.getElementById("gs-url").value.trim()||GS_URL;if(!url)return;await setConfig("gs_url",url);document.getElementById("gs-url").value=url;setGsStatus("loading","Testing...");const r=await gsReq(url,"GET",{action:"ping"});r.status==="ok"?setGsStatus("success","✅ Koneksi berhasil!"):setGsStatus("error","❌ "+(r.error||"Gagal"))}
 async function syncGS(){const url=document.getElementById("gs-url").value.trim()||GS_URL;if(!url)return;await setConfig("gs_url",url);document.getElementById("gs-url").value=url;setGsStatus("loading","Menyinkronkan...");const r=await gsReq(url,"POST",{action:"sync",data:bookings.map(b=>({...b,tanggal:fmtISO(currentDate),therapistName:getTh(b.therapist).nama}))});if(r.error)setGsStatus("error","❌ "+r.error);else{const t=new Date().toLocaleString("id-ID");setGsStatus("success","✅ "+(r.message||"Berhasil"));localStorage.setItem("gs_last",t);document.getElementById("gs-last").textContent="🕐 Terakhir: "+t}}
+// ══════════════════════════════════════════════════════════
+// FASE 5: LAPORAN — Insentif & Penggajian
+// ══════════════════════════════════════════════════════════
+let lapData=[], lapFrom="", lapTo="", lapRange="today";
+
+function setLapRange(range, btn){
+  lapRange=range;
+  document.querySelectorAll(".lp-range-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  const custom=document.getElementById("lp-custom");
+  if(range==="custom"){ custom.classList.remove("hidden"); return; }
+  custom.classList.add("hidden");
+  loadLaporan();
+}
+
+function getLapDates(){
+  const now=new Date();
+  const today=fmtISO(now);
+  if(lapRange==="today") return {from:today, to:today, label:"Hari ini, "+fmtDate(now)};
+  if(lapRange==="week"){
+    const dow=now.getDay(); // 0=Sun
+    const mon=addDays(now,-dow+1);
+    const sun=addDays(mon,6);
+    return {from:fmtISO(mon), to:fmtISO(sun), label:"Minggu ini ("+fmtISO(mon)+" s/d "+fmtISO(sun)+")"};
+  }
+  if(lapRange==="month"){
+    const from=new Date(now.getFullYear(),now.getMonth(),1);
+    const to=new Date(now.getFullYear(),now.getMonth()+1,0);
+    return {from:fmtISO(from), to:fmtISO(to), label:MONTHS[now.getMonth()]+" "+now.getFullYear()};
+  }
+  // custom
+  const f=document.getElementById("lp-from")?.value||today;
+  const t=document.getElementById("lp-to")?.value||today;
+  return {from:f, to:t, label:f+" s/d "+t};
+}
+
+async function loadLaporan(){
+  const{from,to,label}=getLapDates();
+  lapFrom=from; lapTo=to;
+  document.getElementById("lp-range-lbl").textContent=label;
+  document.getElementById("lp-loading").classList.remove("hidden");
+  document.getElementById("lp-content").style.opacity="0.4";
+  try{
+    const{data,error}=await db.from("app_booking")
+      .select("id,tanggal,patient,service,therapist_id,therapist_name,harga,dp_amount,sisa_bayar,pay_status,duration_min,method")
+      .gte("tanggal",from).lte("tanggal",to)
+      .order("tanggal").order("start_time");
+    if(error) throw error;
+    lapData=(data||[]).map(r=>({
+      id:r.id, tanggal:r.tanggal, patient:r.patient,
+      service:r.service||"-", therapistId:r.therapist_id||"",
+      therapistName:r.therapist_name||"",
+      harga:r.harga||0, dp:r.dp_amount||0, sisa:r.sisa_bayar||0,
+      payStatus:r.pay_status||"Belum Bayar", dur:r.duration_min||60,
+      method:r.method||"-"
+    }));
+  }catch(e){
+    console.error("loadLaporan error:",e);
+    lapData=[];
+  }
+  document.getElementById("lp-loading").classList.add("hidden");
+  document.getElementById("lp-content").style.opacity="1";
+  renderLaporan();
+}
+
+function renderLaporan(){
+  const d=lapData;
+  if(!d.length){
+    document.getElementById("lp-rev-cards").innerHTML="<div style='grid-column:1/-1;text-align:center;padding:20px;color:#94a3b8;font-size:.78rem'>📭 Tidak ada data sesi</div>";
+    document.getElementById("lp-terapis-list").innerHTML="<div style='text-align:center;padding:16px;color:#94a3b8;font-size:.78rem'>Tidak ada data</div>";
+    document.getElementById("lp-top-layanan").innerHTML="";
+    document.getElementById("lp-detail-list").innerHTML="";
+    document.getElementById("lp-sesi-count").textContent="0 sesi";
+    return;
+  }
+
+  // ── REVENUE ─────────────────────────────────────────
+  const totalRev=d.reduce((s,b)=>s+b.harga,0);
+  const revLunas=d.filter(b=>b.payStatus==="Lunas").reduce((s,b)=>s+b.harga,0);
+  const revDP=d.filter(b=>b.payStatus==="DP").reduce((s,b)=>s+b.dp,0);
+  const revPiutang=d.filter(b=>b.payStatus!=="Lunas").reduce((s,b)=>s+b.sisa,0);
+  const totalSesi=d.length;
+  const avgHarga=totalSesi?Math.round(totalRev/totalSesi):0;
+
+  document.getElementById("lp-rev-cards").innerHTML=[
+    ["💰 Total Potensi",fmtRp(totalRev),"#2563eb","#dbeafe"],
+    ["✅ Sudah Lunas",fmtRp(revLunas),"#16a34a","#dcfce7"],
+    ["💵 DP Masuk",fmtRp(revDP),"#d97706","#fef3c7"],
+    ["🔴 Piutang",fmtRp(revPiutang),"#dc2626","#fee2e2"],
+  ].map(([l,v,c,bg])=>`<div style="background:${bg};border-radius:11px;padding:11px 13px;text-align:center">
+    <div style="font-size:.98rem;font-weight:900;color:${c}">${v}</div>
+    <div style="font-size:.6rem;color:#374151;margin-top:3px;font-weight:600">${l}</div>
+  </div>`).join("");
+
+  document.getElementById("lp-rev-bar").innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9">
+      ${[["Total Sesi",totalSesi+" sesi","#0f172a"],["Rata-rata/sesi",fmtRp(avgHarga),"#2563eb"],["Hari Aktif",new Set(d.map(b=>b.tanggal)).size+" hari","#9333ea"]]
+        .map(([l,v,c])=>`<div style="text-align:center"><div style="font-size:.88rem;font-weight:800;color:${c}">${v}</div><div style="font-size:.6rem;color:#94a3b8">${l}</div></div>`).join("")}
+    </div>`;
+
+  // ── INSENTIF & PENGGAJIAN TERAPIS ─────────────────────
+  const thMap={};
+  d.forEach(b=>{
+    const tid=b.therapistId||"?";
+    const th=getTh(tid);
+    if(!thMap[tid]) thMap[tid]={
+      id:tid, nama:b.therapistName||th.nama, warna:th.warna||"#2563eb",
+      insentifPct:th.insentif||0, sesi:0, omzet:0, insentif:0, lunas:0, dp:0, piutang:0
+    };
+    const pct=th.insentif||0;
+    thMap[tid].sesi++;
+    thMap[tid].omzet+=b.harga;
+    thMap[tid].insentif+=Math.round(b.harga*(pct/100));
+    if(b.payStatus==="Lunas") thMap[tid].lunas++;
+    else if(b.payStatus==="DP") thMap[tid].dp++;
+    else thMap[tid].piutang++;
+  });
+  const thArr=Object.values(thMap).sort((a,b)=>b.omzet-a.omzet);
+  const totalInsentif=thArr.reduce((s,t)=>s+t.insentif,0);
+
+  document.getElementById("lp-th-count").textContent=thArr.length+" terapis aktif";
+  document.getElementById("lp-total-insentif").textContent=fmtRp(totalInsentif);
+
+  document.getElementById("lp-terapis-list").innerHTML=thArr.map(t=>`
+    <div class="lp-th-card">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+        <div style="width:34px;height:34px;border-radius:10px;background:${t.warna};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.78rem;flex-shrink:0">${t.nama.slice(0,2).toUpperCase()}</div>
+        <div style="flex:1">
+          <div style="font-weight:800;font-size:.85rem;color:#0f172a">${t.nama}</div>
+          <div style="font-size:.62rem;color:#94a3b8">${t.insentifPct}% komisi · ${t.sesi} sesi</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:.88rem;font-weight:900;color:#d97706">${fmtRp(t.insentif)}</div>
+          <div style="font-size:.6rem;color:#94a3b8">insentif</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">
+        ${[["Omzet",fmtRp(t.omzet),"#2563eb"],["Lunas",t.lunas+" sesi","#16a34a"],["DP",t.dp+" sesi","#d97706"],["Piutang",t.piutang+" sesi","#dc2626"]]
+          .map(([l,v,c])=>`<div style="background:#fff;border-radius:7px;padding:6px 8px;text-align:center;border:1px solid #f1f5f9">
+            <div style="font-size:.72rem;font-weight:800;color:${c}">${v}</div>
+            <div style="font-size:.55rem;color:#94a3b8">${l}</div>
+          </div>`).join("")}
+      </div>
+    </div>`).join("");
+
+  // ── TOP LAYANAN ─────────────────────────────────────────
+  const svMap={};
+  d.forEach(b=>{
+    if(!svMap[b.service]) svMap[b.service]={nama:b.service,count:0,omzet:0};
+    svMap[b.service].count++;
+    svMap[b.service].omzet+=b.harga;
+  });
+  const svArr=Object.values(svMap).sort((a,b)=>b.count-a.count).slice(0,8);
+  const maxCount=svArr[0]?.count||1;
+  document.getElementById("lp-top-layanan").innerHTML=svArr.map((s,i)=>`
+    <div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:3px">
+        <span style="font-weight:700;color:#0f172a">${i+1}. ${s.nama}</span>
+        <span style="color:#64748b">${s.count} sesi · ${fmtRp(s.omzet)}</span>
+      </div>
+      <div class="lp-sv-bar"><div class="lp-sv-fill" style="width:${(s.count/maxCount*100).toFixed(0)}%"></div></div>
+    </div>`).join("");
+
+  // ── DETAIL SESI ─────────────────────────────────────────
+  document.getElementById("lp-sesi-count").textContent=d.length+" sesi";
+  const grouped={};
+  d.forEach(b=>{ if(!grouped[b.tanggal]) grouped[b.tanggal]=[]; grouped[b.tanggal].push(b); });
+
+  document.getElementById("lp-detail-list").innerHTML=Object.entries(grouped).map(([tgl,items])=>`
+    <div style="margin-bottom:10px">
+      <div style="font-size:.68rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #f1f5f9">${tgl}</div>
+      ${items.map(b=>{const[c,bg]=PAY_CLR[b.payStatus]||["#94a3b8","#f1f5f9"];return`
+        <div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f8fafc">
+          <div style="width:28px;height:28px;border-radius:7px;background:${getTh(b.therapistId).warna||"#2563eb"};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.6rem;flex-shrink:0">${(b.therapistName||"?").slice(0,2).toUpperCase()}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.78rem;font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</div>
+            <div style="font-size:.6rem;color:#94a3b8">${b.service} · ${b.therapistName} · ${b.dur}mnt</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:.78rem;font-weight:800;color:#16a34a">${fmtRp(b.harga)}</div>
+            <span style="font-size:.58rem;background:${bg};color:${c};border-radius:4px;padding:1px 5px;font-weight:700">${b.payStatus}</span>
+          </div>
+        </div>`}).join("")}
+    </div>`).join("");
+}
+
+// ── EXPORT LAPORAN EXCEL ────────────────────────────────
+function exportLaporan(){
+  if(!lapData.length){toast("⚠️ Tidak ada data untuk di-export");return}
+  const{from,to}=getLapDates();
+
+  // Sheet 1: Revenue Summary
+  const thMap={};
+  lapData.forEach(b=>{
+    const tid=b.therapistId||"?";
+    const th=getTh(tid);
+    if(!thMap[tid]) thMap[tid]={nama:b.therapistName||th.nama,pct:th.insentif||0,sesi:0,omzet:0,insentif:0};
+    thMap[tid].sesi++;
+    thMap[tid].omzet+=b.harga;
+    thMap[tid].insentif+=Math.round(b.harga*((th.insentif||0)/100));
+  });
+
+  const wb=XLSX.utils.book_new();
+
+  // Sheet: Penggajian
+  const gaji=Object.values(thMap).map(t=>({
+    "Terapis":t.nama,"Jumlah Sesi":t.sesi,
+    "Total Omzet":t.omzet,"% Komisi":t.pct+"%",
+    "Insentif (Rp)":t.insentif,"Gaji Pokok (Rp)":0,"Total Gaji":t.insentif
+  }));
+  gaji.push({"Terapis":"TOTAL","Jumlah Sesi":lapData.length,"Total Omzet":lapData.reduce((s,b)=>s+b.harga,0),"% Komisi":"","Insentif (Rp)":Object.values(thMap).reduce((s,t)=>s+t.insentif,0),"Gaji Pokok (Rp)":0,"Total Gaji":Object.values(thMap).reduce((s,t)=>s+t.insentif,0)});
+  const ws1=XLSX.utils.json_to_sheet(gaji);
+  ws1["!cols"]=[{wch:20},{wch:14},{wch:16},{wch:10},{wch:16},{wch:16},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws1,"Penggajian");
+
+  // Sheet: Detail Sesi
+  const detail=lapData.map(b=>({
+    "Tanggal":b.tanggal,"Pasien":b.patient,"Layanan":b.service,
+    "Terapis":b.therapistName,"Durasi (mnt)":b.dur,
+    "Harga (Rp)":b.harga,"DP (Rp)":b.dp,"Sisa (Rp)":b.sisa,
+    "Status":b.payStatus,"Metode":b.method
+  }));
+  const ws2=XLSX.utils.json_to_sheet(detail);
+  ws2["!cols"]=Array(10).fill({wch:16});
+  XLSX.utils.book_append_sheet(wb,ws2,"Detail Sesi");
+
+  // Sheet: Top Layanan
+  const svMap={};
+  lapData.forEach(b=>{ if(!svMap[b.service]) svMap[b.service]={Layanan:b.service,"Jumlah Sesi":0,"Total Omzet":0}; svMap[b.service]["Jumlah Sesi"]++; svMap[b.service]["Total Omzet"]+=b.harga; });
+  const ws3=XLSX.utils.json_to_sheet(Object.values(svMap).sort((a,b)=>b["Jumlah Sesi"]-a["Jumlah Sesi"]));
+  ws3["!cols"]=[{wch:24},{wch:14},{wch:16}];
+  XLSX.utils.book_append_sheet(wb,ws3,"Top Layanan");
+
+  const wbout=XLSX.write(wb,{bookType:"xlsx",type:"array"});
+  const blob=new Blob([wbout],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");a.href=url;a.download="Laporan_TAPAJIVA_"+from+"_to_"+to+".xlsx";
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},1500);
+  toast("📥 Laporan Excel berhasil didownload!");
+}
+
+// Auto-init laporan date pickers
+function initLaporan(){
+  const now=new Date();
+  const y=now.getFullYear(), m=String(now.getMonth()+1).padStart(2,"0"), d2=String(now.getDate()).padStart(2,"0");
+  const mon=new Date(now.getFullYear(),now.getMonth(),1);
+  const monStr=mon.getFullYear()+"-"+String(mon.getMonth()+1).padStart(2,"0")+"-01";
+  const el1=document.getElementById("lp-from");
+  const el2=document.getElementById("lp-to");
+  if(el1) el1.value=monStr;
+  if(el2) el2.value=`${y}-${m}-${d2}`;
+}
+
 </script>
 </body>
 </html>
