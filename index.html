@@ -1109,7 +1109,7 @@ function renderGrid(){
         const cellH=spans*38;
         // Color by pay status
         const cellBg=bk.payStatus==="Lunas"?"#16a34a":bk.payStatus==="DP"?"#d97706":"#dc2626";
-        const sisaText=bk.payStatus==="DP"&&bk.sisa_bayar>0?`Sisa: ${fmtRp(bk.sisa_bayar)}`:"";
+        const sisaText=bk.payStatus==="DP"&&bk.sisa_bayar>0?"Sisa: "+fmtRp(bk.sisa_bayar):"";const sisaHtml=sisaText?"<span class='bk-timer'>"+sisaText+"</span>":"<span class='bk-timer'></span>";
         const thLabel=th.nama||bk.therapistName||"";
         const subLine=bk.service?`${bk.service} · ${thLabel}`:(thLabel||bk.start+"–"+bk.end);
         html+=`<td class="td-r" rowspan="${spans}" style="background:${cellBg};height:${cellH}px;border-left:3px solid rgba(255,255,255,.3)" data-bk="${bk.id}" onclick="openDetail('${bk.id}')">
@@ -1118,7 +1118,7 @@ function renderGrid(){
             <div class="bk-sub">${subLine}</div>
             <div class="bk-foot">
               <span class="bk-badge">${bk.harga>0?fmtRp(bk.harga):bk.payStatus}</span>
-              ${sisaText?`<span class="bk-timer" style="font-size:.48rem;background:rgba(0,0,0,.3)">${sisaText}</span>`:"<span class="bk-timer"></span>"}
+              ${sisaHtml}
             </div>
           </div></td>`;
       }else{
@@ -1762,7 +1762,7 @@ function renderSvList(){
   });
   document.getElementById("set-sv-list").innerHTML=out;
 }
-async async function addLayanan(){
+async function addLayanan(){
   const nama=document.getElementById("sv-nama").value.trim();
   const kat =document.getElementById("sv-kat").value;
   const h30 =parseInt(document.getElementById("sv-h30").value||0);
