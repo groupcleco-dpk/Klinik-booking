@@ -164,6 +164,17 @@ table{border-collapse:collapse;min-width:560px;width:100%}
 .toggle.on::after{left:16px}
 
 /* FAB */
+.fi.invalid{border-color:#dc2626!important;background:#fff5f5!important}
+.fi.invalid:focus{border-color:#dc2626!important}
+.err-msg{font-size:.68rem;color:#dc2626;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:4px}
+/* Pay status color coding */
+.pay-belum{background:#fee2e2!important;color:#dc2626!important;border-color:#dc2626!important}
+.pay-dp{background:#fef3c7!important;color:#d97706!important;border-color:#d97706!important}
+.pay-lunas{background:#dcfce7!important;color:#16a34a!important;border-color:#16a34a!important}
+/* Grid cell color by pay status */
+.cell-belum{background:#dc2626!important}
+.cell-dp{background:#d97706!important}
+.cell-lunas{background:#16a34a!important}
 .fab{position:fixed;bottom:22px;right:18px;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff;font-size:1.4rem;box-shadow:0 6px 20px rgba(37,99,235,.5);display:flex;align-items:center;justify-content:center;z-index:150}
 </style>
 </head>
@@ -307,6 +318,16 @@ table{border-collapse:collapse;min-width:560px;width:100%}
       <div id="fpanel-2" class="hidden">
         <div class="ff"><label class="fl">💳 Metode Pembayaran</label><div id="fp-meth-list"></div></div>
         <div class="ff"><label class="fl">📊 Status Bayar</label><div style="display:flex;gap:6px" id="fp-pay-list"></div></div>
+        <!-- DP Amount field - shown only when DP is selected -->
+        <div class="ff hidden" id="fp-dp-wrap">
+          <label class="fl">💵 Nominal DP yang Dibayar</label>
+          <div style="position:relative">
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.8rem;color:#64748b;font-weight:600">Rp</span>
+            <input class="fi" id="fp-dp-amount" type="number" placeholder="0" min="0" step="1000"
+              style="padding-left:36px" oninput="updatePriceDisplay();updateSummary()">
+          </div>
+          <div id="fp-sisa-disp" style="font-size:.72rem;color:#dc2626;font-weight:700;margin-top:4px"></div>
+        </div>
         <div class="sumbox"><div style="font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:8px">Ringkasan</div><div id="fp-sum"></div></div>
       </div>
     </div>
@@ -630,6 +651,7 @@ async function loadBookings(){
     therapist:r.therapist_id||"",therapistName:r.therapist_name||"",
     room:r.room||"",start:r.start_time||"",end:r.end_time||"",
     duration:r.duration_min||60,harga:r.harga||0,
+    dp_amount:r.dp_amount||0,sisa_bayar:r.sisa_bayar||0,
     method:r.method||"Tunai",
     payStatus:r.pay_status||"Belum Bayar",catatan:r.catatan||""
   }));
@@ -641,7 +663,8 @@ async function insertBK(bk,tanggal){
     id:bk.id,tanggal,patient:bk.patient,phone:bk.phone,service:bk.service,
     therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,
     start_time:bk.start,end_time:bk.end,duration_min:bk.duration,
-    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,harga:bk.harga||0
+    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,
+    harga:bk.harga||0,dp_amount:bk.dp_amount||0,sisa_bayar:bk.sisa_bayar||0
   }]);
   if(error)toast("❌ "+error.message);
   else{toast("✅ Booking disimpan");autoSyncGS();}
@@ -653,7 +676,8 @@ async function updateBK(bk){
     patient:bk.patient,phone:bk.phone,service:bk.service,
     therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,
     start_time:bk.start,end_time:bk.end,duration_min:bk.duration,
-    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,harga:bk.harga||0
+    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,
+    harga:bk.harga||0,dp_amount:bk.dp_amount||0,sisa_bayar:bk.sisa_bayar||0
   }).eq("id",bk.id);
   if(error)toast("❌ "+error.message);
   else{toast("✅ Booking diupdate");autoSyncGS();}
@@ -750,11 +774,19 @@ function renderGrid(){
         const{bk,spans}=entry;
         const th=getTh(bk.therapist);
         const cellH=spans*38;
-        html+=`<td class="td-r" rowspan="${spans}" style="background:${th.warna};height:${cellH}px" data-bk="${bk.id}" onclick="openDetail('${bk.id}')">
+        // Color by pay status
+        const cellBg=bk.payStatus==="Lunas"?"#16a34a":bk.payStatus==="DP"?"#d97706":"#dc2626";
+        const sisaText=bk.payStatus==="DP"&&bk.sisa_bayar>0?`Sisa: ${fmtRp(bk.sisa_bayar)}`:"";
+        const thLabel=th.nama||bk.therapistName||"";
+        const subLine=bk.service?`${bk.service} · ${thLabel}`:(thLabel||bk.start+"–"+bk.end);
+        html+=`<td class="td-r" rowspan="${spans}" style="background:${cellBg};height:${cellH}px;border-left:3px solid rgba(255,255,255,.3)" data-bk="${bk.id}" onclick="openDetail('${bk.id}')">
           <div class="bk-card">
             <div class="bk-name">${bk.patient}</div>
-            <div class="bk-sub">${bk.service||th.nama} · ${bk.harga>0?fmtRp(bk.harga):bk.start+"–"+bk.end}</div>
-            <div class="bk-foot"><span class="bk-badge">${bk.payStatus}</span><span class="bk-timer"></span></div>
+            <div class="bk-sub">${subLine}</div>
+            <div class="bk-foot">
+              <span class="bk-badge">${bk.harga>0?fmtRp(bk.harga):bk.payStatus}</span>
+              ${sisaText?`<span class="bk-timer" style="font-size:.48rem;background:rgba(0,0,0,.3)">${sisaText}</span>`:"<span class="bk-timer"></span>"}
+            </div>
           </div></td>`;
       }else{
         html+=`<td class="td-r" style="background:${ti%2===0?"#fff":"#fafafa"}" onclick="openAddSlot('${room}','${ts}')"></td>`;
@@ -778,7 +810,19 @@ function renderList(){
     const th=getTh(b.therapist);const[cl,bg]=PAY_CLR[b.payStatus]||["#94a3b8","#f1f5f9"];
     const dur=b.duration||calcDur(b.start,b.end)||60;
     const hargaTxt=b.harga>0?fmtRp(b.harga):"";
-    return`<div class="li-item" onclick="openDetail('${b.id}')"><div class="li-av" style="background:${th.warna}">${b.patient.slice(0,2).toUpperCase()}</div><div style="flex:1;min-width:0"><div style="font-weight:800;color:#0f172a;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</div><div style="font-size:.68rem;color:#64748b">${b.service||"-"} · ${b.room} · ${b.start} (${dur}mnt)</div></div><div style="text-align:right;flex-shrink:0"><span class="badge" style="background:${bg};color:${cl};display:block;margin-bottom:3px">${b.payStatus}</span><span style="font-size:.65rem;font-weight:700;color:#16a34a">${hargaTxt}</span></div></div>`;
+    const sisaTxt=b.payStatus==="DP"&&b.sisa_bayar>0?`Sisa: ${fmtRp(b.sisa_bayar)}`:"";
+    const thNama=b.therapistName||getTh(b.therapist).nama||"";
+    return`<div class="li-item" onclick="openDetail('${b.id}')">
+      <div class="li-av" style="background:${b.payStatus==="Lunas"?"#16a34a":b.payStatus==="DP"?"#d97706":"#dc2626"}">${b.patient.slice(0,2).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:#0f172a;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</div>
+        <div style="font-size:.65rem;color:#64748b">${b.service||"-"} · ${thNama} · ${b.room} · ${b.start}</div>
+        ${sisaTxt?`<div style="font-size:.62rem;font-weight:700;color:#dc2626">${sisaTxt}</div>`:""}
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <span class="badge" style="background:${bg};color:${cl};display:block;margin-bottom:3px">${b.payStatus}</span>
+        <span style="font-size:.62rem;font-weight:700;color:#16a34a">${hargaTxt}</span>
+      </div></div>`;
   }).join("");
 }
 
@@ -915,6 +959,7 @@ function updatePriceDisplay(){
   const price= getPrice(nama,dur);
   const el   = document.getElementById("fp-price-disp");
   if(el) el.textContent = price>0 ? fmtRp(price) : (nama?"Harga tidak tersedia":"–");
+  updateSisaDP();
 }
 
 // ── AVAILABILITY CHECK ───────────────────────────────────────
@@ -1022,8 +1067,13 @@ function openAddSlot(room,start){openAdd();selRoom(room);document.getElementById
 function resetForm(){
   busyTherapists=new Set(); busyRooms=new Set(); // Clear conflict state
   ["avail-warn-terapis","avail-warn-room"].forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add("hidden")});
-  ["fp-patient","fp-phone","fp-catatan"].forEach(id=>document.getElementById(id).value="");
-  document.getElementById("fp-service").value="";
+  // Clear validation states
+  ["fp-patient","fp-phone","fp-service","fp-dp-amount"].forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove("invalid");el.value="";}});
+  ["err-fp-patient","err-fp-phone","err-fp-service","err-fp-dp-amount"].forEach(id=>{const el=document.getElementById(id);if(el)el.remove()});
+  document.getElementById("fp-catatan").value="";
+  // Hide DP wrap
+  const dpW=document.getElementById("fp-dp-wrap");if(dpW)dpW.classList.add("hidden");
+  const siD=document.getElementById("fp-sisa-disp");if(siD)siD.textContent="";
   document.getElementById("fp-date").value=fmtISO(currentDate);
   document.getElementById("fp-start").value=TIME_SLOTS[0]||"08:00";
   document.getElementById("fp-dur").value="60";
@@ -1048,6 +1098,11 @@ function fillForm(bk){
   updateEndTime();
   formSel={therapist:bk.therapist,room:bk.room,method:bk.method||"Tunai",payStatus:bk.payStatus||"Belum Bayar"};
   selTh(formSel.therapist);selRoom(formSel.room);selMeth(formSel.method);selPay(formSel.payStatus);
+  // Restore DP amount if editing a DP booking
+  if(bk.payStatus==="DP"&&bk.dp_amount>0){
+    const dpIn=document.getElementById("fp-dp-amount");
+    if(dpIn){dpIn.value=String(bk.dp_amount);updateSisaDP();}
+  }
 }
 
 function fTab(n){
@@ -1057,11 +1112,66 @@ function fTab(n){
   if(n===2) updateSummary();
   renderFoot();
 }
+function validateTab(n){
+  // Returns true if current tab passes validation
+  if(n===0){
+    const pat=document.getElementById("fp-patient").value.trim();
+    const ph =document.getElementById("fp-phone").value.trim();
+    const sv =document.getElementById("fp-service").value;
+    const errs=[];
+    setFieldErr("fp-patient",!pat,"Nama pasien wajib diisi");
+    setFieldErr("fp-phone",!ph,"No. HP wajib diisi");
+    setFieldErr("fp-service",!sv,"Layanan wajib dipilih");
+    return pat&&ph&&sv;
+  }
+  if(n===1){
+    const noTh=!formSel.therapist||busyTherapists.has(formSel.therapist);
+    const noRm=!formSel.room||busyRooms.has(formSel.room);
+    if(noTh) showAvailWarning("terapis","Pilih terapis yang tersedia terlebih dahulu");
+    if(noRm) showAvailWarning("room","Pilih ruangan yang tersedia terlebih dahulu");
+    return !noTh&&!noRm;
+  }
+  if(n===2){
+    if(formSel.payStatus==="DP"){
+      const dp=parseInt(document.getElementById("fp-dp-amount")?.value||0);
+      const harga=getPrice(document.getElementById("fp-service").value, parseInt(document.getElementById("fp-dur").value));
+      if(dp<=0){
+        setFieldErr("fp-dp-amount",true,"Nominal DP harus diisi");return false;
+      }
+      if(dp>=harga&&harga>0){
+        setFieldErr("fp-dp-amount",true,"Nominal DP tidak boleh >= harga penuh. Pilih Lunas");return false;
+      }
+      setFieldErr("fp-dp-amount",false,"");
+    }
+    return true;
+  }
+  return true;
+}
+
+function setFieldErr(id,isErr,msg){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.toggle("invalid",isErr);
+  // Show/hide error message below field
+  let em=document.getElementById("err-"+id);
+  if(!em&&isErr){
+    em=document.createElement("div");em.id="err-"+id;em.className="err-msg";
+    el.parentNode.insertBefore(em,el.nextSibling);
+  }
+  if(em){em.textContent=isErr?"⚠ "+msg:"";em.style.display=isErr?"flex":"none";}
+}
+
 function renderFoot(){
   const f=document.getElementById("form-footer");
   const back=formTab>0?`<button class="btn-o" onclick="fTab(${formTab-1})">← Kembali</button>`:"";
-  const next=formTab<2?`<button class="btn-p" style="flex:2" onclick="fTab(${formTab+1})">Lanjut →</button>`:`<button class="btn-g" style="flex:2" onclick="submitForm()">✓ Simpan</button>`;
+  const next=formTab<2
+    ?`<button class="btn-p" style="flex:2" onclick="goNextTab()">Lanjut →</button>`
+    :`<button class="btn-g" style="flex:2" onclick="submitForm()">✓ Simpan Booking</button>`;
   f.innerHTML=back+next;
+}
+
+function goNextTab(){
+  if(!validateTab(formTab)) return;
+  fTab(formTab+1);
 }
 function updateSummary(){
   const th=getTh(formSel.therapist);
@@ -1075,19 +1185,23 @@ function updateSummary(){
     ["Jam",document.getElementById("fp-start").value+" → "+document.getElementById("fp-end-disp").textContent],
     ["Durasi",(DUR_OPT.find(d=>d.v===dur)?.l||dur+"mnt")],
     ["💰 Harga",price>0?fmtRp(price):"–"],
+    ...(formSel.payStatus==="DP"?[["💵 DP Dibayar",fmtRp(parseInt(document.getElementById("fp-dp-amount")?.value||0))],["🔴 Sisa Bayar",fmtRp(Math.max(price-parseInt(document.getElementById("fp-dp-amount")?.value||0),0))]]:[]),
     ["Metode",formSel.method],
   ].map(([k,v])=>`<div class="sumrow"><span style="color:#64748b">${k}</span><span style="font-weight:700">${v}</span></div>`).join("");
 }
 
 async function submitForm(){
+  // Final validation before save
+  if(!validateTab(0)||!validateTab(2)) return;
   const patient=document.getElementById("fp-patient").value.trim();
-  if(!patient){alert("Nama pasien wajib diisi!");fTab(0);return}
   const start=document.getElementById("fp-start").value;
   const dur=parseInt(document.getElementById("fp-dur").value);
   const end=addMins(start,dur);
-  const tanggal=document.getElementById("fp-date").value; // ← use form date!
+  const tanggal=document.getElementById("fp-date").value;
   const svNama=document.getElementById("fp-service").value;
   const harga=getPrice(svNama,dur);
+  const dpAmount=formSel.payStatus==="DP"?parseInt(document.getElementById("fp-dp-amount")?.value||0):0;
+  const sisaBayar=formSel.payStatus==="DP"?Math.max(harga-dpAmount,0):0;
   const bk={
     id:formMode==="edit"?currentBk.id:genId(),
     tanggal,
@@ -1096,6 +1210,7 @@ async function submitForm(){
     catatan:document.getElementById("fp-catatan").value,
     therapist:formSel.therapist,therapistName:getTh(formSel.therapist).nama,
     room:formSel.room,start,end,duration:dur,harga,
+    dp_amount:dpAmount,sisa_bayar:sisaBayar,
     method:formSel.method,payStatus:formSel.payStatus
   };
   closeModal("modal-form");
@@ -1134,7 +1249,35 @@ function selRoom(r){
   });
 }
 function selMeth(m){formSel.method=m;METHODS.forEach(mt=>{const cl=mt.replace(/^[^\s]+ /,""),ic=mt.split(" ")[0];const b=document.getElementById("mb-"+cl);if(!b)return;b.className="methb"+(cl===m?" sel":"");b.innerHTML=`${ic} <span>${cl}</span>${cl===m?'<span style="margin-left:auto">✓</span>':""}`})}
-function selPay(s){formSel.payStatus=s;PAY_ST.forEach(ps=>{const b=document.getElementById("pb-"+ps);if(!b)return;const[c,bg]=PAY_CLR[ps];b.className="payb"+(ps===s?" sel":"");b.style.cssText=ps===s?`border-color:${c};background:${bg};color:${c}`:""})}
+function selPay(s){
+  formSel.payStatus=s;
+  PAY_ST.forEach(ps=>{
+    const b=document.getElementById("pb-"+ps);if(!b)return;
+    const[c,bg]=PAY_CLR[ps];
+    b.className="payb"+(ps===s?" sel":"");
+    b.style.cssText=ps===s?`border-color:${c};background:${bg};color:${c}`:"";
+  });
+  // Show DP amount field only when DP selected
+  const dpWrap=document.getElementById("fp-dp-wrap");
+  if(dpWrap) dpWrap.classList.toggle("hidden",s!=="DP");
+  if(s!=="DP"){ const dpIn=document.getElementById("fp-dp-amount");if(dpIn)dpIn.value=""; }
+  updateSisaDP();
+  updatePriceDisplay();
+}
+
+function updateSisaDP(){
+  const disp=document.getElementById("fp-sisa-disp");if(!disp)return;
+  if(formSel.payStatus!=="DP"){disp.textContent="";return}
+  const svNama=document.getElementById("fp-service")?.value||"";
+  const dur=parseInt(document.getElementById("fp-dur")?.value||60);
+  const harga=getPrice(svNama,dur);
+  const dp=parseInt(document.getElementById("fp-dp-amount")?.value||0);
+  if(harga>0&&dp>0){
+    const sisa=harga-dp;
+    disp.textContent=sisa>0?`Sisa pembayaran: ${fmtRp(sisa)}`:(sisa===0?"✅ Lunas penuh":"⚠️ DP melebihi harga!");
+    disp.style.color=sisa>0?"#dc2626":sisa===0?"#16a34a":"#f97316";
+  }else disp.textContent="";
+}
 
 // ═══ DETAIL ═══════════════════════════════════════════════════
 function openDetail(id){
@@ -1149,6 +1292,25 @@ function openDetail(id){
   document.getElementById("det-badge").textContent=bk.payStatus;
   document.getElementById("det-sv").textContent=bk.service||"-";
   document.getElementById("det-harga").textContent=bk.harga>0?fmtRp(bk.harga):"–";
+  // DP info box
+  let dpInfoEl=document.getElementById("det-dp-info");
+  if(bk.payStatus==="DP"&&bk.dp_amount>0){
+    if(!dpInfoEl){
+      dpInfoEl=document.createElement("div");dpInfoEl.id="det-dp-info";
+      const thBox=document.getElementById("det-th-box");
+      if(thBox) thBox.parentNode.insertBefore(dpInfoEl,thBox);
+    }
+    dpInfoEl.style.cssText="background:#fef3c7;border:1.5px solid #fde68a;border-radius:9px;padding:10px 14px;margin-bottom:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;";
+    dpInfoEl.innerHTML=`
+      <div style="text-align:center">
+        <div style="font-size:.6rem;color:#92400e;margin-bottom:2px">💵 DP Dibayar</div>
+        <div style="font-size:.9rem;font-weight:900;color:#d97706">${fmtRp(bk.dp_amount)}</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:.6rem;color:#92400e;margin-bottom:2px">🔴 Sisa Pembayaran</div>
+        <div style="font-size:.9rem;font-weight:900;color:#dc2626">${fmtRp(bk.sisa_bayar||bk.harga-bk.dp_amount)}</div>
+      </div>`;
+  }else if(dpInfoEl){dpInfoEl.remove();}
   document.getElementById("det-room").textContent=bk.room;
   document.getElementById("det-meth").textContent=bk.method||"-";
   document.getElementById("det-start").textContent=bk.start;
