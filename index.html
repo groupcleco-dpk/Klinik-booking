@@ -368,15 +368,65 @@ table{border-collapse:collapse;min-width:560px;width:100%}
   70% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 0 6px rgba(201,160,65,0); }
   100% { transform: translate(-50%, -50%) scale(0.95); box-shadow: 0 0 0 0 rgba(201,160,65,0); }
 }
-.td-r.active-session{box-shadow:inset 0 0 0 2px rgba(201,160,65,0.9)!important;animation:blink-gold 1.2s ease-in-out infinite}
-@keyframes blink-gold{0%,100%{box-shadow:inset 0 0 0 2px rgba(201,160,65,0.9)!important}50%{box-shadow:inset 0 0 0 2px rgba(201,160,65,0.1)!important}}
+/* ── ACTIVE SESSION BLINK ── */
+.td-r.active-session{
+  animation:blink-td 1s ease-in-out infinite !important;
+  position:relative;z-index:5;
+}
+@keyframes blink-td{
+  0%,100%{
+    box-shadow:inset 0 0 0 3px #C9A041, 0 0 18px rgba(201,160,65,0.7) !important;
+    filter:brightness(1.15);
+  }
+  50%{
+    box-shadow:inset 0 0 0 3px rgba(201,160,65,0.15), 0 0 4px rgba(201,160,65,0.1) !important;
+    filter:brightness(0.85);
+  }
+}
+.td-r.active-session .bk-card{
+  animation:blink-card 1s ease-in-out infinite !important;
+}
+@keyframes blink-card{
+  0%,100%{ opacity:1; }
+  50%{ opacity:0.7; }
+}
+.td-r.active-session .bk-name{
+  animation:blink-name 1s ease-in-out infinite !important;
+}
+@keyframes blink-name{
+  0%,100%{ text-shadow:0 0 8px rgba(255,255,255,0.9),0 1px 3px rgba(0,0,0,0.35); }
+  50%{ text-shadow:0 0 2px rgba(255,255,255,0.3),0 1px 3px rgba(0,0,0,0.35); }
+}
+/* Label "SESI AKTIF" di pojok */
+.td-r.active-session::before{
+  content:'🟢 AKTIF';
+  position:absolute;top:2px;right:3px;
+  font-size:0.42rem;font-weight:900;letter-spacing:0.05em;
+  color:#fff;background:rgba(45,212,160,0.9);
+  border-radius:3px;padding:1px 4px;z-index:10;
+  animation:blink-badge 1s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes blink-badge{
+  0%,100%{opacity:1;}
+  50%{opacity:0.3;}
+}
 .bk-card{padding:3px 5px;height:100%;display:flex;flex-direction:column;justify-content:space-between}
 .bk-name{font-size:.63rem;font-weight:800;color:#fff;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 3px rgba(0,0,0,0.35)}
 .bk-sub{font-size:.56rem;color:rgba(255,255,255,.85);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bk-foot{display:flex;justify-content:space-between;align-items:center;margin-top:1px}
 .bk-badge{font-size:.5rem;background:rgba(255,255,255,.2);border-radius:3px;padding:1px 4px;color:#fff;font-weight:700;backdrop-filter:blur(4px)}
 .bk-timer{font-size:.5rem;color:#fff}
-.bk-timer-active{font-size:.65rem!important;color:#fff!important;background:rgba(0,0,0,.65)!important;border:1px solid var(--gold-500);border-radius:4px;padding:2px 6px;font-weight:800!important;letter-spacing:1px;}
+.bk-timer-active{
+  font-size:.65rem!important;color:#fff!important;
+  background:rgba(0,0,0,.75)!important;
+  border:1px solid var(--gold-400);border-radius:4px;
+  padding:2px 6px;font-weight:800!important;letter-spacing:0.5px;
+}
+@keyframes blink-timer{
+  0%,100%{background:rgba(45,212,160,0.85)!important;border-color:#2DD4A0;color:#051C22!important;}
+  50%{background:rgba(0,0,0,0.75)!important;border-color:var(--gold-400);color:#fff!important;}
+}
 @keyframes pulse-t{0%,100%{opacity:1}50%{opacity:.35}}
 
 /* ══════════════════════════════════
@@ -1971,14 +2021,16 @@ function requestNotifPermission(){
 // ═══ COUNTDOWN TIMER ══════════════════════════════════════════
 function startCountdownTimer(){
   updateCountdowns();
-  countdownTimer=setInterval(updateCountdowns,30000);
+  // Update setiap 1 detik untuk animasi berkedip & countdown real-time
+  if(countdownTimer) clearInterval(countdownTimer);
+  countdownTimer=setInterval(updateCountdowns,1000);
 }
 
 function updateCountdowns(){
   const now=new Date();
   const isToday=fmtISO(currentDate)===fmtISO(now);
+  const nowMs=now.getTime();
   const nowM=now.getHours()*60+now.getMinutes();
-  const nowSec=now.getSeconds();
   bookings.forEach(b=>{
     const startM=toMin(b.start||"00:00");
     const endM=toMin(b.end||"00:00");
@@ -1986,24 +2038,37 @@ function updateCountdowns(){
     if(!cell)return;
     const timerEl=cell.querySelector(".bk-timer");
     if(isToday&&nowM>=startM&&nowM<endM){
+      // ── SESI SEDANG BERLANGSUNG: berkedip + countdown detik ──
       cell.classList.add("active-session");
-      const sisaMnt=endM-nowM;
-      const sisaTxt=sisaMnt>=60?Math.floor(sisaMnt/60)+"j "+(sisaMnt%60)+"m":sisaMnt+"m";
+      // Hitung sisa waktu tepat sampai detik
+      const endDate=new Date(now.getFullYear(),now.getMonth(),now.getDate(),
+        parseInt(b.end.split(':')[0]),parseInt(b.end.split(':')[1]),0);
+      const sisaMs=endDate.getTime()-nowMs;
+      const sisaTotal=Math.ceil(sisaMs/1000);
+      const jj=Math.floor(sisaTotal/3600);
+      const mm=Math.floor((sisaTotal%3600)/60);
+      const ss=sisaTotal%60;
+      const sisaTxt=(jj>0?jj+"j ":"")+mm+"m "+String(ss).padStart(2,'0')+"d";
       if(timerEl){
         timerEl.textContent="⏱ "+sisaTxt;
         timerEl.className="bk-timer bk-timer-active";
+        timerEl.style.animation="blink-timer 1s ease-in-out infinite";
       }
     }else{
-      // Check if session JUST ended and not paid
-      const justEnded=nowM>=endM&&nowM<=endM+5; // within 5min of end
-      if(justEnded&&b.payStatus!=="Lunas"&&isToday){
-        // Show unpaid alert
-        showUnpaidAlert(b);
-      }
+      const justEnded=nowM>=endM&&nowM<=endM+5;
+      if(justEnded&&b.payStatus!=="Lunas"&&isToday) showUnpaidAlert(b);
       cell.classList.remove("active-session");
       if(timerEl){
-        timerEl.textContent="";
-        timerEl.className="bk-timer";
+        // Jika belum mulai, tampilkan waktu mulai
+        if(isToday&&nowM<startM){
+          const menitLagi=startM-nowM;
+          timerEl.textContent=menitLagi<=60?"⏳ "+menitLagi+"m lagi":"";
+          timerEl.className="bk-timer";
+        } else {
+          timerEl.textContent="";
+          timerEl.className="bk-timer";
+        }
+        timerEl.style.animation="";
       }
     }
   });
@@ -2086,7 +2151,7 @@ function renderGrid(){
         const sisaText=bk.payStatus==="DP"&&bk.sisa_bayar>0?"Sisa: "+fmtRp(bk.sisa_bayar):"";const sisaHtml=sisaText?"<span class='bk-timer'>"+sisaText+"</span>":"<span class='bk-timer'></span>";
         const thLabel=th.nama||bk.therapistName||"";
         const subLine=bk.service?`${bk.service} · ${thLabel}`:(thLabel||bk.start+"–"+bk.end);
-        html+=`<td class="td-r" style="background:${cellBg};color:#fff;vertical-align:top;padding:2px;" rowspan="${spans}" onclick="openDetail('${bk.id}')"><div class="bk-card"><div class="bk-name">${bk.patient}</div><div class="bk-sub">${subLine}</div><div class="bk-foot"><span class="bk-badge">${bk.payStatus}</span><span class="bk-timer bk-timer-active" data-start="${bk.start}" data-end="${bk.end}">Menunggu...</span></div></div></td>`;
+        html+=`<td class="td-r" data-bk="${bk.id}" style="background:${cellBg};color:#fff;vertical-align:top;padding:2px;position:relative;" rowspan="${spans}" onclick="openDetail('${bk.id}')"><div class="bk-card"><div class="bk-name">${bk.patient}</div><div class="bk-sub">${subLine}</div><div class="bk-foot"><span class="bk-badge">${bk.payStatus}</span><span class="bk-timer" data-start="${bk.start}" data-end="${bk.end}">Menunggu...</span></div></div></td>`;
       }else{
         html+=`<td class="td-r" style="background:${ti%2===0?"#fff":"#fafafa"}" onclick="openAddSlot('${room}','${ts}')"></td>`;
       }
@@ -3545,7 +3610,7 @@ function exportLaporanPDF(){
     @media print{.no-print{display:none}body{padding:8px}}
     /* --- PASTE KODENYA DI SINI, TEPAT DI ATAS </style> --- */
 .booking-active-pulse {
-  animation: active-session-glow 2s infinite !important;
+  animation: active-session-glow 1s infinite !important;
   border: 1px solid var(--gold-400) !important;
   border-radius: 6px;
   z-index: 5;
