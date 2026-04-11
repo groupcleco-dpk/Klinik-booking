@@ -1666,7 +1666,51 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
           </div>
           <div id="fp-sisa-disp" style="font-size:.72rem;color:#dc2626;font-weight:700;margin-top:4px"></div>
         </div>
-        <div class="sumbox"><div style="font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:8px">Ringkasan</div><div id="fp-sum"></div></div>
+        <!-- SPLIT PEMBAYARAN -->
+        <div class="ff" style="margin-top:10px">
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(201,160,65,0.08);border:1px solid rgba(201,160,65,0.2);border-radius:10px;cursor:pointer" onclick="toggleSplit()" id="split-toggle-row">
+            <span style="font-size:.85rem">💰</span>
+            <span style="flex:1;font-size:.78rem;font-weight:600;color:var(--cream-80)">Split Pembayaran (2 Metode)</span>
+            <span style="font-size:.7rem;color:var(--gold-400);font-weight:700" id="split-toggle-lbl">+ Aktifkan</span>
+          </div>
+          <div id="split-wrap" style="display:none;margin-top:8px;padding:12px;background:rgba(5,28,34,0.5);border:1px solid rgba(248,243,236,0.08);border-radius:10px">
+            <div style="font-size:.65rem;color:var(--gold-400);text-transform:uppercase;letter-spacing:.12em;margin-bottom:8px">Rincian Split Pembayaran</div>
+            <div class="g2" style="margin-bottom:8px">
+              <div>
+                <label class="fl" style="margin-bottom:4px">Metode 1</label>
+                <select class="fi" id="split-m1" style="padding:9px;font-size:.8rem">
+                  <option value="Tunai">💵 Tunai</option>
+                  <option value="Transfer Bank">🏦 Transfer Bank</option>
+                  <option value="QRIS">📱 QRIS</option>
+                  <option value="Kartu Debit">💳 Kartu Debit</option>
+                  <option value="Kartu Kredit">💳 Kartu Kredit</option>
+                </select>
+              </div>
+              <div>
+                <label class="fl" style="margin-bottom:4px">Nominal 1 (Rp)</label>
+                <input class="fi" id="split-a1" type="number" placeholder="0" min="0" step="1000" style="font-size:.85rem" oninput="updateSplitSisa()">
+              </div>
+            </div>
+            <div class="g2">
+              <div>
+                <label class="fl" style="margin-bottom:4px">Metode 2</label>
+                <select class="fi" id="split-m2" style="padding:9px;font-size:.8rem">
+                  <option value="Transfer Bank">🏦 Transfer Bank</option>
+                  <option value="QRIS">📱 QRIS</option>
+                  <option value="Tunai">💵 Tunai</option>
+                  <option value="Kartu Debit">💳 Kartu Debit</option>
+                  <option value="Kartu Kredit">💳 Kartu Kredit</option>
+                </select>
+              </div>
+              <div>
+                <label class="fl" style="margin-bottom:4px">Nominal 2 (Rp)</label>
+                <input class="fi" id="split-a2" type="number" placeholder="0" min="0" step="1000" style="font-size:.85rem;background:rgba(248,243,236,0.04)" readonly id="split-a2">
+              </div>
+            </div>
+            <div id="split-info" style="font-size:.7rem;color:var(--cream-55);margin-top:6px;text-align:center"></div>
+          </div>
+        </div>
+        <div class="sumbox" style="margin-top:8px"><div style="font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:8px">Ringkasan</div><div id="fp-sum"></div></div>
       </div>
     </div>
     <div class="sfooter" id="form-footer"></div>
@@ -1687,6 +1731,7 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
         <div class="dbox"><div class="dlbl">💰 Harga</div><div class="dval" id="det-harga" style="color:#16a34a"></div></div>
         <div class="dbox"><div class="dlbl">🚪 Ruangan</div><div class="dval" id="det-room"></div></div>
         <div class="dbox"><div class="dlbl">💳 Metode</div><div class="dval" id="det-meth"></div></div>
+        <div class="dbox hidden" id="det-split-box"><div class="dlbl">🔀 Split</div><div class="dval" id="det-split-val" style="font-size:.72rem"></div></div>
         <div class="dbox"><div class="dlbl">🕐 Jam Mulai</div><div class="dval" id="det-start"></div></div>
         <div class="dbox"><div class="dlbl">🏁 Jam Selesai</div><div class="dval" id="det-end"></div></div>
         <div class="dbox"><div class="dlbl">⏱ Durasi</div><div class="dval" id="det-dur"></div></div>
@@ -2265,7 +2310,7 @@ async function insertBK(bk,tanggal){
     id:bk.id,tanggal,patient:bk.patient,phone:bk.phone,service:bk.service,
     therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,
     start_time:bk.start,end_time:bk.end,duration_min:bk.duration,
-    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,
+    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,split_method:bk.split_method||"",split_amount1:bk.split_amount1||0,split_amount2:bk.split_amount2||0,
     harga:bk.harga||0,dp_amount:bk.dp_amount||0,sisa_bayar:bk.sisa_bayar||0
   }]);
   if(error){ toast("❌ "+error.message); return; }
@@ -2286,7 +2331,7 @@ async function updateBK(bk){
     patient:bk.patient,phone:bk.phone,service:bk.service,
     therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,
     start_time:bk.start,end_time:bk.end,duration_min:bk.duration,
-    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,
+    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,split_method:bk.split_method||"",split_amount1:bk.split_amount1||0,split_amount2:bk.split_amount2||0,
     harga:bk.harga||0,dp_amount:bk.dp_amount||0,sisa_bayar:bk.sisa_bayar||0
   }).eq("id",bk.id);
   if(error)toast("❌ "+error.message);
@@ -2470,9 +2515,9 @@ function renderGrid(){
   // Body
   let html="";
   TIME_SLOTS.forEach((ts,ti)=>{
-    const bg=ti%2===0?"#f0f7ff":"#e8f4fd";
+    const bg=ti%2===0?"rgba(5,28,34,0.8)":"rgba(10,46,58,0.7)";
     const isHalfHour=ts.endsWith(":30");
-    html+=`<tr><td class="td-t" style="background:${bg};color:${isHalfHour?"#94a3b8":""}">${ts}</td>`;
+    html+=`<tr><td class="td-t" style="background:${bg};color:${isHalfHour?"rgba(201,160,65,0.45)":"var(--gold-400)"}">${ts}</td>`;
 
     ROOMS.forEach(room=>{
       const key=room+"|"+ts;
@@ -2489,7 +2534,7 @@ function renderGrid(){
         const subLine=bk.service?`${bk.service} · ${thLabel}`:(thLabel||bk.start+"–"+bk.end);
         html+=`<td class="td-r" data-bk="${bk.id}" style="background:${cellBg};color:#fff;vertical-align:top;padding:2px;position:relative;" rowspan="${spans}" onclick="openDetail('${bk.id}')"><div class="bk-card"><div class="bk-name">${bk.patient}</div><div class="bk-sub">${subLine}</div><div class="bk-foot"><span class="bk-badge">${bk.payStatus}</span><span class="bk-timer" data-start="${bk.start}" data-end="${bk.end}">Menunggu...</span></div></div></td>`;
       }else{
-        html+=`<td class="td-r" style="background:${ti%2===0?"#fff":"#fafafa"}" onclick="openAddSlot('${room}','${ts}')"></td>`;
+        html+=`<td class="td-r" style="background:${ti%2===0?"rgba(10,46,58,0.35)":"rgba(5,28,34,0.3)"}" onclick="openAddSlot('${room}','${ts}')"></td>`;
       }
     });
     html+="</tr>";
@@ -2558,10 +2603,32 @@ function renderRekap(){
         <div style="font-size:.6rem;color:#64748b;margin-top:2px">🔴 Total Piutang</div>
       </div>
     </div>
-    <div style="background:#f8fafc;border-radius:9px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center">
-      <span style="font-size:.72rem;color:#374151">💳 Uang Masuk Hari Ini</span>
-      <span style="font-size:.88rem;font-weight:900;color:#2563eb">${fmtRp(revLunas+revDP)}</span>
-    </div>`;
+    <div style="background:rgba(5,28,34,0.5);border:1px solid rgba(201,160,65,0.15);border-radius:9px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:.72rem;color:rgba(248,243,236,.7)">💳 Uang Masuk Hari Ini</span>
+      <span style="font-size:.88rem;font-weight:900;color:var(--gold-400)">${fmtRp(revLunas+revDP)}</span>
+    </div>
+    ${(()=>{
+      const methMap={};
+      bookings.filter(b=>b.payStatus==="Lunas"||b.payStatus==="DP").forEach(b=>{
+        const amt=b.payStatus==="Lunas"?(b.harga||0):(b.dp_amount||0);
+        if(!amt)return;
+        const m=b.method||"Lainnya";
+        methMap[m]=(methMap[m]||0)+amt;
+      });
+      const clr={"Tunai":"#2DD4A0","Transfer Bank":"#5DADE2","QRIS":"#C9A041","Kartu Debit":"#B39DDB","Kartu Kredit":"#F0B96E"};
+      const entries=Object.entries(methMap).sort((a,b)=>b[1]-a[1]);
+      if(!entries.length)return"";
+      return"<div style='margin-top:2px'>"+entries.map(([m,v])=>{
+        const col=clr[m]||"#94a3b8";
+        const pct=Math.round(v/(revLunas+revDP)*100)||0;
+        return`<div style='display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(248,243,236,0.06)'>
+          <div style='width:8px;height:8px;border-radius:2px;background:${col};flex-shrink:0'></div>
+          <div style='flex:1;font-size:.72rem;color:rgba(248,243,236,.75)'>${m}</div>
+          <div style='font-size:.72rem;font-weight:700;color:${col}'>${fmtRp(v)}</div>
+          <div style='font-size:.65rem;color:rgba(248,243,236,.4);width:30px;text-align:right'>${pct}%</div>
+        </div>`;
+      }).join("")+"</div>";
+    })()}`;
   document.getElementById("rek-pay").innerHTML=PAY_ST.map(s=>{
     const c=bookings.filter(b=>b.payStatus===s).length;const[cl]=PAY_CLR[s];
     return`<div class="rek-row"><div style="width:9px;height:9px;border-radius:50%;background:${cl};flex-shrink:0"></div><div style="flex:1;font-size:.8rem">${s}</div><div style="font-weight:800;color:${cl}">${c}</div><div style="width:70px;height:7px;background:#f1f5f9;border-radius:3px"><div style="width:${c/t*100}%;height:100%;border-radius:3px;background:${cl}"></div></div></div>`;
@@ -2710,6 +2777,7 @@ function onServiceChange(){
 }
 
 function updatePriceDisplay(){
+  if(splitActive) updateSplitSisa();
   const nama = document.getElementById("fp-service")?.value||"";
   const dur  = parseInt(document.getElementById("fp-dur")?.value||60);
   const price= getPrice(nama,dur);
@@ -2868,6 +2936,13 @@ function resetForm(){
   document.getElementById("fp-catatan").value="";
   // Hide DP wrap
   const dpW=document.getElementById("fp-dp-wrap");if(dpW)dpW.classList.add("hidden");
+  // Reset split payment
+  splitActive=false;
+  const sw=document.getElementById("split-wrap");if(sw)sw.style.display="none";
+  const sl=document.getElementById("split-toggle-lbl");if(sl)sl.textContent="+ Aktifkan";
+  const sr=document.getElementById("split-toggle-row");if(sr)sr.style.background="rgba(201,160,65,0.08)";
+  const sa1=document.getElementById("split-a1");if(sa1)sa1.value="";
+  const sa2=document.getElementById("split-a2");if(sa2)sa2.value="";
   const siD=document.getElementById("fp-sisa-disp");if(siD)siD.textContent="";
   const dkSel=document.getElementById("fp-diskon");if(dkSel)dkSel.value="";
   const pkSel=document.getElementById("fp-paket");if(pkSel)pkSel.value="";
@@ -2985,8 +3060,53 @@ function updateSummary(){
     ["💰 Harga Asli",price>0?fmtRp(price):"–"],
     ...(getSelectedDiskon()&&price>0?[["🏷️ Diskon","-"+fmtRp(calcDiskon(price,getSelectedDiskon()))],["💳 Harga Akhir",fmtRp(price-calcDiskon(price,getSelectedDiskon()))]]:[]),
     ...(formSel.payStatus==="DP"?[["💵 DP Dibayar",fmtRp(parseInt(document.getElementById("fp-dp-amount")?.value||0))],["🔴 Sisa Bayar",fmtRp(Math.max((price-calcDiskon(price,getSelectedDiskon()))-parseInt(document.getElementById("fp-dp-amount")?.value||0),0))]]:[]),
-    ["Metode",formSel.method],
+    ["Metode",splitActive?(()=>{
+      const m1el=document.getElementById("split-m1");
+      const m2el=document.getElementById("split-m2");
+      const a1=parseInt(document.getElementById("split-a1")?.value||0);
+      const a2=parseInt(document.getElementById("split-a2")?.value||0);
+      const m1=(m1el?.options[m1el.selectedIndex]?.text||"").replace(/^[^\s]+ /,"");
+      const m2=(m2el?.options[m2el.selectedIndex]?.text||"").replace(/^[^\s]+ /,"");
+      return `Split: ${m1} ${fmtRp(a1)} + ${m2} ${fmtRp(a2)}`;
+    })():formSel.method],
   ].map(([k,v])=>`<div class="sumrow"><span style="color:#64748b">${k}</span><span style="font-weight:700">${v}</span></div>`).join("");
+}
+
+let splitActive=false;
+function toggleSplit(){
+  splitActive=!splitActive;
+  const wrap=document.getElementById("split-wrap");
+  const lbl=document.getElementById("split-toggle-lbl");
+  const row=document.getElementById("split-toggle-row");
+  if(splitActive){
+    wrap.style.display="block";
+    lbl.textContent="− Nonaktifkan";
+    row.style.background="rgba(201,160,65,0.15)";
+    updateSplitSisa();
+  }else{
+    wrap.style.display="none";
+    lbl.textContent="+ Aktifkan";
+    row.style.background="rgba(201,160,65,0.08)";
+  }
+  updateSummary();
+}
+function updateSplitSisa(){
+  if(!splitActive)return;
+  const svNama=document.getElementById("fp-service").value||"";
+  const dur=parseInt(document.getElementById("fp-dur")?.value||60);
+  const hargaAsli=getPrice(svNama,dur);
+  const dk=getSelectedDiskon();
+  const totalHarga=Math.max(hargaAsli-calcDiskon(hargaAsli,dk),0);
+  const a1=parseInt(document.getElementById("split-a1")?.value||0);
+  const sisa=Math.max(totalHarga-a1,0);
+  const a2el=document.getElementById("split-a2");
+  if(a2el){a2el.value=sisa>0?sisa:"";}
+  const infoEl=document.getElementById("split-info");
+  if(infoEl){
+    if(a1>totalHarga){infoEl.style.color="var(--rose)";infoEl.textContent="⚠️ Nominal 1 melebihi harga total";}
+    else if(a1===0){infoEl.style.color="var(--cream-55)";infoEl.textContent="Masukkan nominal metode 1";}
+    else{infoEl.style.color="var(--emerald)";infoEl.textContent="✓ "+document.getElementById("split-m1").options[document.getElementById("split-m1").selectedIndex].text.replace(/^[^\s]+ /,"")+" Rp"+a1.toLocaleString("id-ID")+" + "+document.getElementById("split-m2").options[document.getElementById("split-m2").selectedIndex].text.replace(/^[^\s]+ /,"")+" Rp"+sisa.toLocaleString("id-ID");}
+  }
 }
 
 async function submitForm(){
@@ -3015,7 +3135,12 @@ async function submitForm(){
     therapist:formSel.therapist,therapistName:getTh(formSel.therapist).nama,
     room:formSel.room,start,end,duration:dur,harga,
     dp_amount:dpAmount,sisa_bayar:sisaBayar,
-    method:formSel.method,payStatus:formSel.payStatus
+    method:splitActive?(document.getElementById("split-m1")?.options[document.getElementById("split-m1").selectedIndex]?.text||formSel.method).replace(/^[^\s]+ /,""):formSel.method,
+    split_method:splitActive?(document.getElementById("split-m2")?.options[document.getElementById("split-m2").selectedIndex]?.text||"").replace(/^[^\s]+ /,""):"",
+    split_amount1:splitActive?parseInt(document.getElementById("split-a1")?.value||0):0,
+    split_amount2:splitActive?parseInt(document.getElementById("split-a2")?.value||0):0,
+    is_split:splitActive,
+    payStatus:formSel.payStatus
   };
   closeModal("modal-form");
   if(formMode==="edit") await updateBK(bk);
@@ -3122,6 +3247,17 @@ function openDetail(id){
   document.getElementById("det-dur").textContent=DUR_OPT.find(d=>d.v===dur)?.l||dur+"mnt";
   const statEl=document.getElementById("det-stat");
   if(statEl){const[sc,sbg]=PAY_CLR[bk.payStatus]||["#94a3b8","#f1f5f9"];statEl.style.color=sc;statEl.textContent=bk.payStatus;}
+  // Show split payment
+  const splitBox=document.getElementById("det-split-box");
+  const splitVal=document.getElementById("det-split-val");
+  if(splitBox&&splitVal){
+    if(bk.is_split&&bk.split_method){
+      splitBox.classList.remove("hidden");
+      splitVal.innerHTML=`<span style="color:var(--gold-400)">${bk.method}: ${fmtRp(bk.split_amount1)}</span><br><span style="color:var(--sapphire,#5DADE2)">${bk.split_method}: ${fmtRp(bk.split_amount2)}</span>`;
+    }else{
+      splitBox.classList.add("hidden");
+    }
+  }
   document.getElementById("det-th-box").style.background=th.warna+"22";
   document.getElementById("det-th-av").style.background=th.warna;
   document.getElementById("det-th-av").textContent=(bk.therapistName||th.nama).slice(0,2).toUpperCase();
@@ -3944,19 +4080,7 @@ function exportLaporanPDF(){
     .total-row td{font-weight:800;background:#f0fdf4!important;border-top:2px solid #16a34a}
     footer{margin-top:16px;text-align:center;font-size:9px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px}
     @media print{.no-print{display:none}body{padding:8px}}
-    /* --- PASTE KODENYA DI SINI, TEPAT DI ATAS </style> --- */
-.booking-active-pulse {
-  animation: active-session-glow 1s infinite !important;
-  border: 1px solid var(--gold-400) !important;
-  border-radius: 6px;
-  z-index: 5;
-}
-@keyframes active-session-glow {
-  0% { box-shadow: 0 0 0 0 rgba(201, 160, 65, 0.2); background-color: rgba(201, 160, 65, 0.05); }
-  50% { box-shadow: 0 0 12px rgba(201, 160, 65, 0.6); background-color: rgba(201, 160, 65, 0.15); }
-  100% { box-shadow: 0 0 0 0 rgba(201, 160, 65, 0); background-color: rgba(201, 160, 65, 0.05); }
-}
-/* -------------------------------------------------- */
+
   </style></head><body>
   <div class="header">
     <div>
