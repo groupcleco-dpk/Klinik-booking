@@ -720,6 +720,342 @@ table{border-collapse:collapse;min-width:560px;width:100%}
 *::-webkit-scrollbar-thumb{background:rgba(201,160,65,0.3);border-radius:4px}
 *::-webkit-scrollbar-thumb:hover{background:rgba(201,160,65,0.5)}
 input:focus,select:focus,textarea:focus{outline:none!important;border-color:var(--gold-500)!important;box-shadow:0 0 0 3px rgba(201,160,65,0.12)!important}
+
+/* ═══════════════════════════════════════════════════════
+   TAPA JIVA — LUXURY PATCH v4.0
+   FIX: White elements, Grid redesign, Laporan, CRM,
+        Settings, Timer size, Payment method split
+   ═══════════════════════════════════════════════════════ */
+
+/* ── TIMER: Kecilkan ukuran ── */
+.bk-timer-active {
+  font-size: .52rem!important;
+  padding: 1px 4px!important;
+  font-weight: 700!important;
+  letter-spacing: 0!important;
+  border: none!important;
+  background: rgba(0,0,0,.55)!important;
+  color: #fff!important;
+  border-radius: 3px!important;
+}
+.bk-timer { font-size: .48rem!important; }
+
+/* ── FIX WHITE BACKGROUNDS (inline styles) ── */
+/* Rekap cards header */
+.rek-card > div[style*="color:#0f172a"] { color: var(--cream)!important; }
+
+/* Laporan cards */
+div[style*="background:#fff"][style*="border-radius:14px"],
+div[style*="background:#fff"][style*="border-radius:12px"] {
+  background: rgba(10,46,58,0.62)!important;
+  border: 1px solid rgba(201,160,65,0.15)!important;
+  box-shadow: 0 4px 20px rgba(3,15,20,0.4)!important;
+}
+div[style*="background:#fff"][style*="border-radius:14px"] > div[style*="color:#0f172a"],
+div[style*="background:#fff"][style*="border-radius:12px"] > div[style*="color:#0f172a"] {
+  color: var(--cream)!important;
+}
+
+/* Revenue bar */
+div[style*="background:#f0fdf4"][style*="border-radius:11px"],
+div[style*="background:#f0fdf4"][style*="border-radius:9px"] {
+  background: rgba(45,212,160,0.08)!important;
+  border: 1px solid rgba(45,212,160,0.18)!important;
+}
+div[style*="background:#f0fdf4"] span, div[style*="background:#f0fdf4"] > span {
+  color: var(--cream-80)!important;
+}
+div[style*="background:#f0fdf4"] span[style*="color:#16a34a"],
+div[style*="background:#f0fdf4"] span[style*="color:#2563eb"] {
+  color: var(--emerald)!important;
+}
+
+/* Rekap revenue mini cards */
+div[style*="background:#f0fdf4"][style*="border-radius:9px"],
+div[style*="background:#dcfce7"][style*="border-radius:9px"] {
+  background: rgba(45,212,160,0.1)!important;
+  border: 1px solid rgba(45,212,160,0.2)!important;
+}
+div[style*="background:#fef3c7"][style*="border-radius:9px"] {
+  background: rgba(240,185,110,0.1)!important;
+  border: 1px solid rgba(240,185,110,0.2)!important;
+}
+div[style*="background:#fee2e2"][style*="border-radius:9px"] {
+  background: rgba(255,107,117,0.1)!important;
+  border: 1px solid rgba(255,107,117,0.2)!important;
+}
+div[style*="background:#f8fafc"][style*="border-radius:9px"],
+div[style*="background:#f8fafc"][style*="border-radius:8px"] {
+  background: rgba(5,28,34,0.5)!important;
+  border: 1px solid rgba(201,160,65,0.12)!important;
+}
+div[style*="background:#f8fafc"][style*="border-radius:10px"] {
+  background: rgba(5,28,34,0.5)!important;
+  border: 1px solid rgba(248,243,236,0.08)!important;
+}
+
+/* Revenue text colors fix */
+div[style*="color:#64748b"] { color: var(--cream-55)!important; }
+div[style*="color:#374151"] { color: var(--cream-80)!important; }
+div[style*="color:#0f172a"] { color: var(--cream)!important; }
+span[style*="color:#0f172a"] { color: var(--cream)!important; }
+span[style*="color:#64748b"] { color: var(--cream-55)!important; }
+span[style*="color:#374151"] { color: var(--cream-80)!important; }
+
+/* Blue text → gold */
+span[style*="color:#2563eb"] { color: var(--gold-400)!important; }
+div[style*="color:#2563eb"] { color: var(--gold-400)!important; }
+
+/* PIN modal info box */
+div[style*="background:#dbeafe"] {
+  background: rgba(201,160,65,0.08)!important;
+  border: 1px solid rgba(201,160,65,0.2)!important;
+  color: var(--cream-80)!important;
+}
+div[style*="background:#dbeafe"] b { color: var(--gold-300)!important; }
+
+/* Pin default text */
+#pin-default-text b[style*="color:#2563eb"] { color: var(--gold-400)!important; }
+span[style*="color:#2563eb"][style*="cursor:pointer"] { color: var(--gold-400)!important; }
+
+/* Filter button white */
+button[style*="background:#fff"][style*="border:2px solid #e2e8f0"] {
+  background: rgba(248,243,236,0.06)!important;
+  border: 1.5px solid rgba(248,243,236,0.12)!important;
+  color: var(--cream-80)!important;
+}
+/* Reset filter button */
+button[style*="border:2px solid var(--red)"][style*="background:#fff"] {
+  background: rgba(255,107,117,0.08)!important;
+  color: var(--rose)!important;
+}
+
+/* Live alert notification */
+div[style*="position:fixed"][style*="background:#fff"][style*="border-radius:16px"] {
+  background: rgba(10,46,58,0.97)!important;
+  border: 1px solid rgba(201,160,65,0.2)!important;
+  color: var(--cream)!important;
+}
+div[style*="position:fixed"][style*="background:#fff"] div[style*="color:#0f172a"] {
+  color: var(--cream)!important;
+}
+
+/* Header bar styling */
+div[style*="background:#f0fdf4"][style*="border-radius:11px"] {
+  background: rgba(45,212,160,0.08)!important;
+  border: 1px solid rgba(45,212,160,0.15)!important;
+}
+span[style*="color:#16a34a"] { color: var(--emerald)!important; }
+
+/* CRM summary cards (3 grid) */
+div[style*="background:#fff"][style*="border-radius:12px"][style*="text-align:center"] {
+  background: rgba(10,46,58,0.62)!important;
+  border: 1px solid rgba(201,160,65,0.15)!important;
+  box-shadow: var(--shadow-sm)!important;
+}
+div[style*="background:#fff"][style*="border-radius:12px"] div[style*="color:var(--navy)"],
+div[style*="background:#fff"][style*="border-radius:12px"] div[style*="color:var(--green)"],
+div[style*="background:#fff"][style*="border-radius:12px"] div[style*="color:var(--blue)"] {
+  color: var(--cream)!important;
+}
+div[style*="background:#fff"][style*="border-radius:12px"] div[style*="color:var(--text-l)"] {
+  color: var(--cream-55)!important;
+}
+
+/* ── JADWAL GRID: Redesign header area ── */
+.g-header {
+  background: rgba(3,15,20,0.85)!important;
+  border-bottom: 1px solid rgba(201,160,65,0.2)!important;
+  padding: 10px 16px 8px!important;
+}
+.g-header span { color: var(--cream-55)!important; }
+
+/* Slot hover overlay text color */
+.td-r:hover:not([rowspan])::after {
+  font-size: 0.62rem!important;
+  padding: 4px 10px!important;
+}
+
+/* ── LAPORAN: Dark card redesign ── */
+#tab-laporan div[style*="background:#fff"] {
+  background: rgba(10,46,58,0.62)!important;
+  border: 1px solid rgba(201,160,65,0.15)!important;
+  box-shadow: 0 4px 20px rgba(3,15,20,0.4)!important;
+  color: var(--cream)!important;
+}
+#tab-laporan div[style*="font-weight:800"][style*="color:#0f172a"] {
+  color: var(--cream)!important;
+}
+#tab-laporan .lp-th-card {
+  background: rgba(10,46,58,0.55)!important;
+  border: 1px solid rgba(201,160,65,0.12)!important;
+}
+#tab-laporan div[style*="background:#f0fdf4"] {
+  background: rgba(45,212,160,0.08)!important;
+  border: 1px solid rgba(45,212,160,0.15)!important;
+}
+
+/* Progress bars in laporan */
+#tab-laporan div[style*="background:#f1f5f9"][style*="height:7px"],
+#tab-laporan div[style*="background:#f1f5f9"][style*="height:6px"],
+.lp-sv-bar {
+  background: rgba(248,243,236,0.08)!important;
+}
+div[style*="background:#f1f5f9"][style*="border-radius:3px"][style*="height:7px"],
+div[style*="background:#f1f5f9"][style*="border-radius:3px"][style*="height:6px"] {
+  background: rgba(248,243,236,0.08)!important;
+}
+
+/* Laporan terapis card */
+.lp-th-card div[style*="color:#0f172a"],
+.lp-th-card span[style*="color:#0f172a"] { color: var(--cream)!important; }
+.lp-th-card div[style*="color:#64748b"],
+.lp-th-card span[style*="color:#64748b"] { color: var(--cream-55)!important; }
+
+/* ── REKAP: Fix all card contents ── */
+#tab-rekap .rek-card { position: relative; }
+#tab-rekap .rek-card > div:first-child {
+  color: var(--gold-400)!important;
+  font-size: .75rem!important;
+  letter-spacing: .15em!important;
+  text-transform: uppercase!important;
+  margin-bottom: 10px!important;
+}
+.rek-row { color: var(--cream-80)!important; }
+.rek-row > div:nth-child(2) { color: var(--cream-80)!important; }
+
+/* Rekap revenue boxes */
+#rek-rev div[style*="background:#f0fdf4"],
+#rek-rev div[style*="background:#dcfce7"] {
+  background: rgba(45,212,160,0.1)!important;
+  border: 1px solid rgba(45,212,160,0.2)!important;
+  border-radius: 10px!important;
+}
+#rek-rev div[style*="background:#fef3c7"] {
+  background: rgba(240,185,110,0.1)!important;
+  border: 1px solid rgba(240,185,110,0.2)!important;
+  border-radius: 10px!important;
+}
+#rek-rev div[style*="background:#fee2e2"] {
+  background: rgba(255,107,117,0.1)!important;
+  border: 1px solid rgba(255,107,117,0.2)!important;
+  border-radius: 10px!important;
+}
+#rek-rev div[style*="color:#64748b"] { color: var(--cream-55)!important; }
+#rek-rev div[style*="background:#f8fafc"] {
+  background: rgba(5,28,34,0.5)!important;
+  border: 1px solid rgba(201,160,65,0.15)!important;
+  border-radius: 9px!important;
+}
+#rek-rev span[style*="color:#374151"] { color: var(--cream-80)!important; }
+#rek-rev span[style*="color:#2563eb"] { color: var(--gold-400)!important; }
+
+/* ── CRM: Enhanced cards ── */
+#tab-crm .crm-card {
+  position: relative;
+}
+#tab-crm .crm-card::after {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg,transparent,rgba(201,160,65,0.3),transparent);
+  opacity: 0;
+  transition: opacity .3s;
+}
+#tab-crm .crm-card:hover::after { opacity: 1; }
+#tab-crm .crm-card div[style*="color:#0f172a"],
+#tab-crm .crm-card div[style*="color:#475569"],
+#tab-crm .crm-card div[style*="color:#94a3b8"] {
+  color: var(--cream)!important;
+}
+#tab-crm div[style*="background:#fff"][style*="border-radius:12px"] > div[style*="font-size:1.4rem"] {
+  font-family: 'Cormorant Garamond', Georgia, serif!important;
+  font-size: 1.6rem!important;
+  font-weight: 500!important;
+}
+
+/* CRM + Pasien button */
+#tab-crm button[style*="background:linear-gradient"][style*="border-radius:50px"] {
+  background: linear-gradient(135deg, var(--gold-500), var(--gold-600))!important;
+  color: var(--teal-900)!important;
+  box-shadow: 0 4px 14px rgba(201,160,65,0.35)!important;
+}
+
+/* ── SETTINGS — Layanan, Diskon, Paket ── */
+.set-section div[style*="background:#f0fdf4"],
+.set-section div[style*="background:#dbeafe"],
+#epk-preview { 
+  background: rgba(45,212,160,0.08)!important;
+  border: 1px solid rgba(45,212,160,0.2)!important;
+  color: var(--emerald)!important;
+  border-radius: 9px!important;
+}
+
+/* Layanan harga badges */
+span[style*="background:#dbeafe"][style*="color:#2563eb"] {
+  background: rgba(201,160,65,0.12)!important;
+  color: var(--gold-300)!important;
+  border-radius: 4px!important;
+}
+
+/* Settings service items enhanced */
+.set-item[style*="flex-direction:column"] {
+  border: 1px solid rgba(201,160,65,0.12)!important;
+  background: rgba(10,46,58,0.5)!important;
+}
+.set-item[style*="flex-direction:column"]:hover {
+  border-color: rgba(201,160,65,0.25)!important;
+}
+.set-item-name[style*="font-size:.82rem"] { color: var(--cream)!important; }
+
+/* Diskon/Paket badges */
+.set-item span[style*="color:#64748b"] { color: var(--cream-55)!important; }
+.set-item span[style*="background:#f0fdf4"] {
+  background: rgba(45,212,160,0.12)!important;
+  color: var(--emerald)!important;
+}
+
+/* Export modal */
+#modal-export div[style*="font-weight:800"][style*="color:#0f172a"] {
+  color: var(--cream)!important;
+}
+
+/* Detail modal – countdown */
+#det-countdown {
+  background: rgba(45,212,160,0.08)!important;
+  border: 1.5px solid rgba(45,212,160,0.25)!important;
+  border-radius: 10px!important;
+  color: var(--cream)!important;
+}
+#det-countdown div[style*="color:#0f172a"],
+#det-countdown div[style*="color:#64748b"],
+#det-countdown span { color: var(--cream-80)!important; }
+#det-countdown span[style*="color:#16a34a"] { color: var(--emerald)!important; }
+
+/* Detail grid boxes */
+#modal-detail div[style*="background:#f8fafc"] {
+  background: rgba(5,28,34,0.55)!important;
+  border: 1px solid rgba(248,243,236,0.08)!important;
+  border-radius: 10px!important;
+  color: var(--cream)!important;
+}
+#modal-detail div[style*="color:#94a3b8"],
+#modal-detail div[style*="color:#0f172a"] {
+  color: var(--cream)!important;
+}
+#modal-detail div[style*="color:#94a3b8"] { color: var(--cream-55)!important; }
+
+/* Summary paket/diskon boxes */
+#paket-preview, div[style*="background:#f0fdf4"][id*="preview"] {
+  background: rgba(45,212,160,0.08)!important;
+  border: 1px solid rgba(45,212,160,0.2)!important;
+  color: var(--emerald)!important;
+}
+
+/* ── SCROLLBAR ── */
+* { scrollbar-width: thin; scrollbar-color: rgba(201,160,65,.3) transparent; }
+*::-webkit-scrollbar { width: 3px; height: 3px; }
+*::-webkit-scrollbar-thumb { background: rgba(201,160,65,.35); border-radius: 4px; }
+
 </style>
 </head>
 <body>
@@ -4123,6 +4459,84 @@ function openInvoiceFromDetail2(bkId){
   const cust=crmData.find(c=>c.nama===bk.patient);
   openInvoiceModal({...bk, phone:cust?.phone||bk.phone||""});
 }
+
+</script>
+<script>
+/* ═══ TAPA JIVA — JS PATCH: Payment Method Split + UI Fixes ═══ */
+
+// Monkey-patch renderRekap to add Cash vs Transfer/QRIS split
+(function(){
+  const _orig = window.renderRekap;
+  window.renderRekap = function(){
+    if(_orig) _orig.apply(this, arguments);
+    // Add payment method breakdown after existing rekap-pay
+    try {
+      const methods = {};
+      (window.bookings||[]).forEach(b => {
+        if(!b.method) return;
+        const m = b.method.trim();
+        let grp = 'Lainnya';
+        if(/tunai|cash/i.test(m)) grp = 'Cash / Tunai';
+        else if(/transfer|bca|bni|bri|mandiri|bank/i.test(m)) grp = 'Transfer Bank';
+        else if(/qris|gopay|ovo|dana|shopeepay|dompet/i.test(m)) grp = 'QRIS / E-Wallet';
+        methods[grp] = (methods[grp]||{count:0,total:0});
+        methods[grp].count++;
+        methods[grp].total += (b.payStatus==='Lunas'?(b.harga||0):b.payStatus==='DP'?(b.dp_amount||0):0);
+      });
+      const colors = {
+        'Cash / Tunai': '#2DD4A0',
+        'Transfer Bank': '#5DADE2',
+        'QRIS / E-Wallet': '#C9A041',
+        'Lainnya': '#94a3b8'
+      };
+      let html = '';
+      Object.entries(methods).sort((a,b)=>b[1].total-a[1].total).forEach(([grp,data])=>{
+        const col = colors[grp]||'#94a3b8';
+        html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(248,243,236,.07)">
+          <div style="width:9px;height:9px;border-radius:3px;background:${col};flex-shrink:0"></div>
+          <div style="flex:1;font-size:.78rem;color:rgba(248,243,236,.8)">${grp}</div>
+          <div style="font-size:.72rem;font-weight:700;color:${col}">${data.count} sesi</div>
+          <div style="font-size:.72rem;color:rgba(248,243,236,.55)">${window.fmtRp?window.fmtRp(data.total):''}</div>
+        </div>`;
+      });
+      // Insert payment method section after rek-pay
+      const pay = document.getElementById('rek-pay');
+      if(pay && html) {
+        let wrapper = document.getElementById('rek-method-split');
+        if(!wrapper) {
+          wrapper = document.createElement('div');
+          wrapper.id = 'rek-method-split';
+          pay.parentNode.insertAdjacentElement('afterend', wrapper);
+        }
+        wrapper.className = 'rek-card';
+        wrapper.innerHTML = `<div style="font-weight:700;font-size:.75rem;color:var(--gold-400);text-transform:uppercase;letter-spacing:.18em;margin-bottom:10px">💳 Metode Pembayaran</div>${html||'<div style="font-size:.75rem;color:rgba(248,243,236,.4)">Belum ada data</div>'}`;
+      }
+    } catch(e){}
+  };
+})();
+
+// Patch renderRekap call in loadBookings if needed  
+const _origLoad = window.loadBookings;
+if(_origLoad) {
+  window.loadBookings = async function() {
+    await _origLoad.apply(this, arguments);
+    if(document.getElementById('tab-rekap') && !document.getElementById('tab-rekap').classList.contains('hidden')) {
+      window.renderRekap();
+    }
+  };
+}
+
+// Auto dark-ify dynamically generated text
+const _observer = new MutationObserver(()=>{
+  // Fix white text in dynamic content
+  document.querySelectorAll('[style*="color:#0f172a"],[style*="color:#1e3a5f"]').forEach(el=>{
+    if(!el._luxFixed) { el.style.setProperty('color','var(--cream)','important'); el._luxFixed=true; }
+  });
+  document.querySelectorAll('[style*="color:#64748b"],[style*="color:#94a3b8"]').forEach(el=>{
+    if(!el._luxFixed) { el.style.setProperty('color','rgba(248,243,236,.6)','important'); el._luxFixed=true; }
+  });
+});
+_observer.observe(document.body, {childList:true,subtree:true,attributes:true,attributeFilter:['style']});
 
 </script>
 <script>
