@@ -2086,13 +2086,17 @@ function renderGrid(){
         const sisaText=bk.payStatus==="DP"&&bk.sisa_bayar>0?"Sisa: "+fmtRp(bk.sisa_bayar):"";const sisaHtml=sisaText?"<span class='bk-timer'>"+sisaText+"</span>":"<span class='bk-timer'></span>";
         const thLabel=th.nama||bk.therapistName||"";
         const subLine=bk.service?`${bk.service} · ${thLabel}`:(thLabel||bk.start+"–"+bk.end);
-        html+=`<td class="td-r" rowspan="${spans}" style="background:${cellBg};height:${cellH}px;border-left:3px solid rgba(255,255,255,.3)" data-bk="${bk.id}" onclick="openDetail('${bk.id}')">
-          <div class="bk-card">
-            <div class="bk-name">${bk.patient}</div>
-            <div class="bk-sub">${subLine}</div>
-            <div class="bk-foot">
-              <span class="bk-badge">${bk.payStatus==="DP"&&bk.sisa_bayar>0?"Sisa: "+fmtRp(bk.sisa_bayar):bk.payStatus}</span>
-            </div>
+        html += `<div class="bk-item status-${bk.status}" style="top:${top}px; height:${height}px;" onclick="openDetail('${bk.id}')">
+  <div class="bk-time" style="font-size: 0.75rem; color: var(--cream-55);">${bk.start} - ${bk.end}</div>
+  <div class="bk-name" style="font-weight: 800; color: var(--cream);">${bk.patient}</div>
+  
+  <div class="bk-timer-active" data-start="${bk.start}" data-end="${bk.end}" style="margin-top: 6px; display: inline-block;">
+    Menunggu...
+  </div>
+  
+  ${bk.therapist ? `<div class="bk-therapist">${bk.therapist}</div>` : ''}
+  ${bk.method ? `<div class="bk-method">${bk.method}</div>` : ''}
+</div>`;
           </div></td>`;
       }else{
         html+=`<td class="td-r" style="background:${ti%2===0?"#fff":"#fafafa"}" onclick="openAddSlot('${room}','${ts}')"></td>`;
@@ -3550,6 +3554,19 @@ function exportLaporanPDF(){
     .total-row td{font-weight:800;background:#f0fdf4!important;border-top:2px solid #16a34a}
     footer{margin-top:16px;text-align:center;font-size:9px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px}
     @media print{.no-print{display:none}body{padding:8px}}
+    /* --- PASTE KODENYA DI SINI, TEPAT DI ATAS </style> --- */
+.booking-active-pulse {
+  animation: active-session-glow 2s infinite !important;
+  border: 1px solid var(--gold-400) !important;
+  border-radius: 6px;
+  z-index: 5;
+}
+@keyframes active-session-glow {
+  0% { box-shadow: 0 0 0 0 rgba(201, 160, 65, 0.2); background-color: rgba(201, 160, 65, 0.05); }
+  50% { box-shadow: 0 0 12px rgba(201, 160, 65, 0.6); background-color: rgba(201, 160, 65, 0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(201, 160, 65, 0); background-color: rgba(201, 160, 65, 0.05); }
+}
+/* -------------------------------------------------- */
   </style></head><body>
   <div class="header">
     <div>
@@ -4124,35 +4141,47 @@ function exportCRMPDF() {
   setTimeout(() => { printWindow.print(); printWindow.close(); }, 800);
 }
 
-// 3. LIVE COUNTDOWN TIMER
+// 3. LIVE COUNTDOWN TIMER & ACTIVE PULSE TAPA JIVA
 setInterval(() => {
+  const now = new Date();
   document.querySelectorAll(".bk-timer-active").forEach(el => {
      let endTimeStr = el.getAttribute("data-end");
-     if (!endTimeStr) {
-        // Fallback untuk mengekstrak jam selesai otomatis dari teks jadwal
+     let startTimeStr = el.getAttribute("data-start");
+
+     if (!endTimeStr || !startTimeStr) {
         const parentText = el.parentElement.innerText; 
         const match = parentText.match(/(\d{2}:\d{2})/g);
         if(match && match.length >= 2) {
-            endTimeStr = match[1]; 
+            startTimeStr = match[0];
+            endTimeStr = match[1];
+            el.setAttribute("data-start", startTimeStr);
             el.setAttribute("data-end", endTimeStr);
         }
      }
-     if(endTimeStr) {
-        const now = new Date();
+     
+     if(startTimeStr && endTimeStr) {
+        const startParts = startTimeStr.split(":");
         const endParts = endTimeStr.split(":");
+        const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(startParts[0]), parseInt(startParts[1]), 0);
         const endDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), parseInt(endParts[0]), parseInt(endParts[1]), 0);
-        const dist = endDate.getTime() - now.getTime();
+        const parentCard = el.parentElement;
 
-        if (dist < 0) {
-          el.innerHTML = "SELESAI";
-          el.style.color = "var(--rose)";
-          el.style.borderColor = "var(--rose)";
-          el.classList.remove("bk-timer-active");
+        if (now >= startDate && now < endDate) {
+           parentCard.classList.add("booking-active-pulse");
+           const dist = endDate.getTime() - now.getTime();
+           const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+           const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
+           const s = Math.floor((dist % (1000 * 60)) / 1000);
+           el.innerHTML = "⏳ " + (h > 0 ? h + ":" : "") + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+        } else if (now >= endDate) {
+           parentCard.classList.remove("booking-active-pulse");
+           el.innerHTML = "SELESAI";
+           el.style.color = "var(--rose)";
+           el.style.borderColor = "var(--rose)";
+           el.classList.remove("bk-timer-active");
         } else {
-          const h = Math.floor((dist % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-          const m = Math.floor((dist % (1000 * 60 * 60)) / (1000 * 60));
-          const s = Math.floor((dist % (1000 * 60)) / 1000);
-          el.innerHTML = "⏳ " + (h > 0 ? h + ":" : "") + (m < 10 ? "0" + m : m) + ":" + (s < 10 ? "0" + s : s);
+           parentCard.classList.remove("booking-active-pulse");
+           el.innerHTML = "Menunggu...";
         }
      }
   });
