@@ -1270,6 +1270,8 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
       <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
         <div style="font-weight:800;font-size:.82rem;color:#0f172a;margin-bottom:10px">🏆 Top Layanan</div>
         <div id="lp-top-layanan"></div>
+        <div style="font-size:.68rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin:14px 0 6px;padding-top:12px;border-top:1px solid #f1f5f9">📊 Detail Layanan per Terapis</div>
+        <div id="lp-th-layanan-list"></div>
       </div>
       <!-- Detail per Booking -->
       <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
@@ -1608,7 +1610,15 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
     <div class="stabs"><button class="stab active" id="ftab-0" onclick="fTab(0)">👤 Pasien</button><button class="stab" id="ftab-1" onclick="fTab(1)">📅 Jadwal</button><button class="stab" id="ftab-2" onclick="fTab(2)">💳 Bayar</button></div>
     <div class="sbody">
       <div id="fpanel-0">
-        <div class="ff"><label class="fl">👤 Nama Pasien</label><input class="fi" id="fp-patient" placeholder="Nama lengkap..."></div>
+        <div class="ff">
+          <label class="fl">👤 Nama Pasien</label>
+          <input class="fi" id="fp-patient" placeholder="Nama lengkap..." autocomplete="off"
+            oninput="onPatientInput(this.value)" list="crm-patient-list">
+          <datalist id="crm-patient-list"></datalist>
+          <div id="fp-repeat-info" style="display:none;margin-top:6px;background:rgba(45,212,160,0.12);border:1px solid rgba(45,212,160,0.3);border-radius:8px;padding:8px 12px;font-size:.72rem;color:var(--emerald)">
+            <span id="fp-repeat-text"></span>
+          </div>
+        </div>
         <div class="ff"><label class="fl">📱 No. HP</label><input class="fi" id="fp-phone" type="tel" placeholder="08xxxxxxxxxx"></div>
         <div class="ff" id="fp-paket-wrap">
           <label class="fl">📦 Paket <span style="font-size:.6rem;color:var(--text-l);font-weight:500">(opsional)</span></label>
@@ -1616,7 +1626,27 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
             <option value="">Tanpa Paket</option>
           </select>
         </div>
-        <div class="ff"><label class="fl">💆 Layanan</label><select class="fi" id="fp-service"><option value="">-- Pilih --</option></select></div>
+        <div class="ff"><label class="fl">💆 Layanan Utama</label>
+          <select class="fi" id="fp-service"><option value="">-- Pilih Layanan --</option></select>
+        </div>
+        <!-- ── TAMBAH LAYANAN ── -->
+        <div class="ff">
+          <label class="fl">➕ Tambah Layanan <span style="font-size:.6rem;color:var(--text-l);font-weight:400">(opsional)</span></label>
+          <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center">
+            <select class="fi" id="fp-extra-sv-sel" onchange="populateExtraDurasi(this.value)" style="flex:2;padding:9px 10px;font-size:.8rem">
+              <option value="">-- Pilih layanan --</option>
+            </select>
+            <select class="fi" id="fp-extra-dur-sel" style="flex:1;padding:9px 8px;font-size:.8rem">
+              <option value="60">60 mnt</option>
+            </select>
+            <button onclick="addExtraLayanan()" style="background:rgba(45,212,160,0.2);border:1px solid var(--emerald);color:var(--emerald);border-radius:var(--radius-sm);padding:9px 12px;font-size:.78rem;font-weight:700;cursor:pointer;flex-shrink:0">+ Tambah</button>
+          </div>
+          <div id="fp-extra-layanan-list"></div>
+          <div id="fp-extra-total" style="display:none;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(45,212,160,0.1);border-radius:7px;font-size:.75rem;border:1px solid rgba(45,212,160,0.25);margin-top:4px">
+            <span style="color:var(--cream-55)">Total layanan tambahan</span>
+            <span id="fp-extra-total-val" style="font-weight:800;color:var(--emerald)"></span>
+          </div>
+        </div>
         <div class="ff"><label class="fl">📝 Catatan</label><textarea class="fi" id="fp-catatan" rows="3" style="resize:none;line-height:1.5"></textarea></div>
       </div>
       <div id="fpanel-1" class="hidden">
@@ -2770,6 +2800,18 @@ function initForm(){
   });
   // On service change: update duration options + price
   sv.onchange=()=>{ onServiceChange(); };
+  // Populate extra service dropdown
+  const exSvSel=document.getElementById('fp-extra-sv-sel');
+  if(exSvSel){
+    exSvSel.innerHTML="<option value=''>-- Pilih layanan --</option>";
+    const cats2={};
+    SERVICES.forEach(s=>{const k=s.kat||"Lainnya";if(!cats2[k])cats2[k]=[];cats2[k].push(s);});
+    Object.entries(cats2).forEach(([kat,items])=>{
+      const og=document.createElement("optgroup");og.label="── "+kat+" ──";
+      items.forEach(s=>{const o=document.createElement("option");o.value=s.nama||s;o.text=s.nama||s;og.appendChild(o);});
+      exSvSel.appendChild(og);
+    });
+  }
 
   // Therapist buttons
   const tG=document.getElementById("fp-th-grid");tG.innerHTML="";
@@ -3024,6 +3066,7 @@ function resetForm(){
   const dpW=document.getElementById("fp-dp-wrap");if(dpW)dpW.classList.add("hidden");
   // Reset biaya tambahan optional
   resetBiayaTambahan();
+  resetExtraLayanan();
   // Reset split payment
   splitActive=false;
   const sw=document.getElementById("split-wrap");if(sw)sw.style.display="none";
@@ -3278,13 +3321,15 @@ async function submitForm(){
   const diskon=calcDiskon(hargaAsli,dk);
   const biayaTambahan=getBiayaTambahan();
   const hargaSetelahDiskon=Math.max(hargaAsli-diskon,0);
-  const harga=hargaSetelahDiskon+biayaTambahan;
+  const harga=hargaSetelahDiskon+biayaTambahan+getExtraLayananTotal();
+  const extraDurAdd=getExtraLayananDur();
   // Build catatan biaya tambahan
   const biayaTambahanCatatan=Object.entries(biayaTambahanSel)
     .filter(([k,v])=>v&&BIAYA_TAMBAHAN_LIST[k])
     .map(([k])=>BIAYA_TAMBAHAN_LIST[k].label+" "+fmtRp(BIAYA_TAMBAHAN_LIST[k].harga))
     .join(", ");
   const catatanBase=document.getElementById("fp-catatan").value;
+  const svFull=extraLayanan.length>0?(svNama+" + "+getExtraLayananNames()):svNama;
   const catatanFull=biayaTambahanCatatan?(catatanBase?catatanBase+" | [Biaya Tambahan: "+biayaTambahanCatatan+"]":"[Biaya Tambahan: "+biayaTambahanCatatan+"]"):catatanBase;
   const paketData=document.getElementById("fp-paket")?.value||"";
   const dpAmount=formSel.payStatus==="DP"?parseInt(document.getElementById("fp-dp-amount")?.value||0):0;
@@ -3293,11 +3338,12 @@ async function submitForm(){
     id:formMode==="edit"?currentBk.id:genId(),
     tanggal,
     patient,phone:document.getElementById("fp-phone").value,
-    service:svNama,
+    service:svFull,
+    duration:dur+(getExtraLayananDur()),
     diskon_nama:dk?dk.nama:"",diskon_val:diskon,
     catatan:catatanFull,
     therapist:formSel.therapist,therapistName:getTh(formSel.therapist).nama,
-    room:formSel.room,start,end,duration:dur,harga,
+    room:formSel.room,start,end,harga,
     dp_amount:dpAmount,sisa_bayar:sisaBayar,
     method:splitActive?(document.getElementById("split-m1")?.options[document.getElementById("split-m1").selectedIndex]?.text||formSel.method).replace(/^[^\s]+ /,""):formSel.method,
     split_method:splitActive?(document.getElementById("split-m2")?.options[document.getElementById("split-m2").selectedIndex]?.text||"").replace(/^[^\s]+ /,""):"",
@@ -3307,6 +3353,7 @@ async function submitForm(){
     payStatus:formSel.payStatus
   };
   closeModal("modal-form");
+  resetExtraLayanan();
   if(formMode==="edit") await updateBK(bk);
   else await insertBK(bk,tanggal);
   // Always reload current view; show toast for future dates
@@ -3520,6 +3567,142 @@ async function savePindah(){
   toast('✅ Berhasil dipindahkan ke '+newRoom+' · '+newThName);
   // Refresh detail modal
   setTimeout(()=>openDetail(currentBk.id),300);
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+// REPEAT ORDER — autofill data pasien dari CRM
+// ══════════════════════════════════════════════════════════════════
+function populatePatientDatalist(){
+  const dl=document.getElementById('crm-patient-list');
+  if(!dl||!crmData) return;
+  dl.innerHTML=crmData.map(c=>`<option value="${c.nama}">`).join('');
+}
+
+function onPatientInput(val){
+  const infoEl=document.getElementById('fp-repeat-info');
+  const textEl=document.getElementById('fp-repeat-text');
+  if(!val||val.length<2){if(infoEl)infoEl.style.display='none';return;}
+  const cust=crmData.find(c=>c.nama.toLowerCase()===val.toLowerCase());
+  if(cust){
+    const phoneEl=document.getElementById('fp-phone');
+    if(phoneEl&&!phoneEl.value) phoneEl.value=cust.phone||'';
+    const catEl=document.getElementById('fp-catatan');
+    if(catEl&&!catEl.value&&cust.preferensi) catEl.value=cust.preferensi;
+    const kunjungan=cust.total_kunjungan||0;
+    const lastVisit=cust.last_visit?new Date(cust.last_visit).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'–';
+    if(infoEl&&textEl){
+      textEl.innerHTML=`🔄 <b>Repeat Customer</b> · Sudah terapi <b>${kunjungan}×</b> · Terakhir: ${lastVisit}`;
+      infoEl.style.display='block';
+    }
+  }else{
+    if(infoEl) infoEl.style.display='none';
+  }
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+// MEMBER = TIDAK ADA KOMISI TERAPIS
+// ══════════════════════════════════════════════════════════════════
+function isMemberBooking(b){
+  return !!(b.catatan&&b.catatan.includes('Member'));
+}
+function calcInsentif(b,th){
+  if(isMemberBooking(b)) return 0;
+  return Math.round((b.harga||0)*((th.insentif||0)/100));
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+// MULTI LAYANAN — tambah layanan ke-2, ke-3, dst dalam satu booking
+// ══════════════════════════════════════════════════════════════════
+let extraLayanan=[];
+
+function renderExtraLayanan(){
+  const cont=document.getElementById('fp-extra-layanan-list');
+  if(!cont) return;
+  if(!extraLayanan.length){cont.innerHTML='';updateExtraLayananTotal();return;}
+  cont.innerHTML=extraLayanan.map((l,i)=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(201,160,65,0.08);border-radius:8px;margin-bottom:6px;border:1px solid rgba(201,160,65,0.2)">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.8rem;font-weight:700;color:var(--cream)">${l.service}</div>
+        <div style="font-size:.65rem;color:var(--cream-55)">${l.dur} mnt · ${fmtRp(l.harga)}</div>
+      </div>
+      <button onclick="removeExtraLayanan(${i})" style="background:rgba(255,107,117,0.2);border:1px solid var(--rose);color:var(--rose);border-radius:6px;padding:4px 8px;font-size:.7rem;cursor:pointer;flex-shrink:0">✕</button>
+    </div>`).join('');
+  updateExtraLayananTotal();
+}
+
+function addExtraLayanan(){
+  const sel=document.getElementById('fp-extra-sv-sel');
+  const durSel=document.getElementById('fp-extra-dur-sel');
+  if(!sel||!durSel) return;
+  const svNama=sel.value;
+  const dur=parseInt(durSel.value||60);
+  if(!svNama){toast('⚠️ Pilih layanan tambahan terlebih dahulu');return;}
+  const harga=getPrice(svNama,dur);
+  extraLayanan.push({service:svNama,dur,harga});
+  sel.value='';
+  populateExtraDurasi('');
+  renderExtraLayanan();
+  toast('✅ '+svNama+' ditambahkan · '+fmtRp(harga));
+}
+
+function removeExtraLayanan(idx){
+  extraLayanan.splice(idx,1);
+  renderExtraLayanan();
+}
+
+function updateExtraLayananTotal(){
+  const totalExtra=extraLayanan.reduce((s,l)=>s+l.harga,0);
+  const totalExtraDur=extraLayanan.reduce((s,l)=>s+l.dur,0);
+  const el=document.getElementById('fp-extra-total');
+  if(el){
+    if(extraLayanan.length>0){
+      el.style.display='flex';
+      document.getElementById('fp-extra-total-val').textContent='+'+fmtRp(totalExtra)+' · +'+totalExtraDur+' mnt';
+    }else{
+      el.style.display='none';
+    }
+  }
+  updateSummary();
+}
+
+function populateExtraDurasi(svNama){
+  const durSel=document.getElementById('fp-extra-dur-sel');
+  if(!durSel) return;
+  if(!svNama){durSel.innerHTML='<option value="60">60 mnt</option>';return;}
+  const durations=getAvailDurations(svNama);
+  durSel.innerHTML=durations.map(d=>`<option value="${d}">${d} mnt</option>`).join('');
+}
+
+function getExtraLayananTotal(){return extraLayanan.reduce((s,l)=>s+l.harga,0);}
+function getExtraLayananDur(){return extraLayanan.reduce((s,l)=>s+l.dur,0);}
+function getExtraLayananNames(){return extraLayanan.map(l=>l.service).join(' + ');}
+
+function resetExtraLayanan(){
+  extraLayanan=[];
+  renderExtraLayanan();
+  const el=document.getElementById('fp-extra-total');
+  if(el) el.style.display='none';
+}
+
+
+// ══════════════════════════════════════════════════════════════════
+// LAPORAN — detail layanan per terapis (helper)
+// ══════════════════════════════════════════════════════════════════
+function buildThLayananMap(data){
+  const m={};
+  data.forEach(b=>{
+    const tid=b.therapistId||"?";
+    const th=getTh(tid);
+    if(!m[tid]) m[tid]={nama:b.therapistName||th.nama,warna:th.warna||"#2563eb",lMap:{}};
+    const sv=b.service||"Lainnya";
+    if(!m[tid].lMap[sv]) m[tid].lMap[sv]={c:0,o:0};
+    m[tid].lMap[sv].c++;
+    m[tid].lMap[sv].o+=b.harga;
+  });
+  return m;
 }
 
 // ═══ SETTINGS ═════════════════════════════════════════════════
@@ -4094,7 +4277,8 @@ function renderLaporan(){
     const pct=th.insentif||0;
     thMap[tid].sesi++;
     thMap[tid].omzet+=b.harga;
-    thMap[tid].insentif+=Math.round(b.harga*(pct/100));
+    thMap[tid].insentif+=calcInsentif(b,th);
+    if(isMemberBooking(b)) thMap[tid].member=(thMap[tid].member||0)+1;
     if(b.payStatus==="Lunas") thMap[tid].lunas++;
     else if(b.payStatus==="DP") thMap[tid].dp++;
     else thMap[tid].piutang++;
@@ -4127,6 +4311,25 @@ function renderLaporan(){
       </div>
     </div>`).join("");
 
+  // ── DETAIL LAYANAN PER TERAPIS ──────────────────────────
+  const thLayEl=document.getElementById("lp-th-layanan-list");
+  if(thLayEl){
+    const _tlm=buildThLayananMap(d);
+    thLayEl.innerHTML=Object.values(_tlm).map(t=>`
+      <div style="background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:8px;border:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.04)">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="width:28px;height:28px;border-radius:8px;background:${t.warna};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.68rem">${t.nama.slice(0,2).toUpperCase()}</div>
+          <div style="font-weight:800;font-size:.82rem;color:#0f172a">${t.nama}</div>
+        </div>
+        ${Object.entries(t.lMap).sort((a,b)=>b[1].c-a[1].c).map(([sv,d2])=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f8fafc;font-size:.72rem">
+            <span style="color:#374151;flex:1">${sv}</span>
+            <span style="font-weight:700;color:#2563eb;margin:0 8px">${d2.c}×</span>
+            <span style="color:#16a34a;font-weight:700">${fmtRp(d2.o)}</span>
+          </div>`).join("")}
+      </div>`).join("");
+  }
+
   // ── TOP LAYANAN ─────────────────────────────────────────
   const svMap={};
   d.forEach(b=>{
@@ -4156,7 +4359,8 @@ function renderLaporan(){
       ${items.map(b=>{
         const[c,bg]=PAY_CLR[b.payStatus]||["#94a3b8","#f1f5f9"];
         const th=getTh(b.therapistId);
-        const insentif=Math.round(b.harga*(th.insentif||0)/100);
+        const insentif=calcInsentif(b,th);
+        const insentifLbl=isMemberBooking(b)?'<span style="color:#dc2626;font-size:.6rem">❌ No Komisi (Member)</span>':fmtRp(insentif)+' ('+((th.insentif||0))+'%)';
         const cellClr=b.payStatus==="Lunas"?"#16a34a":b.payStatus==="DP"?"#d97706":"#dc2626";
         const dpBlock=b.payStatus==="DP"
           ?`<div style="margin-top:6px;background:#fef9c3;border-radius:7px;padding:6px 10px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
@@ -4176,7 +4380,7 @@ function renderLaporan(){
             <div><div style="font-size:.55rem;color:#94a3b8;margin-bottom:1px">👨‍⚕️ Terapis</div><div style="font-size:.72rem;font-weight:700;color:#0f172a">${b.therapistName||"-"}</div></div>
             <div><div style="font-size:.55rem;color:#94a3b8;margin-bottom:1px">💳 Metode</div><div style="font-size:.72rem;font-weight:700;color:#0f172a">${b.method||"-"}</div></div>
             <div><div style="font-size:.55rem;color:#94a3b8;margin-bottom:1px">💰 Harga</div><div style="font-size:.72rem;font-weight:800;color:#16a34a">${fmtRp(b.harga)}</div></div>
-            <div><div style="font-size:.55rem;color:#94a3b8;margin-bottom:1px">🏆 Insentif</div><div style="font-size:.72rem;font-weight:700;color:#d97706">${fmtRp(insentif)} (${th.insentif||0}%)</div></div>
+            <div><div style="font-size:.55rem;color:#94a3b8;margin-bottom:1px">🏆 Insentif</div><div style="font-size:.72rem;font-weight:700;color:#d97706">${insentifLbl}</div></div>
           </div>
           ${dpBlock}
         </div>`}).join("")}
@@ -4196,7 +4400,7 @@ function exportLaporan(){
     if(!thMap[tid]) thMap[tid]={nama:b.therapistName||th.nama,pct:th.insentif||0,sesi:0,omzet:0,insentif:0};
     thMap[tid].sesi++;
     thMap[tid].omzet+=b.harga;
-    thMap[tid].insentif+=Math.round(b.harga*((th.insentif||0)/100));
+    thMap[tid].insentif+=calcInsentif(b,th);
   });
 
   const wb=XLSX.utils.book_new();
@@ -4229,6 +4433,18 @@ function exportLaporan(){
   const ws3=XLSX.utils.json_to_sheet(Object.values(svMap).sort((a,b)=>b["Jumlah Sesi"]-a["Jumlah Sesi"]));
   ws3["!cols"]=[{wch:24},{wch:14},{wch:16}];
   XLSX.utils.book_append_sheet(wb,ws3,"Top Layanan");
+
+  // Sheet: Detail Layanan per Terapis
+  const _tlm2=buildThLayananMap(lapData);
+  const detPerTerapis=[];
+  Object.values(_tlm2).forEach(t=>{
+    Object.entries(t.lMap).sort((a,b)=>b[1].c-a[1].c).forEach(([sv,d2])=>{
+      detPerTerapis.push({"Terapis":t.nama,"Layanan":sv,"Jumlah Sesi":d2.c,"Total Omzet (Rp)":d2.o,"Rata-rata/Sesi (Rp)":d2.c?Math.round(d2.o/d2.c):0});
+    });
+  });
+  const ws4=XLSX.utils.json_to_sheet(detPerTerapis);
+  ws4["!cols"]=[{wch:20},{wch:28},{wch:12},{wch:18},{wch:18}];
+  XLSX.utils.book_append_sheet(wb,ws4,"Layanan per Terapis");
 
   const wbout=XLSX.write(wb,{bookType:"xlsx",type:"array"});
   const blob=new Blob([wbout],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
@@ -4264,7 +4480,7 @@ function exportLaporanPDF(){
     if(!thMap[tid]) thMap[tid]={nama:b.therapistName||th.nama,pct:th.insentif||0,sesi:0,omzet:0,insentif:0};
     thMap[tid].sesi++;
     thMap[tid].omzet+=b.harga;
-    thMap[tid].insentif+=Math.round(b.harga*((th.insentif||0)/100));
+    thMap[tid].insentif+=calcInsentif(b,th);
   });
 
   const totalRev=lapData.reduce((s,b)=>s+b.harga,0);
@@ -4343,6 +4559,10 @@ function exportLaporanPDF(){
   <table><thead><tr><th>Terapis</th><th>Sesi</th><th>Omzet</th><th>% Komisi</th><th>Insentif</th></tr></thead>
   <tbody>${thRows}<tr class="total-row"><td>TOTAL</td><td style="text-align:center">${lapData.length}</td><td style="text-align:right">${fmtRp(totalRev)}</td><td></td><td style="text-align:right;color:#d97706">${fmtRp(totalInsentif)}</td></tr></tbody></table>
 
+  <h3>📊 Detail Layanan per Terapis</h3>
+  <table><thead><tr><th>Terapis</th><th>Layanan</th><th>Sesi</th><th>Total Omzet</th><th>Rata-rata/Sesi</th></tr></thead>
+  <tbody>${(()=>{const _m=buildThLayananMap(lapData);return Object.values(_m).map(t=>Object.entries(t.lMap).sort((a,b)=>b[1].c-a[1].c).map(([sv,d2],i)=>`<tr><td>${i===0?`<b>${t.nama}</b>`:""}</td><td>${sv}</td><td style="text-align:center">${d2.c}</td><td style="text-align:right;color:#2563eb;font-weight:700">${fmtRp(d2.o)}</td><td style="text-align:right">${fmtRp(d2.c?Math.round(d2.o/d2.c):0)}</td></tr>`).join("")).join("");})()}</tbody></table>
+
   <h3>📋 Detail Semua Sesi (${lapData.length} sesi)</h3>
   <table><thead><tr><th>#</th><th>Pasien</th><th>Layanan</th><th>Terapis</th><th>Durasi</th><th>Harga</th><th>Status</th><th>Insentif</th><th>Metode</th></tr></thead>
   <tbody>${detailRows}</tbody></table>
@@ -4373,6 +4593,7 @@ async function loadCRMData(){
     crmData=data||[];
     await updateCRMSummary();
     renderCRM();
+    populatePatientDatalist();
   }catch(e){ console.warn("CRM load error:",e); renderCRM(); }
 }
 
