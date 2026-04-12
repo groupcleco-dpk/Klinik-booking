@@ -1166,22 +1166,22 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
   </div>
 </div>
 
-<!-- STATS REDESIGN -->
-<div style="padding:10px 12px 6px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-  <div style="background:linear-gradient(135deg,rgba(201,160,65,0.18)0%,rgba(10,46,58,0.7)100%);border:1px solid rgba(201,160,65,0.3);border-radius:14px;padding:12px 14px;grid-column:1/-1">
-    <div style="font-size:.6rem;color:var(--gold-400);font-weight:700;text-transform:uppercase;letter-spacing:.15em;margin-bottom:3px">💰 Revenue Hari Ini</div>
-    <div style="font-size:1.55rem;font-weight:900;color:var(--emerald);line-height:1" id="st-rev">Rp 0</div>
-    <div style="font-size:.6rem;color:var(--cream-55);margin-top:2px">Potensi pendapatan</div>
+<!-- STATS — UNIFIED DESIGN -->
+<div style="padding:10px 14px 4px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+  <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:12px;padding:11px 10px;text-align:center">
+    <div style="font-size:.56rem;color:var(--gold-400);font-weight:700;letter-spacing:.1em;margin-bottom:3px">📅 BOOKING</div>
+    <div style="font-size:1.45rem;font-weight:900;color:var(--gold-300);line-height:1" id="st-total">0</div>
+    <div style="font-size:.56rem;color:var(--cream-55);margin-top:2px">sesi hari ini</div>
   </div>
-  <div style="background:rgba(10,46,58,0.7);border:1px solid rgba(201,160,65,0.15);border-radius:14px;padding:12px 14px">
-    <div style="font-size:.6rem;color:var(--cream-55);font-weight:600;margin-bottom:3px">📅 Total Booking</div>
-    <div style="font-size:1.55rem;font-weight:900;color:var(--gold-400);line-height:1" id="st-total">0</div>
-    <div style="font-size:.6rem;color:var(--cream-55);margin-top:2px">sesi hari ini</div>
+  <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:12px;padding:11px 10px;text-align:center">
+    <div style="font-size:.56rem;color:var(--gold-400);font-weight:700;letter-spacing:.1em;margin-bottom:3px">🚪 ROOM</div>
+    <div style="font-size:1.45rem;font-weight:900;color:var(--amber);line-height:1" id="st-room">0/6</div>
+    <div style="font-size:.56rem;color:var(--cream-55);margin-top:2px">terpakai</div>
   </div>
-  <div style="background:rgba(10,46,58,0.7);border:1px solid rgba(201,160,65,0.15);border-radius:14px;padding:12px 14px">
-    <div style="font-size:.6rem;color:var(--cream-55);font-weight:600;margin-bottom:3px">🚪 Room Terpakai</div>
-    <div style="font-size:1.55rem;font-weight:900;color:var(--amber);line-height:1" id="st-room">0/6</div>
-    <div style="font-size:.6rem;color:var(--cream-55);margin-top:2px">dari total room</div>
+  <div style="background:linear-gradient(135deg,rgba(45,212,160,0.18),rgba(10,46,58,0.75));border:1.5px solid rgba(45,212,160,0.3);border-radius:12px;padding:11px 10px;text-align:center">
+    <div style="font-size:.56rem;color:var(--emerald);font-weight:700;letter-spacing:.1em;margin-bottom:3px">💰 REVENUE</div>
+    <div style="font-size:1.1rem;font-weight:900;color:var(--emerald);line-height:1" id="st-rev">Rp 0</div>
+    <div style="font-size:.56rem;color:var(--cream-55);margin-top:2px">potensi hari ini</div>
   </div>
 </div>
 
@@ -2634,16 +2634,16 @@ function showUnpaidAlert(bk){
 }
 // ═══ RENDER ═══════════════════════════════════════════════════
 function renderAll(){
-  document.getElementById("date-lbl").textContent=fmtDate(currentDate);
-  document.getElementById("st-total").textContent=bookings.length;
-  document.getElementById("st-room").textContent=new Set(bookings.map(b=>b.room)).size+"/6";
-  document.getElementById("st-th").textContent=new Set(bookings.map(b=>b.therapist)).size+"/"+THERAPISTS.length;
-  // Revenue in stats
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  const setHTML=(id,v)=>{const e=document.getElementById(id);if(e)e.innerHTML=v;};
+  setEl("date-lbl",fmtDate(currentDate));
+  setEl("st-total",bookings.length);
+  setEl("st-room",new Set(bookings.map(b=>b.room)).size+"/6");
+  // Revenue
   const todayRev=bookings.reduce((s,b)=>s+(b.harga||0),0);
-  const revStatEl=document.getElementById("st-rev");
-  if(revStatEl) revStatEl.textContent=todayRev>0?fmtRp(todayRev):"Rp 0";
-  document.getElementById("gs-count").textContent=bookings.length;
-  document.getElementById("exp-info").textContent=`${bookings.length} booking · ${fmtDate(currentDate)}`;
+  setEl("st-rev",todayRev>0?fmtRp(todayRev):"Rp 0");
+  setEl("gs-count",bookings.length);
+  setEl("exp-info",`${bookings.length} booking · ${fmtDate(currentDate)}`);
   renderGrid();renderList();renderRekap();
   setTimeout(updateCountdowns,200);
 }
@@ -2711,16 +2711,18 @@ function renderList(){
     const hargaTxt=b.harga>0?fmtRp(b.harga):"";
     const sisaTxt=b.payStatus==="DP"&&b.sisa_bayar>0?`Sisa: ${fmtRp(b.sisa_bayar)}`:"";
     const thNama=b.therapistName||getTh(b.therapist).nama||"";
+    const cellBg=b.payStatus==="Lunas"?"#16a34a":b.payStatus==="DP"?"#d97706":"#dc2626";
     return`<div class="li-item" onclick="openDetail('${b.id}')">
-      <div class="li-av" style="background:${b.payStatus==="Lunas"?"#16a34a":b.payStatus==="DP"?"#d97706":"#dc2626"}">${b.patient.slice(0,2).toUpperCase()}</div>
+      <div class="li-av" style="background:${cellBg};border-radius:10px;width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.75rem;color:#fff">${b.patient.slice(0,2).toUpperCase()}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:800;color:#0f172a;font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</div>
-        <div style="font-size:.65rem;color:#64748b">${b.service||"-"} · ${thNama} · ${b.room} · ${b.start}</div>
-        ${sisaTxt?`<div style="font-size:.62rem;font-weight:700;color:#dc2626">${sisaTxt}</div>`:""}
+        <div style="font-weight:800;color:var(--cream);font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</div>
+        <div style="font-size:.65rem;color:var(--cream-55);margin-top:1px">${b.service||"-"} · ${thNama}</div>
+        <div style="font-size:.62rem;color:var(--cream-55);margin-top:1px">🚪 ${b.room} · ⏰ ${b.start}–${b.end||"?"}</div>
+        ${sisaTxt?`<div style="font-size:.62rem;font-weight:700;color:var(--rose);margin-top:2px">${sisaTxt}</div>`:""}
       </div>
-      <div style="text-align:right;flex-shrink:0">
-        <span class="badge" style="background:${bg};color:${cl};display:block;margin-bottom:3px">${b.payStatus}</span>
-        <span style="font-size:.62rem;font-weight:700;color:#16a34a">${hargaTxt}</span>
+      <div style="text-align:right;flex-shrink:0;display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+        <span style="background:${bg};color:${cl};font-size:.6rem;font-weight:700;border-radius:6px;padding:3px 8px">${b.payStatus}</span>
+        ${hargaTxt?`<span style="font-size:.72rem;font-weight:800;color:var(--emerald)">${hargaTxt}</span>`:''}
       </div></div>`;
   }).join("");
 }
@@ -2738,23 +2740,23 @@ function renderRekap(){
   const revEl=document.getElementById("rek-rev");
   if(revEl) revEl.innerHTML=`
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <div style="background:#f0fdf4;border-radius:9px;padding:10px 12px;text-align:center">
+      <div style="background:rgba(22,163,74,0.12);border:1px solid rgba(22,163,74,0.25);border-radius:9px;padding:10px 12px;text-align:center">
         <div style="font-size:1rem;font-weight:900;color:#16a34a">${fmtRp(totalRev)}</div>
-        <div style="font-size:.6rem;color:#64748b;margin-top:2px">💰 Total Potensi</div>
+        <div style="font-size:.6rem;color:var(--cream-55);margin-top:2px">💰 Total Potensi</div>
       </div>
-      <div style="background:#dcfce7;border-radius:9px;padding:10px 12px;text-align:center">
+      <div style="background:rgba(22,163,74,0.08);border:1px solid rgba(22,163,74,0.2);border-radius:9px;padding:10px 12px;text-align:center">
         <div style="font-size:1rem;font-weight:900;color:#16a34a">${fmtRp(revLunas)}</div>
-        <div style="font-size:.6rem;color:#64748b;margin-top:2px">✅ Sudah Lunas</div>
+        <div style="font-size:.6rem;color:var(--cream-55);margin-top:2px">✅ Sudah Lunas</div>
       </div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-      <div style="background:#fef3c7;border-radius:9px;padding:10px 12px;text-align:center">
+      <div style="background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.25);border-radius:9px;padding:10px 12px;text-align:center">
         <div style="font-size:.9rem;font-weight:900;color:#d97706">${fmtRp(revDP)}</div>
-        <div style="font-size:.6rem;color:#64748b;margin-top:2px">💵 DP Masuk</div>
+        <div style="font-size:.6rem;color:var(--cream-55);margin-top:2px">💵 DP Masuk</div>
       </div>
-      <div style="background:#fee2e2;border-radius:9px;padding:10px 12px;text-align:center">
+      <div style="background:rgba(220,38,38,0.12);border:1px solid rgba(220,38,38,0.2);border-radius:9px;padding:10px 12px;text-align:center">
         <div style="font-size:.9rem;font-weight:900;color:#dc2626">${fmtRp(totalPiutang)}</div>
-        <div style="font-size:.6rem;color:#64748b;margin-top:2px">🔴 Total Piutang</div>
+        <div style="font-size:.6rem;color:var(--cream-55);margin-top:2px">🔴 Total Piutang</div>
       </div>
     </div>
     <div style="background:rgba(5,28,34,0.5);border:1px solid rgba(201,160,65,0.15);border-radius:9px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
@@ -2791,7 +2793,7 @@ function renderRekap(){
     const c=bookings.filter(b=>b.room===r).length;
     return`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:3px"><span style="font-weight:700">${r}</span><span style="color:#64748b">${c} sesi</span></div><div style="height:7px;background:#f1f5f9;border-radius:3px"><div style="width:${Math.min(c/TIME_SLOTS.length*100,100)}%;height:100%;border-radius:3px;background:var(--blue)"></div></div></div>`;
   }).join("");
-  document.getElementById("rek-th").innerHTML=THERAPISTS.map(th=>{
+  const _rekTh=document.getElementById("rek-th");if(_rekTh) _rekTh.innerHTML=THERAPISTS.map(th=>{
     const c=bookings.filter(b=>b.therapist===th.id).length;
     return`<div class="rek-row"><div style="width:9px;height:9px;border-radius:3px;background:${th.warna};flex-shrink:0"></div><div style="flex:1;font-size:.8rem;font-weight:600">${th.nama}</div><div style="font-weight:800;color:${th.warna}">${c}</div><div style="width:70px;height:7px;background:#f1f5f9;border-radius:3px"><div style="width:${c/t*100}%;height:100%;border-radius:3px;background:${th.warna}"></div></div></div>`;
   }).join("");
@@ -3646,8 +3648,9 @@ function onPatientInput(val){
 // MEMBER = TIDAK ADA KOMISI TERAPIS
 // ══════════════════════════════════════════════════════════════════
 function isMemberBooking(b){
-  // Cek dari catatan (booking tersimpan) ATAU dari form aktif
-  return !!(b.catatan&&b.catatan.includes('Member'));
+  // Cek dari catatan — termasuk format "[Biaya Tambahan: 👑 Member ...]"
+  const cat=b.catatan||"";
+  return cat.includes('Member')||cat.includes('member');
 }
 function isFormMember(){
   // Cek apakah form saat ini pilih member
