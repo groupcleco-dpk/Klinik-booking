@@ -2328,22 +2328,27 @@ async function loadBookings(){
     dp_amount:r.dp_amount||0,sisa_bayar:r.sisa_bayar||0,
     method:r.method||"Tunai",
     payStatus:r.pay_status||"Belum Bayar",catatan:r.catatan||"",
-    split_method:r.split_method||"",
-    split_amount1:r.split_nominal1||r.split_amount1||0,
-    split_amount2:r.split_nominal2||r.split_amount2||0,
-    is_split:!!(r.split_method)
+    // Parse split info dari catatan jika ada
+    split_method:(()=>{const m=(r.catatan||"").match(/\[Split:[^+]+\+\s*([^\s]+)/);return m?m[1].trim():"";})(),
+    split_amount1:(()=>{const m=(r.catatan||"").match(/\[Split:[^:]+:\s*Rp[\d.,]+|\[Split:[^:]+:\s*([\d]+)/);return 0;})(),
+    split_amount2:0,
+    is_split:!!(r.catatan||"").includes("[Split:")
   }));
   renderAll();
 }
 
 async function insertBK(bk,tanggal){
+  // Gabungkan info split ke catatan jika ada
+  let catatanFinal=bk.catatan||"";
+  if(bk.is_split&&bk.split_method){
+    const splitInfo=`[Split: ${bk.method} ${fmtRp(bk.split_amount1||0)} + ${bk.split_method} ${fmtRp(bk.split_amount2||0)}]`;
+    catatanFinal=catatanFinal?(catatanFinal+" | "+splitInfo):splitInfo;
+  }
   const{error}=await db.from("app_booking").insert([{
     id:bk.id,tanggal,patient:bk.patient,phone:bk.phone,service:bk.service,
     therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,
     start_time:bk.start,end_time:bk.end,duration_min:bk.duration,
-    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,
-    split_method:bk.split_method||"",
-    split_nominal1:bk.split_amount1||0,split_nominal2:bk.split_amount2||0,
+    method:bk.method,pay_status:bk.payStatus,catatan:catatanFinal,
     harga:bk.harga||0,dp_amount:bk.dp_amount||0,sisa_bayar:bk.sisa_bayar||0
   }]);
   if(error){ toast("❌ "+error.message); return; }
@@ -2359,14 +2364,18 @@ async function insertBK(bk,tanggal){
 }
 
 async function updateBK(bk){
+  let catatanFinal=bk.catatan||"";
+  if(bk.is_split&&bk.split_method){
+    const splitInfo=`[Split: ${bk.method} ${fmtRp(bk.split_amount1||0)} + ${bk.split_method} ${fmtRp(bk.split_amount2||0)}]`;
+    if(!catatanFinal.includes('[Split:'))
+      catatanFinal=catatanFinal?(catatanFinal+" | "+splitInfo):splitInfo;
+  }
   const{error}=await db.from("app_booking").update({
     tanggal:bk.tanggal||fmtISO(currentDate),
     patient:bk.patient,phone:bk.phone,service:bk.service,
     therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,
     start_time:bk.start,end_time:bk.end,duration_min:bk.duration,
-    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,
-    split_method:bk.split_method||"",
-    split_nominal1:bk.split_amount1||0,split_nominal2:bk.split_amount2||0,
+    method:bk.method,pay_status:bk.payStatus,catatan:catatanFinal,
     harga:bk.harga||0,dp_amount:bk.dp_amount||0,sisa_bayar:bk.sisa_bayar||0
   }).eq("id",bk.id);
   if(error)toast("❌ "+error.message);
