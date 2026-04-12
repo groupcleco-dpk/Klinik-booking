@@ -1166,14 +1166,23 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
   </div>
 </div>
 
-<div class="stats">
-  <div class="sc"><div class="si">📅</div><div class="sv" id="st-total" style="color:var(--blue)">0</div><div class="sl">Total Booking</div></div>
-  <div class="sc"><div class="si">🚪</div><div class="sv" id="st-room" style="color:var(--orange)">0/6</div><div class="sl">Room Terpakai</div></div>
-  <div class="sc"><div class="si">👨‍⚕️</div><div class="sv" id="st-th" style="color:var(--green)">0/6</div><div class="sl">Terapis Aktif</div></div>
-</div>
-<div style="margin:0 12px 8px;background:#f0fdf4;border-radius:11px;padding:9px 14px;display:flex;justify-content:space-between;align-items:center">
-  <span style="font-size:.72rem;color:#374151;font-weight:700">💰 Potensi Revenue Hari Ini</span>
-  <span style="font-size:.9rem;font-weight:900;color:#16a34a" id="st-rev">Rp 0</span>
+<!-- STATS REDESIGN -->
+<div style="padding:10px 12px 6px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+  <div style="background:linear-gradient(135deg,rgba(201,160,65,0.18)0%,rgba(10,46,58,0.7)100%);border:1px solid rgba(201,160,65,0.3);border-radius:14px;padding:12px 14px;grid-column:1/-1">
+    <div style="font-size:.6rem;color:var(--gold-400);font-weight:700;text-transform:uppercase;letter-spacing:.15em;margin-bottom:3px">💰 Revenue Hari Ini</div>
+    <div style="font-size:1.55rem;font-weight:900;color:var(--emerald);line-height:1" id="st-rev">Rp 0</div>
+    <div style="font-size:.6rem;color:var(--cream-55);margin-top:2px">Potensi pendapatan</div>
+  </div>
+  <div style="background:rgba(10,46,58,0.7);border:1px solid rgba(201,160,65,0.15);border-radius:14px;padding:12px 14px">
+    <div style="font-size:.6rem;color:var(--cream-55);font-weight:600;margin-bottom:3px">📅 Total Booking</div>
+    <div style="font-size:1.55rem;font-weight:900;color:var(--gold-400);line-height:1" id="st-total">0</div>
+    <div style="font-size:.6rem;color:var(--cream-55);margin-top:2px">sesi hari ini</div>
+  </div>
+  <div style="background:rgba(10,46,58,0.7);border:1px solid rgba(201,160,65,0.15);border-radius:14px;padding:12px 14px">
+    <div style="font-size:.6rem;color:var(--cream-55);font-weight:600;margin-bottom:3px">🚪 Room Terpakai</div>
+    <div style="font-size:1.55rem;font-weight:900;color:var(--amber);line-height:1" id="st-room">0/6</div>
+    <div style="font-size:.6rem;color:var(--cream-55);margin-top:2px">dari total room</div>
+  </div>
 </div>
 
 <div class="tabs">
@@ -1199,11 +1208,35 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
       <div class="swrap"><span>🔍</span><input class="sinput" id="s-input" placeholder="Cari nama pasien..." oninput="renderList()"></div>
       <button style="padding:9px 12px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.72rem" onclick="document.getElementById('fpanel').classList.toggle('hidden')">🎯 Filter</button>
     </div>
-    <div class="fpanel hidden" id="fpanel">
-      <div><label class="fl">Ruangan</label><select class="fi" id="fr-filter" onchange="renderList()" style="padding:7px;font-size:.75rem"><option value="">Semua</option></select></div>
-      <div><label class="fl">Terapis</label><select class="fi" id="ft-filter" onchange="renderList()" style="padding:7px;font-size:.75rem"><option value="">Semua</option></select></div>
-      <div><label class="fl">Status Bayar</label><select class="fi" id="fp-filter" onchange="renderList()" style="padding:7px;font-size:.75rem"><option value="">Semua</option><option>Belum Bayar</option><option>DP</option><option>Lunas</option></select></div>
-      <div style="display:flex;align-items:flex-end"><button onclick="resetFilter()" style="width:100%;padding:8px;border-radius:9px;border:2px solid var(--red);background:#fff;color:var(--red);font-weight:700;font-size:.72rem">🗑 Reset</button></div>
+    <div class="fpanel hidden" id="fpanel" style="padding:8px 0 4px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
+        <div>
+          <label style="font-size:.6rem;font-weight:700;color:var(--gold-400);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:3px">🚪 Ruangan</label>
+          <select class="fi" id="fr-filter" onchange="renderList()" style="padding:8px 10px;font-size:.75rem;background:rgba(10,46,58,0.8)">
+            <option value="">Semua</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:.6rem;font-weight:700;color:var(--gold-400);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:3px">👤 Terapis</label>
+          <select class="fi" id="ft-filter" onchange="renderList()" style="padding:8px 10px;font-size:.75rem;background:rgba(10,46,58,0.8)">
+            <option value="">Semua</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+        <div>
+          <label style="font-size:.6rem;font-weight:700;color:var(--gold-400);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:3px">💳 Status Bayar</label>
+          <select class="fi" id="fp-filter" onchange="renderList()" style="padding:8px 10px;font-size:.75rem;background:rgba(10,46,58,0.8)">
+            <option value="">Semua</option>
+            <option value="Belum Bayar">Belum Bayar</option>
+            <option value="DP">DP</option>
+            <option value="Lunas">Lunas</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <button onclick="resetFilter()" style="width:100%;padding:8px;border-radius:9px;border:1.5px solid rgba(201,160,65,0.3);background:rgba(201,160,65,0.1);color:var(--gold-400);font-weight:700;font-size:.72rem;cursor:pointer">🔄 Reset Filter</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="list-wrap" id="list-cont"></div>
@@ -1662,13 +1695,18 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
             <option value="180">3 jam</option>
           </select></div>
         </div>
-        <div class="ff" style="background:#f0f7ff;border-radius:9px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:.75rem;color:#374151;font-weight:600">⏰ Jam Selesai (otomatis)</span>
-          <span style="font-size:.88rem;font-weight:800;color:var(--blue)" id="fp-end-disp">–</span>
-        </div>
-        <div class="ff" style="background:#f0fdf4;border-radius:9px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:.75rem;color:#374151;font-weight:600">💰 Harga Layanan</span>
-          <span style="font-size:.95rem;font-weight:900;color:#16a34a" id="fp-price-disp">–</span>
+        <!-- JAM SELESAI + HARGA — redesign -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div style="background:rgba(37,99,235,0.12);border:1.5px solid rgba(37,99,235,0.3);border-radius:10px;padding:10px 12px;text-align:center">
+            <div style="font-size:.58rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">⏰ Jam Selesai</div>
+            <div style="font-size:1.15rem;font-weight:900;color:var(--blue)" id="fp-end-disp">–</div>
+            <div style="font-size:.58rem;color:#94a3b8;margin-top:1px">otomatis</div>
+          </div>
+          <div style="background:rgba(22,163,74,0.12);border:1.5px solid rgba(22,163,74,0.3);border-radius:10px;padding:10px 12px;text-align:center">
+            <div style="font-size:.58rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">💰 Harga</div>
+            <div style="font-size:1.05rem;font-weight:900;color:#16a34a" id="fp-price-disp">–</div>
+            <div style="font-size:.58rem;color:#94a3b8;margin-top:1px">dari pricelist</div>
+          </div>
         </div>
         <div class="ff"><label class="fl">👨‍⚕️ Terapis</label><div class="g2" id="fp-th-grid"></div></div>
         <div class="ff"><label class="fl">🚪 Ruangan</label><div class="g3" id="fp-room-grid"></div></div>
@@ -3185,8 +3223,9 @@ function updateSummary(){
   const dk=getSelectedDiskon();
   const diskon=calcDiskon(price,dk);
   const biayaTambahan=getBiayaTambahan();
+  const extraHarga=typeof getExtraLayananTotal==='function'?getExtraLayananTotal():0;
   const hargaSetelahDiskon=Math.max(price-diskon,0);
-  const hargaTotal=hargaSetelahDiskon+biayaTambahan;
+  const hargaTotal=hargaSetelahDiskon+biayaTambahan+extraHarga;
   const biayaRows=Object.entries(biayaTambahanSel)
     .filter(([k,v])=>v&&BIAYA_TAMBAHAN_LIST[k])
     .map(([k])=>["  └ "+BIAYA_TAMBAHAN_LIST[k].label,"+"+fmtRp(BIAYA_TAMBAHAN_LIST[k].harga)]);
@@ -3199,7 +3238,8 @@ function updateSummary(){
     ["💰 Harga Layanan",price>0?fmtRp(price):"–"],
     ...(dk&&price>0?[["🏷️ Diskon","– "+fmtRp(diskon)],["Setelah Diskon",fmtRp(hargaSetelahDiskon)]]:[]),
     ...(biayaTambahan>0?[["➕ Biaya Tambahan","+"+fmtRp(biayaTambahan)],...biayaRows]:[]),
-    ...(biayaTambahan>0||dk?[["💳 Total Akhir",fmtRp(hargaTotal)]]:[]),
+    ...(extraHarga>0?[["➕ Layanan Tambahan","+"+fmtRp(extraHarga)]]:[]),
+    ...(biayaTambahan>0||dk||extraHarga>0?[["💳 Total Akhir",fmtRp(hargaTotal)]]:[]),
     ...(formSel.payStatus==="DP"?[["💵 DP Dibayar",fmtRp(parseInt(document.getElementById("fp-dp-amount")?.value||0))],["🔴 Sisa Bayar",fmtRp(Math.max(hargaTotal-parseInt(document.getElementById("fp-dp-amount")?.value||0),0))]]:[]),
     ["Metode",splitActive?(()=>{
       const m1el=document.getElementById("split-m1");
@@ -3585,10 +3625,11 @@ function onPatientInput(val){
   if(!val||val.length<2){if(infoEl)infoEl.style.display='none';return;}
   const cust=crmData.find(c=>c.nama.toLowerCase()===val.toLowerCase());
   if(cust){
+    // Selalu update data ketika nama cocok (termasuk saat ganti nama pasien)
     const phoneEl=document.getElementById('fp-phone');
-    if(phoneEl&&!phoneEl.value) phoneEl.value=cust.phone||'';
+    if(phoneEl) phoneEl.value=cust.phone||'';
     const catEl=document.getElementById('fp-catatan');
-    if(catEl&&!catEl.value&&cust.preferensi) catEl.value=cust.preferensi;
+    if(catEl&&cust.preferensi&&!catEl.value) catEl.value=cust.preferensi;
     const kunjungan=cust.total_kunjungan||0;
     const lastVisit=cust.last_visit?new Date(cust.last_visit).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'–';
     if(infoEl&&textEl){
@@ -3605,7 +3646,12 @@ function onPatientInput(val){
 // MEMBER = TIDAK ADA KOMISI TERAPIS
 // ══════════════════════════════════════════════════════════════════
 function isMemberBooking(b){
+  // Cek dari catatan (booking tersimpan) ATAU dari form aktif
   return !!(b.catatan&&b.catatan.includes('Member'));
+}
+function isFormMember(){
+  // Cek apakah form saat ini pilih member
+  return !!(biayaTambahanSel&&biayaTambahanSel['member']);
 }
 function calcInsentif(b,th){
   if(isMemberBooking(b)) return 0;
@@ -4232,12 +4278,19 @@ async function loadLaporan(){
 
 function renderLaporan(){
   const d=lapData;
+  // Helper untuk clear elemen dengan aman
+  const clr=(id,v='')=>{const e=document.getElementById(id);if(e)e.innerHTML=v;};
+  const clrTxt=(id,v='')=>{const e=document.getElementById(id);if(e)e.textContent=v;};
   if(!d.length){
-    document.getElementById("lp-rev-cards").innerHTML="<div style='grid-column:1/-1;text-align:center;padding:20px;color:#94a3b8;font-size:.78rem'>📭 Tidak ada data sesi</div>";
-    document.getElementById("lp-terapis-list").innerHTML="<div style='text-align:center;padding:16px;color:#94a3b8;font-size:.78rem'>Tidak ada data</div>";
-    document.getElementById("lp-top-layanan").innerHTML="";
-    document.getElementById("lp-detail-list").innerHTML="";
-    document.getElementById("lp-sesi-count").textContent="0 sesi";
+    clr("lp-rev-cards","<div style='grid-column:1/-1;text-align:center;padding:24px 20px;color:#94a3b8;font-size:.78rem'>📭 Tidak ada data sesi untuk periode ini</div>");
+    clr("lp-rev-bar","");
+    clr("lp-terapis-list","<div style='text-align:center;padding:16px;color:#94a3b8;font-size:.78rem'>Tidak ada data</div>");
+    clr("lp-top-layanan","");
+    clr("lp-th-layanan-list","");
+    clr("lp-detail-list","");
+    clrTxt("lp-sesi-count","0 sesi");
+    clrTxt("lp-th-count","0 terapis");
+    clrTxt("lp-total-insentif","Rp 0");
     return;
   }
 
@@ -5183,17 +5236,42 @@ function exportCRMExcel() {
 }
 function exportCRMPDF() {
   if(!crmData || crmData.length === 0) return toast("Data CRM kosong");
-  let printWindow = window.open('', '_blank');
-  let html = `<html><head><title>CRM TAPA JIVA</title>
-  <style>body{font-family:sans-serif; color: #051C22;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #104F62;padding:10px;text-align:left;} th{background:#0D3D4D;color:#FFF;}</style>
-  </head><body><h2>Database Pasien (CRM) - TAPA JIVA</h2>
-  <table><tr><th>Nama</th><th>Telepon</th><th>Total Kunjungan</th><th>Terakhir Datang</th></tr>`;
-  crmData.forEach(p => { html += `<tr><td>${p.nama}</td><td>${p.phone || '-'}</td><td>${p.total_kunjungan || 0}</td><td>${p.last_visit || '-'}</td></tr>`; });
-  html += '</table></body></html>';
-  printWindow.document.write(html);
-  printWindow.document.close();
-  printWindow.focus();
-  setTimeout(() => { printWindow.print(); printWindow.close(); }, 800);
+  const now = new Date().toLocaleString("id-ID");
+  let rows = crmData.map((p,i) => `<tr>
+    <td style="text-align:center">${i+1}</td>
+    <td><b>${p.nama||'-'}</b></td>
+    <td>${p.phone||'-'}</td>
+    <td style="text-align:center;font-weight:700;color:#2563eb">${p.total_kunjungan||0}</td>
+    <td>${p.last_visit?new Date(p.last_visit).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'-'}</td>
+    <td style="font-size:10px;color:#64748b">${p.preferensi||'-'}</td>
+  </tr>`).join('');
+  const pdfHtml = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>CRM TAPA JIVA</title>
+  <style>
+    *{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;padding:16px;font-size:11px;color:#0f172a}
+    .hdr{display:flex;align-items:center;justify-content:space-between;padding-bottom:10px;border-bottom:3px solid #0D3D4D;margin-bottom:14px}
+    .brand{font-size:18px;font-weight:900;color:#0D3D4D}.sub{font-size:10px;color:#64748b}
+    table{width:100%;border-collapse:collapse;margin-top:8px}
+    th{background:#0D3D4D;color:#fff;padding:7px 8px;font-size:9px;text-align:left}
+    td{padding:6px 8px;border-bottom:1px solid #f1f5f9;font-size:10px;vertical-align:top}
+    tr:nth-child(even) td{background:#f8fafc}
+    .total{font-weight:800;background:#dbeafe!important;color:#1e3a5f}
+    footer{margin-top:14px;text-align:center;font-size:9px;color:#94a3b8;border-top:1px solid #e2e8f0;padding-top:8px}
+    @media print{button{display:none}}
+  </style></head><body>
+  <div class="hdr"><div><div class="brand">TAPA JIVA</div><div class="sub">Database Pasien (CRM)</div></div>
+  <div style="text-align:right;font-size:9px;color:#64748b">Dicetak: ${now}<br>Total: ${crmData.length} pasien</div></div>
+  <button onclick="window.print()" style="background:#0D3D4D;color:#fff;border:none;border-radius:7px;padding:8px 18px;font-size:11px;cursor:pointer;margin-bottom:10px">🖨️ Print / Save PDF</button>
+  <table><thead><tr><th>#</th><th>Nama Pasien</th><th>No. HP</th><th>Total Kunjungan</th><th>Terakhir Datang</th><th>Preferensi</th></tr></thead>
+  <tbody>${rows}</tbody></table>
+  <footer>TAPA JIVA • Family Massage • Database CRM</footer>
+  </body></html>`;
+  const blob = new Blob([pdfHtml], {type:'text/html;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download='CRM_TAPAJIVA_'+new Date().toISOString().split('T')[0]+'.html';
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(url)},1500);
+  toast('📥 File HTML didownload — buka lalu klik Print / Save PDF', 3500);
 }
 
 // 3. LIVE COUNTDOWN TIMER & ACTIVE PULSE TAPA JIVA
