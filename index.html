@@ -1655,6 +1655,48 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
             <div style="background:var(--amber-l);border-radius:var(--radius-sm);padding:9px 14px;font-size:.82rem;font-weight:800;color:var(--orange);white-space:nowrap" id="fp-diskon-val">–</div>
           </div>
         </div>
+        <!-- BIAYA TAMBAHAN OPTIONAL -->
+        <div class="ff">
+          <label class="fl">➕ Biaya Tambahan <span style="font-size:.6rem;color:var(--text-l);font-weight:500">(opsional)</span></label>
+          <div style="display:flex;flex-direction:column;gap:6px;background:rgba(5,28,34,0.4);border:1px solid rgba(201,160,65,0.15);border-radius:var(--radius-sm);padding:10px 12px">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0" onclick="toggleBiayaTambahan('member')">
+              <div id="chk-member" style="width:20px;height:20px;border-radius:5px;border:2px solid rgba(201,160,65,0.4);background:rgba(248,243,236,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s">
+                <span id="chk-member-icon" style="display:none;color:var(--teal-900);font-size:.72rem;font-weight:900">✓</span>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:.82rem;font-weight:600;color:var(--cream-80)">👑 Member</div>
+                <div style="font-size:.65rem;color:var(--cream-55)">Biaya keanggotaan member</div>
+              </div>
+              <div style="font-size:.78rem;font-weight:700;color:var(--gold-400)">+ Rp 25.000</div>
+            </label>
+            <div style="height:1px;background:rgba(248,243,236,0.06)"></div>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0" onclick="toggleBiayaTambahan('private_room')">
+              <div id="chk-private_room" style="width:20px;height:20px;border-radius:5px;border:2px solid rgba(201,160,65,0.4);background:rgba(248,243,236,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s">
+                <span id="chk-private_room-icon" style="display:none;color:var(--teal-900);font-size:.72rem;font-weight:900">✓</span>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:.82rem;font-weight:600;color:var(--cream-80)">🚪 Private Room</div>
+                <div style="font-size:.65rem;color:var(--cream-55)">Upgrade ke ruangan private</div>
+              </div>
+              <div style="font-size:.78rem;font-weight:700;color:var(--gold-400)">+ Rp 50.000</div>
+            </label>
+            <div style="height:1px;background:rgba(248,243,236,0.06)"></div>
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0" onclick="toggleBiayaTambahan('minyak_hangat')">
+              <div id="chk-minyak_hangat" style="width:20px;height:20px;border-radius:5px;border:2px solid rgba(201,160,65,0.4);background:rgba(248,243,236,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s">
+                <span id="chk-minyak_hangat-icon" style="display:none;color:var(--teal-900);font-size:.72rem;font-weight:900">✓</span>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:.82rem;font-weight:600;color:var(--cream-80)">🫙 Minyak Hangat</div>
+                <div style="font-size:.65rem;color:var(--cream-55)">Tambahan minyak hangat esensial</div>
+              </div>
+              <div style="font-size:.78rem;font-weight:700;color:var(--gold-400)">+ Rp 35.000</div>
+            </label>
+            <div id="biaya-tambahan-total" style="display:none;border-top:1px solid rgba(201,160,65,0.2);margin-top:4px;padding-top:8px;display:none;justify-content:space-between;align-items:center">
+              <span style="font-size:.72rem;font-weight:700;color:var(--gold-400)">Total Biaya Tambahan</span>
+              <span style="font-size:.8rem;font-weight:800;color:var(--gold-300)" id="biaya-tambahan-total-val"></span>
+            </div>
+          </div>
+        </div>
         <div class="ff"><label class="fl">📊 Status Bayar</label><div style="display:flex;gap:6px" id="fp-pay-list"></div></div>
         <!-- DP Amount field - shown only when DP is selected -->
         <div class="ff hidden" id="fp-dp-wrap">
@@ -2980,6 +3022,8 @@ function resetForm(){
   document.getElementById("fp-catatan").value="";
   // Hide DP wrap
   const dpW=document.getElementById("fp-dp-wrap");if(dpW)dpW.classList.add("hidden");
+  // Reset biaya tambahan optional
+  resetBiayaTambahan();
   // Reset split payment
   splitActive=false;
   const sw=document.getElementById("split-wrap");if(sw)sw.style.display="none";
@@ -3095,15 +3139,25 @@ function updateSummary(){
   const dur=parseInt(document.getElementById("fp-dur")?.value||60);
   const svNama=document.getElementById("fp-service").value||"";
   const price=getPrice(svNama,dur);
+  const dk=getSelectedDiskon();
+  const diskon=calcDiskon(price,dk);
+  const biayaTambahan=getBiayaTambahan();
+  const hargaSetelahDiskon=Math.max(price-diskon,0);
+  const hargaTotal=hargaSetelahDiskon+biayaTambahan;
+  const biayaRows=Object.entries(biayaTambahanSel)
+    .filter(([k,v])=>v&&BIAYA_TAMBAHAN_LIST[k])
+    .map(([k])=>["  └ "+BIAYA_TAMBAHAN_LIST[k].label,"+"+fmtRp(BIAYA_TAMBAHAN_LIST[k].harga)]);
   document.getElementById("fp-sum").innerHTML=[
     ["Pasien",document.getElementById("fp-patient").value||"-"],
     ["Layanan",svNama||"-"],
     ["Terapis",th.nama],["Ruangan",formSel.room],
     ["Jam",document.getElementById("fp-start").value+" → "+document.getElementById("fp-end-disp").textContent],
     ["Durasi",(DUR_OPT.find(d=>d.v===dur)?.l||dur+"mnt")],
-    ["💰 Harga Asli",price>0?fmtRp(price):"–"],
-    ...(getSelectedDiskon()&&price>0?[["🏷️ Diskon","-"+fmtRp(calcDiskon(price,getSelectedDiskon()))],["💳 Harga Akhir",fmtRp(price-calcDiskon(price,getSelectedDiskon()))]]:[]),
-    ...(formSel.payStatus==="DP"?[["💵 DP Dibayar",fmtRp(parseInt(document.getElementById("fp-dp-amount")?.value||0))],["🔴 Sisa Bayar",fmtRp(Math.max((price-calcDiskon(price,getSelectedDiskon()))-parseInt(document.getElementById("fp-dp-amount")?.value||0),0))]]:[]),
+    ["💰 Harga Layanan",price>0?fmtRp(price):"–"],
+    ...(dk&&price>0?[["🏷️ Diskon","– "+fmtRp(diskon)],["Setelah Diskon",fmtRp(hargaSetelahDiskon)]]:[]),
+    ...(biayaTambahan>0?[["➕ Biaya Tambahan","+"+fmtRp(biayaTambahan)],...biayaRows]:[]),
+    ...(biayaTambahan>0||dk?[["💳 Total Akhir",fmtRp(hargaTotal)]]:[]),
+    ...(formSel.payStatus==="DP"?[["💵 DP Dibayar",fmtRp(parseInt(document.getElementById("fp-dp-amount")?.value||0))],["🔴 Sisa Bayar",fmtRp(Math.max(hargaTotal-parseInt(document.getElementById("fp-dp-amount")?.value||0),0))]]:[]),
     ["Metode",splitActive?(()=>{
       const m1el=document.getElementById("split-m1");
       const m2el=document.getElementById("split-m2");
@@ -3114,6 +3168,63 @@ function updateSummary(){
       return `Split: ${m1} ${fmtRp(a1)} + ${m2} ${fmtRp(a2)}`;
     })():formSel.method],
   ].map(([k,v])=>`<div class="sumrow"><span style="color:#64748b">${k}</span><span style="font-weight:700">${v}</span></div>`).join("");
+}
+
+// ── BIAYA TAMBAHAN OPTIONAL ──────────────────────────────────
+const BIAYA_TAMBAHAN_LIST = {
+  member:      { label:"👑 Member",       harga: 25000 },
+  private_room:{ label:"🚪 Private Room", harga: 50000 },
+  minyak_hangat:{ label:"🫙 Minyak Hangat",harga: 35000 },
+};
+let biayaTambahanSel = {}; // key => true/false
+
+function toggleBiayaTambahan(key){
+  biayaTambahanSel[key] = !biayaTambahanSel[key];
+  const chk = document.getElementById("chk-"+key);
+  const icon = document.getElementById("chk-"+key+"-icon");
+  if(chk && icon){
+    if(biayaTambahanSel[key]){
+      chk.style.background = "var(--gold-500)";
+      chk.style.borderColor = "var(--gold-400)";
+      icon.style.display = "inline";
+    } else {
+      chk.style.background = "rgba(248,243,236,0.05)";
+      chk.style.borderColor = "rgba(201,160,65,0.4)";
+      icon.style.display = "none";
+    }
+  }
+  // Update total row
+  const total = getBiayaTambahan();
+  const totalRow = document.getElementById("biaya-tambahan-total");
+  const totalVal = document.getElementById("biaya-tambahan-total-val");
+  if(totalRow){
+    if(total > 0){
+      totalRow.style.display = "flex";
+      if(totalVal) totalVal.textContent = fmtRp(total);
+    } else {
+      totalRow.style.display = "none";
+    }
+  }
+  updateSummary();
+  if(splitActive) updateSplitSisa();
+}
+
+function getBiayaTambahan(){
+  return Object.entries(biayaTambahanSel)
+    .filter(([k,v]) => v && BIAYA_TAMBAHAN_LIST[k])
+    .reduce((sum,[k]) => sum + BIAYA_TAMBAHAN_LIST[k].harga, 0);
+}
+
+function resetBiayaTambahan(){
+  biayaTambahanSel = {};
+  Object.keys(BIAYA_TAMBAHAN_LIST).forEach(key => {
+    const chk = document.getElementById("chk-"+key);
+    const icon = document.getElementById("chk-"+key+"-icon");
+    if(chk){ chk.style.background="rgba(248,243,236,0.05)"; chk.style.borderColor="rgba(201,160,65,0.4)"; }
+    if(icon){ icon.style.display="none"; }
+  });
+  const totalRow = document.getElementById("biaya-tambahan-total");
+  if(totalRow) totalRow.style.display = "none";
 }
 
 let splitActive=false;
@@ -3140,7 +3251,7 @@ function updateSplitSisa(){
   const dur=parseInt(document.getElementById("fp-dur")?.value||60);
   const hargaAsli=getPrice(svNama,dur);
   const dk=getSelectedDiskon();
-  const totalHarga=Math.max(hargaAsli-calcDiskon(hargaAsli,dk),0);
+  const totalHarga=Math.max(hargaAsli-calcDiskon(hargaAsli,dk),0)+getBiayaTambahan();
   const a1=parseInt(document.getElementById("split-a1")?.value||0);
   const sisa=Math.max(totalHarga-a1,0);
   const a2el=document.getElementById("split-a2");
@@ -3165,7 +3276,16 @@ async function submitForm(){
   const hargaAsli=getPrice(svNama,dur);
   const dk=getSelectedDiskon();
   const diskon=calcDiskon(hargaAsli,dk);
-  const harga=Math.max(hargaAsli-diskon,0);
+  const biayaTambahan=getBiayaTambahan();
+  const hargaSetelahDiskon=Math.max(hargaAsli-diskon,0);
+  const harga=hargaSetelahDiskon+biayaTambahan;
+  // Build catatan biaya tambahan
+  const biayaTambahanCatatan=Object.entries(biayaTambahanSel)
+    .filter(([k,v])=>v&&BIAYA_TAMBAHAN_LIST[k])
+    .map(([k])=>BIAYA_TAMBAHAN_LIST[k].label+" "+fmtRp(BIAYA_TAMBAHAN_LIST[k].harga))
+    .join(", ");
+  const catatanBase=document.getElementById("fp-catatan").value;
+  const catatanFull=biayaTambahanCatatan?(catatanBase?catatanBase+" | [Biaya Tambahan: "+biayaTambahanCatatan+"]":"[Biaya Tambahan: "+biayaTambahanCatatan+"]"):catatanBase;
   const paketData=document.getElementById("fp-paket")?.value||"";
   const dpAmount=formSel.payStatus==="DP"?parseInt(document.getElementById("fp-dp-amount")?.value||0):0;
   const sisaBayar=formSel.payStatus==="DP"?Math.max(harga-dpAmount,0):0;
@@ -3175,7 +3295,7 @@ async function submitForm(){
     patient,phone:document.getElementById("fp-phone").value,
     service:svNama,
     diskon_nama:dk?dk.nama:"",diskon_val:diskon,
-    catatan:document.getElementById("fp-catatan").value,
+    catatan:catatanFull,
     therapist:formSel.therapist,therapistName:getTh(formSel.therapist).nama,
     room:formSel.room,start,end,duration:dur,harga,
     dp_amount:dpAmount,sisa_bayar:sisaBayar,
