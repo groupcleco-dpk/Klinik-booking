@@ -1754,8 +1754,35 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn-o" onclick="closeModal('modal-detail')">Tutup</button>
         <button class="btn-p" style="flex:1" onclick="editCurrent()">✏️ Edit</button>
+        <button class="btn-g" style="padding:8px 12px;font-size:.76rem" onclick="openPindahModal()">🔄 Pindah</button>
         <button onclick="openInvoiceFromDetail2(currentBk?.id)" style="background:linear-gradient(135deg,#0f2744,#1e3a5f);color:#fff;border:none;border-radius:var(--radius-sm);padding:12px 14px;font-weight:700;font-size:.78rem;cursor:pointer">🧾</button>
         <button class="btn-ro" onclick="document.getElementById('det-confirm').classList.remove('hidden')">🗑</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══ MODAL: PINDAH RUANGAN / GANTI TERAPIS ═══════════════ -->
+<div class="overlay hidden" id="modal-pindah" onclick="closeOvr(event,'modal-pindah')">
+  <div class="sheet" style="max-height:60vh">
+    <div class="hbar"></div>
+    <div style="padding:16px 18px 20px">
+      <div style="font-size:.62rem;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Ubah Jadwal</div>
+      <div style="font-size:1.05rem;font-weight:800;color:#0f172a;margin-bottom:16px">🔄 Pindah Ruangan / Ganti Terapis</div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">🚪 Ruangan</label>
+        <select id="pindah-room" class="fi" style="font-size:.85rem;padding:10px">
+        </select>
+      </div>
+      <div style="margin-bottom:20px">
+        <label style="font-size:.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">👤 Terapis</label>
+        <select id="pindah-terapis" class="fi" style="font-size:.85rem;padding:10px">
+        </select>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-o" style="flex:1" onclick="closeModal('modal-pindah')">Batal</button>
+        <button class="btn-p" style="flex:2" onclick="savePindah()">✅ Simpan Perubahan</button>
       </div>
     </div>
   </div>
@@ -2300,7 +2327,11 @@ async function loadBookings(){
     duration:r.duration_min||60,harga:r.harga||0,
     dp_amount:r.dp_amount||0,sisa_bayar:r.sisa_bayar||0,
     method:r.method||"Tunai",
-    payStatus:r.pay_status||"Belum Bayar",catatan:r.catatan||""
+    payStatus:r.pay_status||"Belum Bayar",catatan:r.catatan||"",
+    split_method:r.split_method||"",
+    split_amount1:r.split_nominal1||r.split_amount1||0,
+    split_amount2:r.split_nominal2||r.split_amount2||0,
+    is_split:!!(r.split_method)
   }));
   renderAll();
 }
@@ -2310,7 +2341,9 @@ async function insertBK(bk,tanggal){
     id:bk.id,tanggal,patient:bk.patient,phone:bk.phone,service:bk.service,
     therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,
     start_time:bk.start,end_time:bk.end,duration_min:bk.duration,
-    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,split_method:bk.split_method||"",split_amount1:bk.split_amount1||0,split_amount2:bk.split_amount2||0,
+    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,
+    split_method:bk.split_method||"",
+    split_nominal1:bk.split_amount1||0,split_nominal2:bk.split_amount2||0,
     harga:bk.harga||0,dp_amount:bk.dp_amount||0,sisa_bayar:bk.sisa_bayar||0
   }]);
   if(error){ toast("❌ "+error.message); return; }
@@ -2331,7 +2364,9 @@ async function updateBK(bk){
     patient:bk.patient,phone:bk.phone,service:bk.service,
     therapist_id:bk.therapist,therapist_name:bk.therapistName,room:bk.room,
     start_time:bk.start,end_time:bk.end,duration_min:bk.duration,
-    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,split_method:bk.split_method||"",split_amount1:bk.split_amount1||0,split_amount2:bk.split_amount2||0,
+    method:bk.method,pay_status:bk.payStatus,catatan:bk.catatan,
+    split_method:bk.split_method||"",
+    split_nominal1:bk.split_amount1||0,split_nominal2:bk.split_amount2||0,
     harga:bk.harga||0,dp_amount:bk.dp_amount||0,sisa_bayar:bk.sisa_bayar||0
   }).eq("id",bk.id);
   if(error)toast("❌ "+error.message);
@@ -3279,6 +3314,84 @@ function openDetail(id){
 }
 function editCurrent(){closeModal("modal-detail");formMode="edit";document.getElementById("form-ttl").textContent="✏️ Edit Booking";fillForm(currentBk);fTab(0);openModal("modal-form")}
 async function confirmDelete(){await deleteBK(currentBk.id);closeModal("modal-detail");await loadBookings()}
+
+
+// ══════════════════════════════════════════════════════════════
+// PINDAH RUANGAN / GANTI TERAPIS
+// ══════════════════════════════════════════════════════════════
+function openPindahModal(){
+  if(!currentBk)return;
+  const m=document.getElementById('modal-pindah');
+  // Populate room select
+  const selRoom=document.getElementById('pindah-room');
+  if(selRoom){
+    selRoom.innerHTML=ROOMS.map(r=>`<option value="${r}"${r===currentBk.room?' selected':''}>${r}</option>`).join('');
+  }
+  // Populate terapis select
+  const selTh=document.getElementById('pindah-terapis');
+  if(selTh){
+    selTh.innerHTML=THERAPISTS.filter(t=>t.aktif!==false).map(t=>
+      `<option value="${t.id}"${t.id===currentBk.therapist?' selected':''}>${t.nama}</option>`
+    ).join('');
+  }
+  openModal('modal-pindah');
+}
+
+async function savePindah(){
+  if(!currentBk)return;
+  const newRoom=document.getElementById('pindah-room')?.value||currentBk.room;
+  const newThId=document.getElementById('pindah-terapis')?.value||currentBk.therapist;
+  const newTh=getTh(newThId);
+  const newThName=newTh.nama||currentBk.therapistName;
+
+  // Cek konflik ruangan (jika ruangan berubah)
+  if(newRoom!==currentBk.room){
+    const konflik=bookings.find(b=>
+      b.id!==currentBk.id&&b.room===newRoom&&
+      ((toMin(b.start)<=toMin(currentBk.start)&&toMin(b.end)>toMin(currentBk.start))||
+       (toMin(b.start)>=toMin(currentBk.start)&&toMin(b.start)<toMin(currentBk.end)))
+    );
+    if(konflik){
+      toast('⚠️ Ruangan '+newRoom+' sudah terisi jam '+konflik.start+' – '+konflik.end+' ('+konflik.patient+')');
+      return;
+    }
+  }
+
+  // Cek konflik terapis (jika terapis berubah)
+  if(newThId!==currentBk.therapist){
+    const konflikTh=bookings.find(b=>
+      b.id!==currentBk.id&&b.therapist===newThId&&
+      ((toMin(b.start)<=toMin(currentBk.start)&&toMin(b.end)>toMin(currentBk.start))||
+       (toMin(b.start)>=toMin(currentBk.start)&&toMin(b.start)<toMin(currentBk.end)))
+    );
+    if(konflikTh){
+      toast('⚠️ '+newThName+' sudah ada jadwal jam '+konflikTh.start+' – '+konflikTh.end);
+      return;
+    }
+  }
+
+  // Update ke Supabase
+  const{error}=await db.from('app_booking').update({
+    room:newRoom,
+    therapist_id:newThId,
+    therapist_name:newThName
+  }).eq('id',currentBk.id);
+
+  if(error){toast('❌ '+error.message);return;}
+
+  // Update local
+  currentBk.room=newRoom;
+  currentBk.therapist=newThId;
+  currentBk.therapistName=newThName;
+  const idx=bookings.findIndex(b=>b.id===currentBk.id);
+  if(idx>=0){bookings[idx].room=newRoom;bookings[idx].therapist=newThId;bookings[idx].therapistName=newThName;}
+
+  closeModal('modal-pindah');
+  renderAll();
+  toast('✅ Berhasil dipindahkan ke '+newRoom+' · '+newThName);
+  // Refresh detail modal
+  setTimeout(()=>openDetail(currentBk.id),300);
+}
 
 // ═══ SETTINGS ═════════════════════════════════════════════════
 let setTabIdx=0;
