@@ -1051,11 +1051,726 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
   color: var(--emerald)!important;
 }
 
-/* ── SCROLLBAR ── */
-* { scrollbar-width: thin; scrollbar-color: rgba(201,160,65,.3) transparent; }
-*::-webkit-scrollbar { width: 3px; height: 3px; }
-*::-webkit-scrollbar-thumb { background: rgba(201,160,65,.35); border-radius: 4px; }
 
+/* ═══════════════════════════════════════════════════════════════
+   TAPA JIVA — FULL 3D LUXURY SYSTEM v5.0
+   Crystalline Glass · Sculptural Depth · Living Motion
+   Author: Design System Upgrade
+═══════════════════════════════════════════════════════════════ */
+
+/* ── EXTENDED DESIGN TOKENS ── */
+:root {
+  /* 3D Shadow Layers */
+  --s1: 0 1px 3px rgba(0,0,0,.5), 0 0 0 1px rgba(201,160,65,.07);
+  --s2: 0 4px 16px rgba(0,0,0,.55), 0 1px 4px rgba(0,0,0,.35), 0 0 0 1px rgba(201,160,65,.1);
+  --s3: 0 12px 40px rgba(0,0,0,.7), 0 4px 12px rgba(0,0,0,.4), 0 0 0 1px rgba(201,160,65,.14);
+  --s4: 0 30px 80px rgba(0,0,0,.82), 0 12px 30px rgba(0,0,0,.5), 0 0 0 1px rgba(201,160,65,.18);
+
+  /* Glow */
+  --glow-g: 0 0 24px rgba(201,160,65,.22), 0 0 70px rgba(201,160,65,.07);
+  --glow-t: 0 0 20px rgba(45,212,160,.2), 0 0 55px rgba(45,212,160,.06);
+  --glow-r: 0 0 16px rgba(255,107,117,.2);
+
+  /* Bevel */
+  --bev: inset 0 1px 0 rgba(255,255,255,.09), inset 0 -1px 0 rgba(0,0,0,.22);
+  --bev-top: inset 0 1px 0 rgba(255,255,255,.09);
+  --bev-in: inset 0 2px 6px rgba(0,0,0,.45), inset 0 1px 0 rgba(0,0,0,.18);
+
+  /* Shine */
+  --shine: linear-gradient(135deg, rgba(255,255,255,.07) 0%, transparent 55%);
+
+  /* Glass */
+  --glass-1: rgba(10,44,56,.82);
+  --glass-2: rgba(5,26,34,.88);
+  --glass-3: rgba(3,15,20,.94);
+}
+
+/* ══════════════════════════════════════
+   BODY & ATMOSPHERE
+══════════════════════════════════════ */
+body {
+  background:
+    radial-gradient(ellipse 130% 100% at 50% -15%, rgba(16,79,98,.55) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 60% at 95% 100%, rgba(201,160,65,.06) 0%, transparent 50%),
+    linear-gradient(180deg, #020C11 0%, #041620 55%, #030E18 100%) !important;
+}
+
+/* Living background orbs */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(ellipse 600px 400px at 85% 10%, rgba(13,61,77,.22) 0%, transparent 70%),
+    radial-gradient(ellipse 400px 600px at 5% 90%, rgba(201,160,65,.05) 0%, transparent 70%),
+    radial-gradient(ellipse 300px 300px at 45% 55%, rgba(45,212,160,.025) 0%, transparent 70%);
+  animation: atm 18s ease-in-out infinite alternate;
+}
+@keyframes atm {
+  0%   { transform:translate(0,0) scale(1); opacity:.65; }
+  33%  { transform:translate(-18px,12px) scale(1.04); opacity:.9; }
+  66%  { transform:translate(10px,-8px) scale(.97); opacity:.75; }
+  100% { transform:translate(6px,5px) scale(1.02); opacity:.85; }
+}
+
+/* Noise grain texture */
+body::after {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: .5;
+}
+
+/* ══════════════════════════════════════
+   HEADER — CRYSTALLINE GLASS
+══════════════════════════════════════ */
+.header {
+  background:
+    linear-gradient(180deg, rgba(2,10,15,.97) 0%, rgba(4,20,28,.94) 100%),
+    var(--shine) !important;
+  backdrop-filter: blur(48px) saturate(200%) brightness(1.05) !important;
+  -webkit-backdrop-filter: blur(48px) saturate(200%) brightness(1.05) !important;
+  padding: 14px 16px 12px !important;
+  border-bottom: 1px solid rgba(201,160,65,.22) !important;
+  box-shadow:
+    var(--s2),
+    var(--bev-top),
+    0 1px 0 rgba(201,160,65,.22),
+    inset 0 0 40px rgba(201,160,65,.02) !important;
+  position: sticky; top: 0; z-index: 100;
+}
+
+/* Gold shimmer line across top */
+.header::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(201,160,65,.4) 20%,
+    rgba(232,202,122,.95) 50%,
+    rgba(201,160,65,.4) 80%,
+    transparent 100%
+  );
+  animation: hdr-shimmer 4s ease-in-out infinite;
+}
+@keyframes hdr-shimmer {
+  0%,100% { opacity:.7; }
+  50%     { opacity:1; }
+}
+
+/* Logo 3D lift on hover */
+.header-top > div:first-child {
+  transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+.header-top > div:first-child:active {
+  transform: perspective(300px) rotateY(-8deg) scale(.96);
+}
+
+/* Header icon buttons */
+.btn-h {
+  background: linear-gradient(150deg, rgba(201,160,65,.17) 0%, rgba(201,160,65,.06) 100%) !important;
+  border: 1px solid rgba(201,160,65,.28) !important;
+  border-radius: 11px !important;
+  box-shadow: var(--s1), var(--bev), inset 0 0 14px rgba(201,160,65,.04) !important;
+  transition: all .22s cubic-bezier(.34,1.56,.64,1) !important;
+  position: relative; overflow: hidden;
+}
+.btn-h::after {
+  content: ''; position: absolute; inset: 0;
+  background: var(--shine); border-radius: inherit; pointer-events: none;
+}
+.btn-h:hover { transform: translateY(-1px) scale(1.05) !important; box-shadow: var(--s2), var(--glow-g), var(--bev) !important; }
+.btn-h:active { transform: scale(.88) translateY(2px) !important; box-shadow: var(--bev-in) !important; }
+
+/* Date navigator */
+.date-nav { margin-top: 12px !important; gap: 10px !important; }
+.dn-btn {
+  background: linear-gradient(150deg, rgba(201,160,65,.2) 0%, rgba(201,160,65,.08) 100%) !important;
+  border: 1px solid rgba(201,160,65,.32) !important;
+  box-shadow: var(--s1), var(--bev) !important;
+  border-radius: 13px !important;
+  padding: 6px 20px !important;
+  font-size: 1.1rem !important; font-weight: 800 !important;
+  transition: all .22s cubic-bezier(.34,1.56,.64,1) !important;
+}
+.dn-btn:hover { transform: translateY(-2px) !important; box-shadow: var(--s2), var(--glow-g) !important; }
+.dn-btn:active { transform: scale(.88) translateY(2px) !important; box-shadow: var(--bev-in) !important; }
+.dn-lbl {
+  flex: 1; text-align: center;
+  background: rgba(201,160,65,.05);
+  border: 1px solid rgba(201,160,65,.14); border-radius: 11px;
+  padding: 6px 14px; font-size: .82rem !important; font-weight: 700 !important;
+  box-shadow: var(--s1), var(--bev); letter-spacing: .05em;
+  color: var(--cream) !important;
+}
+
+/* Live sync indicator */
+.rt-dot { box-shadow: 0 0 0 2px rgba(45,212,160,.2); }
+
+/* ══════════════════════════════════════
+   STAT CARDS — SCULPTED CRYSTAL
+══════════════════════════════════════ */
+#app > div[style*="grid-template-columns:1fr 1fr"] {
+  padding: 12px 14px 6px !important;
+}
+#app > div[style*="grid-template-columns:1fr 1fr"] > div {
+  background: linear-gradient(145deg, rgba(11,48,62,.9) 0%, rgba(6,30,42,.94) 100%) !important;
+  border: 1px solid rgba(201,160,65,.22) !important;
+  border-radius: 18px !important;
+  box-shadow:
+    var(--s2), var(--bev),
+    inset 1px 1px 0 rgba(255,255,255,.05),
+    inset 0 0 30px rgba(201,160,65,.02) !important;
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1), box-shadow .28s !important;
+  position: relative; overflow: hidden;
+}
+/* Glass highlight on top half */
+#app > div[style*="grid-template-columns:1fr 1fr"] > div::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height:55%;
+  background: linear-gradient(180deg, rgba(255,255,255,.04) 0%, transparent 100%);
+  pointer-events: none;
+}
+/* Corner sparkle */
+#app > div[style*="grid-template-columns:1fr 1fr"] > div::after {
+  content: ''; position: absolute; top:-1px; right:-1px;
+  width: 40px; height: 40px;
+  background: radial-gradient(circle at top right, rgba(201,160,65,.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+#app > div[style*="grid-template-columns:1fr 1fr"] > div:active {
+  transform: scale(.94) translateY(3px) !important;
+  box-shadow: var(--s1) !important;
+}
+/* Revenue wide card */
+#app > div[style*="grid-template-columns:1fr 1fr"] > div[style*="grid-column"] {
+  background: linear-gradient(135deg,
+    rgba(45,212,160,.14) 0%,
+    rgba(8,36,48,.93) 45%,
+    rgba(10,44,56,.91) 100%) !important;
+  border-color: rgba(45,212,160,.3) !important;
+  box-shadow: var(--s2), var(--bev), var(--glow-t),
+              inset 1px 1px 0 rgba(45,212,160,.06) !important;
+}
+
+/* ══════════════════════════════════════
+   TERAPIS MONITOR — DEEP VOID GLASS
+══════════════════════════════════════ */
+div[style*="margin:6px 14px"] {
+  background: linear-gradient(145deg, rgba(2,14,20,.85) 0%, rgba(4,22,30,.8) 100%) !important;
+  border: 1px solid rgba(201,160,65,.2) !important;
+  border-radius: 18px !important;
+  box-shadow: var(--s2), var(--bev) !important;
+  overflow: hidden;
+}
+div[style*="margin:6px 14px"] summary {
+  background: linear-gradient(135deg, rgba(2,10,16,.95) 0%, rgba(5,22,32,.9) 100%);
+  padding: 9px 14px !important;
+  cursor: pointer;
+  transition: background .2s !important;
+}
+div[style*="margin:6px 14px"] summary:hover {
+  background: rgba(201,160,65,.07) !important;
+}
+div[style*="margin:6px 14px"] > details > div {
+  padding: 8px 12px 10px !important;
+  border-top: 1px solid rgba(201,160,65,.1);
+}
+
+/* Terapis rows */
+#terapis-monitor > div {
+  background: linear-gradient(135deg, rgba(10,44,56,.62) 0%, rgba(5,26,34,.55) 100%) !important;
+  border: 1px solid rgba(248,243,236,.07) !important;
+  border-radius: 11px !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,.28), var(--bev) !important;
+  margin-bottom: 5px !important;
+  transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s !important;
+  position: relative; overflow: hidden;
+}
+#terapis-monitor > div::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.06) 50%, transparent);
+}
+#terapis-monitor > div:active {
+  transform: scale(.96) translateY(1px) !important;
+}
+
+/* ══════════════════════════════════════
+   TABS — FLOATING GLASS PILLS
+══════════════════════════════════════ */
+.tabs {
+  padding: 8px 14px 10px !important;
+  gap: 6px !important;
+  position: relative;
+}
+.tabs::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(201,160,65,.1) 50%, transparent);
+}
+.tab-btn {
+  background: linear-gradient(145deg, rgba(8,34,46,.65) 0%, rgba(4,20,28,.72) 100%) !important;
+  border: 1px solid rgba(201,160,65,.1) !important;
+  border-radius: 50px !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,.32), var(--bev) !important;
+  font-size: .66rem !important;
+  transition: all .22s cubic-bezier(.34,1.56,.64,1) !important;
+  position: relative; overflow: hidden;
+}
+.tab-btn::after {
+  content: ''; position: absolute; inset:0;
+  background: var(--shine); pointer-events:none; border-radius:inherit;
+}
+.tab-btn:active { transform: scale(.9) !important; }
+.tab-btn.active {
+  background: linear-gradient(135deg, rgba(201,160,65,.26) 0%, rgba(201,160,65,.12) 100%) !important;
+  border-color: rgba(201,160,65,.5) !important;
+  box-shadow:
+    0 4px 20px rgba(201,160,65,.22),
+    var(--bev),
+    0 0 0 1px rgba(201,160,65,.15) !important;
+  color: #F0DA8A !important;
+  text-shadow: 0 0 12px rgba(201,160,65,.5);
+  transform: translateY(-1px);
+  font-weight: 800 !important;
+}
+
+/* ══════════════════════════════════════
+   SCHEDULE GRID — PREMIUM MATRIX
+══════════════════════════════════════ */
+.grid-wrap {
+  background: linear-gradient(145deg, rgba(6,26,36,.8) 0%, rgba(3,16,24,.85) 100%) !important;
+  border: 1px solid rgba(201,160,65,.15) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--s3), var(--bev) !important;
+  overflow: hidden; position: relative;
+  margin-bottom: 90px;
+}
+.grid-wrap::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(201,160,65,.5) 30%, rgba(232,202,122,.7) 50%, rgba(201,160,65,.5) 70%, transparent);
+  z-index: 10;
+}
+.g-header {
+  background: linear-gradient(135deg, rgba(2,10,16,.98) 0%, rgba(3,16,24,.94) 100%) !important;
+  border-bottom: 1px solid rgba(201,160,65,.18) !important;
+  padding: 12px 16px !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,.25);
+}
+.th-t, .th-r {
+  background: linear-gradient(180deg, rgba(1,8,14,.99) 0%, rgba(3,14,22,.96) 100%) !important;
+  border-bottom: 1px solid rgba(201,160,65,.22) !important;
+}
+.td-t {
+  background: linear-gradient(90deg, rgba(1,7,12,.94) 0%, rgba(3,16,24,.85) 100%) !important;
+  border-right: 2px solid rgba(201,160,65,.25) !important;
+  text-shadow: 0 0 10px rgba(201,160,65,.3);
+}
+.td-r {
+  background: rgba(6,26,36,.2) !important;
+  transition: all .15s !important;
+}
+.td-r:hover:not([rowspan]) {
+  background: rgba(201,160,65,.1) !important;
+  box-shadow: inset 0 0 0 2px rgba(201,160,65,.4) !important;
+}
+/* Add booking hover label improvement */
+.td-r:hover:not([rowspan])::after {
+  font-size: .65rem !important;
+  font-weight: 900 !important;
+  letter-spacing: .05em;
+  box-shadow: 0 0 16px rgba(201,160,65,.6), var(--bev-top) !important;
+}
+
+/* ══════════════════════════════════════
+   BOOKING CARDS — JEWEL TILES
+══════════════════════════════════════ */
+.bk-card {
+  border-radius: 10px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,.52), var(--bev), inset 0 1px 0 rgba(255,255,255,.09) !important;
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s !important;
+  position: relative; overflow: hidden;
+}
+/* Glass highlight */
+.bk-card::after {
+  content: ''; position: absolute; top:0; left:0; right:0; height:45%;
+  background: linear-gradient(180deg, rgba(255,255,255,.06) 0%, transparent 100%);
+  pointer-events: none; border-radius: inherit;
+}
+.bk-card:active { transform: scale(.94) translateY(2px) !important; }
+
+/* Active booking animation */
+.booking-active-pulse {
+  animation: jewel-pulse 2.8s ease-in-out infinite !important;
+}
+@keyframes jewel-pulse {
+  0%,100% {
+    box-shadow: 0 4px 16px rgba(0,0,0,.52), inset 0 0 0 2px rgba(45,212,160,.6), 0 0 0 0 rgba(45,212,160,.3), inset 0 1px 0 rgba(255,255,255,.09);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 8px 28px rgba(0,0,0,.48), inset 0 0 0 2px rgba(45,212,160,.95), 0 0 0 5px rgba(45,212,160,.06), inset 0 1px 0 rgba(255,255,255,.09);
+    filter: brightness(1.08);
+  }
+}
+
+/* Booking list rows */
+.bk-row {
+  background: linear-gradient(135deg, rgba(9,38,52,.75) 0%, rgba(4,22,32,.7) 100%) !important;
+  border: 1px solid rgba(201,160,65,.1) !important;
+  border-radius: 15px !important;
+  box-shadow: var(--s1), var(--bev) !important;
+  margin-bottom: 8px;
+  transition: transform .2s cubic-bezier(.34,1.56,.64,1), box-shadow .2s !important;
+  position: relative; overflow: hidden;
+}
+.bk-row::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.05) 50%, transparent);
+}
+.bk-row:active { transform: scale(.975) !important; }
+
+/* ══════════════════════════════════════
+   MODALS — CINEMATIC HOLOGRAM
+══════════════════════════════════════ */
+.modal-overlay {
+  background: rgba(1,6,10,.92) !important;
+  backdrop-filter: blur(32px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(140%) !important;
+}
+.modal-box, .fp-box {
+  background: linear-gradient(145deg,
+    rgba(8,36,50,.99) 0%,
+    rgba(3,18,28,.99) 55%,
+    rgba(6,28,40,.98) 100%) !important;
+  border: 1px solid rgba(201,160,65,.25) !important;
+  border-radius: 26px !important;
+  box-shadow:
+    0 50px 120px rgba(0,0,0,.9),
+    0 20px 50px rgba(0,0,0,.6),
+    var(--bev),
+    var(--glow-g),
+    inset 0 0 60px rgba(201,160,65,.015) !important;
+  position: relative; overflow: hidden;
+}
+/* Gold crown line */
+.modal-box::before, .fp-box::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(201,160,65,.6) 20%,
+    rgba(232,202,122,1) 50%,
+    rgba(201,160,65,.6) 80%,
+    transparent 100%
+  );
+}
+/* Inner glow layer */
+.modal-box::after, .fp-box::after {
+  content: ''; position: absolute; top:0; left:0; right:0; height:50%;
+  background: linear-gradient(180deg, rgba(255,255,255,.025) 0%, transparent 100%);
+  pointer-events: none;
+}
+.modal-hdr {
+  background: linear-gradient(135deg, rgba(1,8,14,.97) 0%, rgba(3,18,28,.94) 100%) !important;
+  border-bottom: 1px solid rgba(201,160,65,.18) !important;
+}
+
+/* Modal slide-in animation */
+.modal-box, .fp-box {
+  animation: modal-rise .32s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes modal-rise {
+  from { transform: translateY(24px) scale(.96); opacity:0; }
+  to   { transform: translateY(0) scale(1); opacity:1; }
+}
+
+/* ══════════════════════════════════════
+   FORM INPUTS — INSET CRYSTAL
+══════════════════════════════════════ */
+.li,
+input:not([type="range"]):not([type="radio"]):not([type="checkbox"]),
+select, textarea {
+  background: rgba(1,8,14,.78) !important;
+  border: 1px solid rgba(201,160,65,.2) !important;
+  border-radius: 13px !important;
+  box-shadow: var(--bev-in), 0 1px 0 rgba(255,255,255,.03) !important;
+  color: var(--cream) !important;
+  transition: border-color .2s, box-shadow .2s !important;
+}
+.li:focus,
+input:not([type="range"]):not([type="radio"]):not([type="checkbox"]):focus,
+select:focus, textarea:focus {
+  border-color: rgba(201,160,65,.6) !important;
+  box-shadow: var(--bev-in), 0 0 0 3px rgba(201,160,65,.13), 0 0 18px rgba(201,160,65,.07) !important;
+  outline: none !important;
+}
+
+/* Select options */
+select option { background: #051C22; color: var(--cream); }
+
+/* ══════════════════════════════════════
+   BUTTONS — PRESSED 3D
+══════════════════════════════════════ */
+/* Login button */
+.lb {
+  background: linear-gradient(135deg, #F0DA8A 0%, #D9B55A 30%, #C9A041 60%, #A67C28 100%) !important;
+  background-size: 200% auto !important;
+  box-shadow:
+    0 6px 26px rgba(201,160,65,.52),
+    0 2px 8px rgba(0,0,0,.45),
+    inset 0 1px 0 rgba(255,255,255,.25),
+    inset 0 -2px 0 rgba(0,0,0,.2) !important;
+  border-radius: 13px !important;
+  transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s, background-position .4s !important;
+  animation: shimBtn 3s linear infinite !important;
+}
+.lb:active {
+  transform: scale(.96) translateY(3px) !important;
+  box-shadow: 0 2px 8px rgba(201,160,65,.3), inset 0 2px 6px rgba(0,0,0,.25) !important;
+}
+
+/* Keypad buttons (PIN) */
+.kp-btn {
+  background: linear-gradient(145deg, rgba(10,42,56,.92) 0%, rgba(5,26,36,.95) 100%) !important;
+  border: 1px solid rgba(201,160,65,.2) !important;
+  border-radius: 15px !important;
+  box-shadow: var(--s1), var(--bev) !important;
+  transition: all .18s cubic-bezier(.34,1.56,.64,1) !important;
+  font-size: 1.3rem !important; font-weight: 700 !important;
+}
+.kp-btn:active {
+  transform: scale(.88) translateY(3px) !important;
+  box-shadow: var(--bev-in) !important;
+  background: rgba(201,160,65,.14) !important;
+}
+
+/* ══════════════════════════════════════
+   PIN DOTS — GEMSTONE
+══════════════════════════════════════ */
+#pin-d0,#pin-d1,#pin-d2,#pin-d3,#pin-d4,#pin-d5 {
+  width: 16px !important; height: 16px !important;
+  background: rgba(248,243,236,.1) !important;
+  border: 1.5px solid rgba(248,243,236,.18) !important;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,.55), 0 1px 0 rgba(255,255,255,.05) !important;
+  transition: all .28s cubic-bezier(.34,1.56,.64,1) !important;
+}
+.pin-dot-filled {
+  background: linear-gradient(135deg, #F0DA8A 0%, #C9A041 60%, #A67C28 100%) !important;
+  border-color: rgba(201,160,65,.6) !important;
+  box-shadow:
+    0 0 18px rgba(201,160,65,.8),
+    0 0 6px rgba(201,160,65,.5),
+    0 2px 10px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.35) !important;
+  transform: scale(1.22) !important;
+}
+
+/* ══════════════════════════════════════
+   REKAP CARDS — STACKED GLASS
+══════════════════════════════════════ */
+.rek-card {
+  background: linear-gradient(145deg, rgba(8,36,50,.9) 0%, rgba(3,20,30,.88) 100%) !important;
+  border: 1px solid rgba(201,160,65,.16) !important;
+  border-radius: 17px !important;
+  box-shadow: var(--s2), var(--bev) !important;
+  position: relative; overflow: hidden;
+  margin-bottom: 10px;
+}
+.rek-card::before {
+  content: ''; position: absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(201,160,65,.32) 50%, transparent);
+}
+
+/* ══════════════════════════════════════
+   DETAIL PANEL — RISING STAGE
+══════════════════════════════════════ */
+#det-panel {
+  background: linear-gradient(145deg, rgba(3,14,22,.99) 0%, rgba(1,8,14,1) 100%) !important;
+  border-top: 1px solid rgba(201,160,65,.28) !important;
+  border-radius: 26px 26px 0 0 !important;
+  box-shadow:
+    0 -28px 80px rgba(0,0,0,.78),
+    0 -6px 24px rgba(0,0,0,.45),
+    var(--glow-g),
+    inset 0 1px 0 rgba(201,160,65,.22) !important;
+}
+
+/* ══════════════════════════════════════
+   FAB — PULSING GOLD ORBS
+══════════════════════════════════════ */
+@keyframes fab-levitate {
+  0%,100% {
+    transform: translateY(0) rotate(0deg);
+    box-shadow: 0 8px 32px rgba(201,160,65,.55), 0 4px 16px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.25);
+  }
+  50% {
+    transform: translateY(-5px) rotate(3deg);
+    box-shadow: 0 16px 44px rgba(201,160,65,.6), 0 6px 22px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.25);
+  }
+}
+#fab, button[style*="border-radius:50%"][style*="#C9A041"],
+button[style*="border-radius:50%"][style*="gold"],
+button[style*="50%"][style*="background:#"] {
+  background: linear-gradient(135deg, #F0DA8A 0%, #D9B55A 30%, #C9A041 65%, #A67C28 100%) !important;
+  box-shadow:
+    0 8px 32px rgba(201,160,65,.58),
+    0 4px 16px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.25),
+    inset 0 -2px 0 rgba(0,0,0,.18) !important;
+  animation: fab-levitate 4s ease-in-out infinite !important;
+}
+#fab:active, button[style*="border-radius:50%"]:active {
+  transform: scale(.86) translateY(4px) !important;
+  animation: none !important;
+  box-shadow: 0 2px 8px rgba(201,160,65,.3) !important;
+}
+
+/* ══════════════════════════════════════
+   TOAST — PREMIUM NOTIFICATION
+══════════════════════════════════════ */
+#toast {
+  background: linear-gradient(135deg, rgba(3,14,22,.99) 0%, rgba(6,28,40,.98) 100%) !important;
+  border: 1px solid rgba(201,160,65,.35) !important;
+  border-left: 3px solid var(--gold-400) !important;
+  border-radius: 15px !important;
+  box-shadow: var(--s4), var(--glow-g) !important;
+}
+#toast.show {
+  animation: toast-in .3s cubic-bezier(.34,1.56,.64,1) forwards;
+}
+@keyframes toast-in {
+  from { transform: translateX(-50%) translateY(12px) scale(.94); opacity:0; }
+  to   { transform: translateX(-50%) translateY(-4px) scale(1); opacity:1; }
+}
+
+/* ══════════════════════════════════════
+   LOGIN SCREEN — SANCTUARY OF LUXURY
+══════════════════════════════════════ */
+#login-screen {
+  background:
+    radial-gradient(ellipse 110% 85% at 50% -10%, rgba(16,79,98,.62) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 55% at 90% 105%, rgba(201,160,65,.09) 0%, transparent 50%),
+    linear-gradient(165deg, #01070C 0%, #020C12 50%, #030E16 100%) !important;
+}
+/* Floating particles effect on login */
+#login-screen::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(circle 3px at 20% 25%, rgba(201,160,65,.4) 0%, transparent 100%),
+    radial-gradient(circle 2px at 70% 15%, rgba(201,160,65,.3) 0%, transparent 100%),
+    radial-gradient(circle 2px at 85% 70%, rgba(45,212,160,.3) 0%, transparent 100%),
+    radial-gradient(circle 3px at 10% 80%, rgba(201,160,65,.25) 0%, transparent 100%),
+    radial-gradient(circle 280px at 25% 65%, rgba(201,160,65,.04) 0%, transparent 70%);
+  animation: ptcl 8s ease-in-out infinite alternate;
+}
+@keyframes ptcl {
+  0%   { transform:translate(0,0); }
+  100% { transform:translate(8px,-10px); }
+}
+
+.login-card {
+  background: linear-gradient(145deg,
+    rgba(6,30,42,.96) 0%,
+    rgba(3,18,28,.98) 55%,
+    rgba(8,34,48,.95) 100%) !important;
+  border: 1px solid rgba(201,160,65,.32) !important;
+  border-radius: 30px !important;
+  box-shadow:
+    0 50px 120px rgba(0,0,0,.88),
+    0 24px 50px rgba(0,0,0,.6),
+    var(--bev),
+    var(--glow-g),
+    inset 0 0 80px rgba(201,160,65,.018) !important;
+  position: relative;
+}
+.login-card::before {
+  content: ''; position: absolute; top:0; left:5%; right:5%; height:1px;
+  background: linear-gradient(90deg, transparent, rgba(201,160,65,.75) 30%, rgba(232,202,122,1) 50%, rgba(201,160,65,.75) 70%, transparent) !important;
+}
+
+/* ══════════════════════════════════════
+   LAPORAN & CRM CARDS
+══════════════════════════════════════ */
+.lp-th-card {
+  background: linear-gradient(145deg, rgba(8,36,50,.82) 0%, rgba(4,22,32,.78) 100%) !important;
+  border: 1px solid rgba(201,160,65,.13) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--s1), var(--bev) !important;
+}
+.crm-card {
+  background: linear-gradient(145deg, rgba(8,36,50,.8) 0%, rgba(4,22,32,.75) 100%) !important;
+  border: 1px solid rgba(201,160,65,.12) !important;
+  border-radius: 15px !important;
+  box-shadow: var(--s1), var(--bev) !important;
+}
+
+/* ══════════════════════════════════════
+   SCROLLBAR — GOLD THREAD
+══════════════════════════════════════ */
+* { scrollbar-width: thin; scrollbar-color: rgba(201,160,65,.3) rgba(1,8,14,.5); }
+*::-webkit-scrollbar { width: 4px; height: 4px; }
+*::-webkit-scrollbar-track { background: rgba(1,8,14,.5); border-radius: 4px; }
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(232,202,122,.5) 0%, rgba(201,160,65,.3) 100%);
+  border-radius: 4px;
+  box-shadow: 0 0 4px rgba(201,160,65,.3);
+}
+
+/* ══════════════════════════════════════
+   TYPOGRAPHY GLOW ACCENTS
+══════════════════════════════════════ */
+/* Gold text glow on key values */
+#st-rev, #st-masuk, #st-total, #st-room {
+  text-shadow: 0 0 20px currentColor !important;
+  letter-spacing: -.01em;
+}
+
+/* Section label shimmer */
+[style*="color:var(--gold-400)"][style*="text-transform:uppercase"],
+[style*="color:var(--gold-400)"][style*="letter-spacing"] {
+  text-shadow: 0 0 12px rgba(201,160,65,.4);
+}
+
+/* ══════════════════════════════════════
+   ACTIVE SESSION — BREATHING GOLD
+══════════════════════════════════════ */
+.td-r.active-session {
+  animation: breathing-cell 2s ease-in-out infinite !important;
+}
+@keyframes breathing-cell {
+  0%,100% {
+    box-shadow: inset 0 0 0 2.5px rgba(201,160,65,.7), 0 0 16px rgba(201,160,65,.5) !important;
+    filter: brightness(1.08);
+  }
+  50% {
+    box-shadow: inset 0 0 0 2.5px rgba(201,160,65,1), 0 0 28px rgba(201,160,65,.7) !important;
+    filter: brightness(1.18);
+  }
+}
+
+/* ══════════════════════════════════════
+   MICRO INTERACTIONS
+══════════════════════════════════════ */
+/* Ripple on all tappable elements */
+.tab-btn, .btn-h, .dn-btn, .kp-btn, .bk-row, .bk-card {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Section dividers with gold shimmer */
+[style*="border-top:1px solid rgba(201,160,65"] {
+  border-top: 1px solid rgba(201,160,65,.18) !important;
+}
+
+/* ══════════════════════════════════════
+   GPU ACCELERATION — SMOOTH RENDER
+══════════════════════════════════════ */
+.header, .modal-overlay, .modal-box, .fp-box,
+.grid-wrap, .rek-card, .bk-card, .bk-row,
+.tab-btn, #det-panel, #toast, .login-card,
+#terapis-monitor > div {
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
 </style>
 </head>
 <body>
@@ -1218,7 +1933,7 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
   <div class="fbar">
     <div class="frow">
       <div class="swrap"><span>🔍</span><input class="sinput" id="s-input" placeholder="Cari nama pasien..." oninput="renderList()"></div>
-      <button style="padding:9px 12px;border-radius:9px;border:2px solid #e2e8f0;background:#fff;color:#64748b;font-weight:700;font-size:.72rem" onclick="document.getElementById('fpanel').classList.toggle('hidden')">🎯 Filter</button>
+      <button style="padding:9px 12px;border-radius:9px;border:1.5px solid rgba(201,160,65,0.35);background:rgba(201,160,65,0.12);color:var(--gold-300);font-weight:700;font-size:.72rem;transition:all .15s" onclick="document.getElementById('fpanel').classList.toggle('hidden')">🎯 Filter</button>
     </div>
     <div class="fpanel hidden" id="fpanel" style="padding:8px 0 4px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">
@@ -1257,10 +1972,10 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
 <!-- TAB REKAP -->
 <div id="tab-rekap" class="hidden">
   <div class="rekap-wrap">
-    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:#0f172a;margin-bottom:10px">💰 Revenue Hari Ini</div><div id="rek-rev"></div></div>
-    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:#0f172a;margin-bottom:10px">💳 Status Pembayaran</div><div id="rek-pay"></div></div>
-    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:#0f172a;margin-bottom:10px">🚪 Kepadatan Room</div><div id="rek-room"></div></div>
-    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:#0f172a;margin-bottom:10px">👥 Sesi per Terapis</div><div id="rek-th"></div></div>
+    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">💰 Revenue Hari Ini</div><div id="rek-rev"></div></div>
+    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">💳 Status Pembayaran</div><div id="rek-pay"></div></div>
+    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">🚪 Kepadatan Room</div><div id="rek-room"></div></div>
+    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">👥 Sesi per Terapis</div><div id="rek-th"></div></div>
   </div>
 </div>
 
@@ -1268,8 +1983,8 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
 <div id="tab-laporan" class="hidden">
   <div style="padding:0 12px;margin-bottom:86px">
     <!-- Date Range Picker -->
-    <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
-      <div style="font-weight:800;font-size:.82rem;color:#0f172a;margin-bottom:10px">📅 Periode Laporan</div>
+    <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">
+      <div style="font-weight:800;font-size:.82rem;color:var(--gold-300);margin-bottom:10px">📅 Periode Laporan</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
         <button class="lp-range-btn active" onclick="setLapRange('today',this)">Hari Ini</button>
         <button class="lp-range-btn" onclick="setLapRange('week',this)">Minggu Ini</button>
@@ -1277,16 +1992,16 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
         <button class="lp-range-btn" onclick="setLapRange('custom',this)">Custom</button>
       </div>
       <div id="lp-custom" class="hidden" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <div><label style="font-size:.65rem;font-weight:700;color:#374151;display:block;margin-bottom:3px">DARI</label>
+        <div><label style="font-size:.65rem;font-weight:700;color:var(--gold-400);display:block;margin-bottom:3px">DARI</label>
           <input class="fi" type="date" id="lp-from" onchange="loadLaporan()" style="font-size:.8rem;padding:8px"></div>
-        <div><label style="font-size:.65rem;font-weight:700;color:#374151;display:block;margin-bottom:3px">SAMPAI</label>
+        <div><label style="font-size:.65rem;font-weight:700;color:var(--gold-400);display:block;margin-bottom:3px">SAMPAI</label>
           <input class="fi" type="date" id="lp-to" onchange="loadLaporan()" style="font-size:.8rem;padding:8px"></div>
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center">
-        <span id="lp-range-lbl" style="font-size:.72rem;font-weight:700;color:#64748b"></span>
+        <span id="lp-range-lbl" style="font-size:.72rem;font-weight:700;color:var(--cream-55)"></span>
         <div style="display:flex;gap:6px">
-          <button onclick="exportLaporan()" style="background:#16a34a;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:.68rem;font-weight:700;cursor:pointer">📊 Excel</button>
-          <button onclick="exportLaporanPDF()" style="background:#dc2626;color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:.68rem;font-weight:700;cursor:pointer">📄 PDF</button>
+          <button onclick="exportLaporan()" style="background:linear-gradient(135deg,rgba(45,212,160,0.2),rgba(45,212,160,0.1));border:1.5px solid rgba(45,212,160,0.4);color:var(--emerald);border-radius:8px;padding:7px 12px;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .15s">📊 Excel</button>
+          <button onclick="exportLaporanPDF()" style="background:linear-gradient(135deg,rgba(255,107,117,0.2),rgba(255,107,117,0.1));border:1.5px solid rgba(255,107,117,0.4);color:var(--rose);border-radius:8px;padding:7px 12px;font-size:.68rem;font-weight:700;cursor:pointer;transition:all .15s">📄 PDF</button>
         </div>
       </div>
     </div>
@@ -1294,35 +2009,35 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
     <div id="lp-loading" class="hidden" style="text-align:center;padding:30px;color:#94a3b8">⏳ Memuat data...</div>
     <div id="lp-content">
       <!-- Revenue Summary -->
-      <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
-        <div style="font-weight:800;font-size:.82rem;color:#0f172a;margin-bottom:10px">💰 Ringkasan Revenue</div>
+      <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">
+        <div style="font-weight:800;font-size:.82rem;color:var(--gold-300);margin-bottom:10px">💰 Ringkasan Revenue</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px" id="lp-rev-cards"></div>
         <div id="lp-rev-bar"></div>
       </div>
       <!-- Insentif & Penggajian Terapis -->
-      <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+      <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <div style="font-weight:800;font-size:.82rem;color:#0f172a">👨‍⚕️ Insentif & Penggajian Terapis</div>
-          <span style="font-size:.62rem;color:#94a3b8;font-weight:600" id="lp-th-count"></span>
+          <div style="font-weight:800;font-size:.82rem;color:var(--gold-300)">👨‍⚕️ Insentif & Penggajian Terapis</div>
+          <span style="font-size:.62rem;color:var(--cream-55);font-weight:600" id="lp-th-count"></span>
         </div>
         <div id="lp-terapis-list"></div>
-        <div style="margin-top:10px;padding:8px 10px;background:#f0fdf4;border-radius:9px;display:flex;justify-content:space-between">
-          <span style="font-size:.75rem;font-weight:700;color:#374151">Total Insentif Semua Terapis</span>
-          <span style="font-size:.82rem;font-weight:900;color:#16a34a" id="lp-total-insentif">Rp 0</span>
+        <div style="margin-top:10px;padding:8px 10px;background:rgba(45,212,160,0.1);border:1px solid rgba(45,212,160,0.25);border-radius:9px;display:flex;justify-content:space-between">
+          <span style="font-size:.75rem;font-weight:700;color:var(--cream-80)">Total Insentif Semua Terapis</span>
+          <span style="font-size:.82rem;font-weight:900;color:var(--emerald)" id="lp-total-insentif">Rp 0</span>
         </div>
       </div>
       <!-- Top Layanan -->
-      <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
-        <div style="font-weight:800;font-size:.82rem;color:#0f172a;margin-bottom:10px">🏆 Top Layanan</div>
+      <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">
+        <div style="font-weight:800;font-size:.82rem;color:var(--gold-300);margin-bottom:10px">🏆 Top Layanan</div>
         <div id="lp-top-layanan"></div>
-        <div style="font-size:.68rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.8px;margin:14px 0 6px;padding-top:12px;border-top:1px solid #f1f5f9">📊 Detail Layanan per Terapis</div>
+        <div style="font-size:.68rem;font-weight:800;color:var(--cream-55);text-transform:uppercase;letter-spacing:.8px;margin:14px 0 6px;padding-top:12px;border-top:1px solid rgba(201,160,65,0.15)">📊 Detail Layanan per Terapis</div>
         <div id="lp-th-layanan-list"></div>
       </div>
       <!-- Detail per Booking -->
-      <div style="background:#fff;border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+      <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-          <div style="font-weight:800;font-size:.82rem;color:#0f172a">📋 Detail Sesi</div>
-          <span style="font-size:.65rem;color:#94a3b8" id="lp-sesi-count"></span>
+          <div style="font-weight:800;font-size:.82rem;color:var(--gold-300)">📋 Detail Sesi</div>
+          <span style="font-size:.65rem;color:var(--cream-55)" id="lp-sesi-count"></span>
         </div>
         <div id="lp-detail-list"></div>
       </div>
@@ -1333,8 +2048,8 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
 <!-- TAB CRM -->
 <div id="tab-crm" class="hidden">
       <div style="display: flex; gap: 10px; margin-bottom: 15px; padding: 0 14px; justify-content: flex-end;">
-        <button class="btn-h" style="padding: 8px 14px; font-size: 0.75rem;" onclick="exportCRMExcel()">📥 Export Excel</button>
-        <button class="btn-h" style="padding: 8px 14px; font-size: 0.75rem;" onclick="exportCRMPDF()">📄 Export PDF</button>
+        <button class="btn-h" style="padding: 8px 14px; font-size: 0.75rem; background:rgba(45,212,160,0.12); border-color:rgba(45,212,160,0.35); color:var(--emerald);" onclick="exportCRMExcel()">📥 Export Excel</button>
+        <button class="btn-h" style="padding: 8px 14px; font-size: 0.75rem; background:rgba(255,107,117,0.12); border-color:rgba(255,107,117,0.35); color:var(--rose);" onclick="exportCRMPDF()">📄 Export PDF</button>
       </div>
   <div style="padding:0 14px;margin-bottom:90px">
     <!-- Search & Stats -->
@@ -2020,12 +2735,12 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
   <div class="sheet" style="max-height:46vh">
     <div class="hbar"></div>
     <div style="padding:14px 18px 22px">
-      <div style="font-weight:800;font-size:.95rem;color:#0f172a;margin-bottom:14px">📤 Export Data</div>
+      <div style="font-weight:800;font-size:.95rem;color:var(--cream);margin-bottom:14px">📤 Export Data</div>
       <div style="display:flex;gap:8px">
-        <button class="btn-g" style="flex:1;font-size:.88rem;padding:13px" onclick="doExcel()">📊 Excel (.xlsx)</button>
-        <button class="btn-r" style="flex:1;font-size:.88rem;padding:13px" onclick="doPDF()">📄 PDF (cetak)</button>
+        <button style="flex:1;font-size:.88rem;padding:13px;background:rgba(45,212,160,0.15);border:1.5px solid rgba(45,212,160,0.4);color:var(--emerald);border-radius:var(--radius-sm);font-weight:700;cursor:pointer" onclick="doExcel()">📊 Excel (.xlsx)</button>
+        <button style="flex:1;font-size:.88rem;padding:13px;background:rgba(255,107,117,0.15);border:1.5px solid rgba(255,107,117,0.4);color:var(--rose);border-radius:var(--radius-sm);font-weight:700;cursor:pointer" onclick="doPDF()">📄 PDF (cetak)</button>
       </div>
-      <div style="margin-top:10px;font-size:.65rem;color:#94a3b8;text-align:center" id="exp-info"></div>
+      <div style="margin-top:10px;font-size:.65rem;color:var(--cream-55);text-align:center" id="exp-info"></div>
     </div>
   </div>
 </div>
@@ -2272,8 +2987,8 @@ function updatePinDots(state){
     if(!d) continue;
     if(state==="error")       d.className="pin-dot-error" + " " + getDotBase();
     else if(state==="ok")     d.className="pin-dot-ok"    + " " + getDotBase();
-    else if(i<pinBuffer.length) d.style.background="#2563eb";
-    else                        d.style.background="#e2e8f0";
+    else if(i<pinBuffer.length) { d.style.background="var(--gold-500)"; d.style.borderColor="var(--gold-300)"; d.style.boxShadow="0 0 10px rgba(201,160,65,0.55)"; d.style.transform="scale(1.2)"; }
+    else                        { d.style.background="rgba(248,243,236,0.15)"; d.style.borderColor="rgba(248,243,236,0.2)"; d.style.boxShadow=""; d.style.transform=""; }
   }
 }
 function getDotBase(){ return ""; }
@@ -4381,19 +5096,19 @@ function renderLaporan(){
   const avgHarga=totalSesi?Math.round(totalRev/totalSesi):0;
 
   document.getElementById("lp-rev-cards").innerHTML=[
-    ["💰 Total Potensi",fmtRp(totalRev),"#2563eb","#dbeafe"],
-    ["✅ Sudah Lunas",fmtRp(revLunas),"#16a34a","#dcfce7"],
-    ["💵 DP Masuk",fmtRp(revDP),"#d97706","#fef3c7"],
-    ["🔴 Piutang",fmtRp(revPiutang),"#dc2626","#fee2e2"],
-  ].map(([l,v,c,bg])=>`<div style="background:${bg};border-radius:11px;padding:11px 13px;text-align:center">
+    ["💰 Total Potensi",fmtRp(totalRev),"var(--gold-400)","rgba(201,160,65,0.15)","rgba(201,160,65,0.25)"],
+    ["✅ Sudah Lunas",fmtRp(revLunas),"var(--emerald)","rgba(45,212,160,0.12)","rgba(45,212,160,0.25)"],
+    ["💵 DP Masuk",fmtRp(revDP),"var(--amber)","rgba(240,185,110,0.12)","rgba(240,185,110,0.25)"],
+    ["🔴 Piutang",fmtRp(revPiutang),"var(--rose)","rgba(255,107,117,0.12)","rgba(255,107,117,0.25)"],
+  ].map(([l,v,c,bg,border])=>`<div style="background:${bg};border:1px solid ${border};border-radius:11px;padding:11px 13px;text-align:center">
     <div style="font-size:.98rem;font-weight:900;color:${c}">${v}</div>
-    <div style="font-size:.6rem;color:#374151;margin-top:3px;font-weight:600">${l}</div>
+    <div style="font-size:.6rem;color:var(--cream-55);margin-top:3px;font-weight:600">${l}</div>
   </div>`).join("");
 
   document.getElementById("lp-rev-bar").innerHTML=`
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9">
-      ${[["Total Sesi",totalSesi+" sesi","#0f172a"],["Rata-rata/sesi",fmtRp(avgHarga),"#2563eb"],["Hari Aktif",new Set(d.map(b=>b.tanggal)).size+" hari","#9333ea"]]
-        .map(([l,v,c])=>`<div style="text-align:center"><div style="font-size:.88rem;font-weight:800;color:${c}">${v}</div><div style="font-size:.6rem;color:#94a3b8">${l}</div></div>`).join("")}
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(201,160,65,0.15)">
+      ${[["Total Sesi",totalSesi+" sesi","var(--cream)"],["Rata-rata/sesi",fmtRp(avgHarga),"var(--gold-400)"],["Hari Aktif",new Set(d.map(b=>b.tanggal)).size+" hari","var(--purple)"]]
+        .map(([l,v,c])=>`<div style="text-align:center"><div style="font-size:.88rem;font-weight:800;color:${c}">${v}</div><div style="font-size:.6rem;color:var(--cream-55)">${l}</div></div>`).join("")}
     </div>`;
 
   // ── INSENTIF & PENGGAJIAN TERAPIS ─────────────────────
@@ -4425,19 +5140,19 @@ function renderLaporan(){
       <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
         <div style="width:34px;height:34px;border-radius:10px;background:${t.warna};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.78rem;flex-shrink:0">${t.nama.slice(0,2).toUpperCase()}</div>
         <div style="flex:1">
-          <div style="font-weight:800;font-size:.85rem;color:#0f172a">${t.nama}</div>
-          <div style="font-size:.62rem;color:#94a3b8">${t.insentifPct}% komisi · ${t.sesi} sesi</div>
+          <div style="font-weight:800;font-size:.85rem;color:var(--cream)">${t.nama}</div>
+          <div style="font-size:.62rem;color:var(--cream-55)">${t.insentifPct}% komisi · ${t.sesi} sesi</div>
         </div>
         <div style="text-align:right">
-          <div style="font-size:.88rem;font-weight:900;color:#d97706">${fmtRp(t.insentif)}</div>
-          <div style="font-size:.6rem;color:#94a3b8">insentif</div>
+          <div style="font-size:.88rem;font-weight:900;color:var(--amber)">${fmtRp(t.insentif)}</div>
+          <div style="font-size:.6rem;color:var(--cream-55)">insentif</div>
         </div>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">
-        ${[["Omzet",fmtRp(t.omzet),"#2563eb"],["Lunas",t.lunas+" sesi","#16a34a"],["DP",t.dp+" sesi","#d97706"],["Piutang",t.piutang+" sesi","#dc2626"]]
-          .map(([l,v,c])=>`<div style="background:#fff;border-radius:7px;padding:6px 8px;text-align:center;border:1px solid #f1f5f9">
+        ${[["Omzet",fmtRp(t.omzet),"var(--gold-400)"],["Lunas",t.lunas+" sesi","var(--emerald)"],["DP",t.dp+" sesi","var(--amber)"],["Piutang",t.piutang+" sesi","var(--rose)"]]
+          .map(([l,v,c])=>`<div style="background:rgba(5,28,34,0.6);border:1px solid rgba(201,160,65,0.15);border-radius:7px;padding:6px 8px;text-align:center">
             <div style="font-size:.72rem;font-weight:800;color:${c}">${v}</div>
-            <div style="font-size:.55rem;color:#94a3b8">${l}</div>
+            <div style="font-size:.55rem;color:var(--cream-55)">${l}</div>
           </div>`).join("")}
       </div>
     </div>`).join("");
