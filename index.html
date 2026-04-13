@@ -1167,22 +1167,34 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
 </div>
 
 <!-- STATS — UNIFIED DESIGN -->
-<div style="padding:10px 14px 4px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
-  <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:12px;padding:11px 10px;text-align:center">
-    <div style="font-size:.56rem;color:var(--gold-400);font-weight:700;letter-spacing:.1em;margin-bottom:3px">📅 BOOKING</div>
-    <div style="font-size:1.45rem;font-weight:900;color:var(--gold-300);line-height:1" id="st-total">0</div>
-    <div style="font-size:.56rem;color:var(--cream-55);margin-top:2px">sesi hari ini</div>
+<div style="padding:10px 14px 4px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+  <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:9px">
+    <div style="font-size:1.5rem;opacity:.8">📅</div>
+    <div><div style="font-size:1.35rem;font-weight:900;color:var(--gold-300);line-height:1" id="st-total">0</div>
+    <div style="font-size:.56rem;color:var(--cream-55);margin-top:1px">Sesi Hari Ini</div></div>
   </div>
-  <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:12px;padding:11px 10px;text-align:center">
-    <div style="font-size:.56rem;color:var(--gold-400);font-weight:700;letter-spacing:.1em;margin-bottom:3px">🚪 ROOM</div>
-    <div style="font-size:1.45rem;font-weight:900;color:var(--amber);line-height:1" id="st-room">0/6</div>
-    <div style="font-size:.56rem;color:var(--cream-55);margin-top:2px">terpakai</div>
+  <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:9px">
+    <div style="font-size:1.5rem;opacity:.8">🚪</div>
+    <div><div style="font-size:1.35rem;font-weight:900;color:var(--amber);line-height:1" id="st-room">0/6</div>
+    <div style="font-size:.56rem;color:var(--cream-55);margin-top:1px">Room Terpakai</div></div>
   </div>
-  <div style="background:linear-gradient(135deg,rgba(45,212,160,0.18),rgba(10,46,58,0.75));border:1.5px solid rgba(45,212,160,0.3);border-radius:12px;padding:11px 10px;text-align:center">
-    <div style="font-size:.56rem;color:var(--emerald);font-weight:700;letter-spacing:.1em;margin-bottom:3px">💰 REVENUE</div>
-    <div style="font-size:1.1rem;font-weight:900;color:var(--emerald);line-height:1" id="st-rev">Rp 0</div>
-    <div style="font-size:.56rem;color:var(--cream-55);margin-top:2px">potensi hari ini</div>
+  <div style="grid-column:1/-1;background:linear-gradient(135deg,rgba(45,212,160,0.15) 0%,rgba(10,46,58,0.8) 100%);border:1.5px solid rgba(45,212,160,0.3);border-radius:12px;padding:10px 14px;display:flex;justify-content:space-between;align-items:center">
+    <div><div style="font-size:.56rem;color:var(--emerald);font-weight:700;letter-spacing:.1em;margin-bottom:2px">💰 POTENSI REVENUE</div>
+    <div style="font-size:1.2rem;font-weight:900;color:var(--emerald);line-height:1" id="st-rev">Rp 0</div></div>
+    <div style="text-align:right"><div style="font-size:.56rem;color:var(--cream-55);margin-bottom:2px">Sudah Masuk</div>
+    <div style="font-size:.95rem;font-weight:800;color:var(--gold-400)" id="st-masuk">Rp 0</div></div>
   </div>
+</div>
+
+<!-- TERAPIS MONITOR -->
+<div style="margin:6px 14px 0;background:rgba(5,28,34,0.65);border:1px solid rgba(201,160,65,0.18);border-radius:12px;overflow:hidden">
+  <details>
+    <summary style="padding:8px 12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;list-style:none;-webkit-appearance:none">
+      <span style="font-size:.65rem;font-weight:700;color:var(--gold-400);text-transform:uppercase;letter-spacing:.1em">👥 Status Terapis</span>
+      <span id="terapis-monitor-time" style="font-size:.6rem;color:var(--cream-55)"></span>
+    </summary>
+    <div id="terapis-monitor" style="padding:6px 10px 8px;border-top:1px solid rgba(201,160,65,0.12)"></div>
+  </details>
 </div>
 
 <div class="tabs">
@@ -1697,12 +1709,12 @@ span[style*="background:#dbeafe"][style*="color:#2563eb"] {
         </div>
         <!-- JAM SELESAI + HARGA — redesign -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <div style="background:rgba(37,99,235,0.12);border:1.5px solid rgba(37,99,235,0.3);border-radius:10px;padding:10px 12px;text-align:center">
+          <div style="background:rgba(10,46,58,0.8);border:1.5px solid rgba(201,160,65,0.25);border-radius:10px;padding:10px 12px;text-align:center">
             <div style="font-size:.58rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">⏰ Jam Selesai</div>
-            <div style="font-size:1.15rem;font-weight:900;color:var(--blue)" id="fp-end-disp">–</div>
+            <div style="font-size:1.15rem;font-weight:900;color:var(--gold-300)" id="fp-end-disp">–</div>
             <div style="font-size:.58rem;color:#94a3b8;margin-top:1px">otomatis</div>
           </div>
-          <div style="background:rgba(22,163,74,0.12);border:1.5px solid rgba(22,163,74,0.3);border-radius:10px;padding:10px 12px;text-align:center">
+          <div style="background:rgba(10,46,58,0.8);border:1.5px solid rgba(45,212,160,0.3);border-radius:10px;padding:10px 12px;text-align:center">
             <div style="font-size:.58rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">💰 Harga</div>
             <div style="font-size:1.05rem;font-weight:900;color:#16a34a" id="fp-price-disp">–</div>
             <div style="font-size:.58rem;color:#94a3b8;margin-top:1px">dari pricelist</div>
@@ -2124,6 +2136,30 @@ async function loadDiskonPaket(){
     _diskonCache=(dk.data||[]);
     _paketCache=(pk.data||[]);
   }catch(e){ console.warn("loadDiskonPaket failed:",e); }
+  refreshDiskonDropdown();
+}
+
+function refreshDiskonDropdown(){
+  const dkSel=document.getElementById("fp-diskon");
+  if(dkSel){
+    dkSel.innerHTML='<option value="">Tanpa Diskon</option>';
+    _diskonCache.forEach(d=>{
+      const o=document.createElement("option");
+      o.value=JSON.stringify(d);
+      o.text=d.nama+(d.tipe==="persen"?" ("+d.nilai+"%)":"  (Rp "+Number(d.nilai).toLocaleString("id-ID")+")");
+      dkSel.appendChild(o);
+    });
+  }
+  const pkSel=document.getElementById("fp-paket");
+  if(pkSel){
+    pkSel.innerHTML='<option value="">Tanpa Paket</option>';
+    _paketCache.forEach(p=>{
+      const o=document.createElement("option");
+      o.value=JSON.stringify(p);
+      o.text=p.nama+" ("+p.sesi+" sesi)";
+      pkSel.appendChild(o);
+    });
+  }
 }
 
 function getSettings(){
@@ -2556,9 +2592,16 @@ function requestNotifPermission(){
 // ═══ COUNTDOWN TIMER ══════════════════════════════════════════
 function startCountdownTimer(){
   updateCountdowns();
-  // Update setiap 1 detik untuk animasi berkedip & countdown real-time
+  updateTerapisMonitor();
   if(countdownTimer) clearInterval(countdownTimer);
-  countdownTimer=setInterval(updateCountdowns,1000);
+  let _tick=0;
+  countdownTimer=setInterval(()=>{
+    updateCountdowns();
+    _tick++;
+    const tEl=document.getElementById("terapis-monitor-time");
+    if(tEl) tEl.textContent=new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    if(_tick%30===0) updateTerapisMonitor();
+  },1000);
 }
 
 function updateCountdowns(){
@@ -2639,13 +2682,43 @@ function renderAll(){
   setEl("date-lbl",fmtDate(currentDate));
   setEl("st-total",bookings.length);
   setEl("st-room",new Set(bookings.map(b=>b.room)).size+"/6");
-  // Revenue
   const todayRev=bookings.reduce((s,b)=>s+(b.harga||0),0);
   setEl("st-rev",todayRev>0?fmtRp(todayRev):"Rp 0");
+  const masuk=bookings.filter(b=>b.payStatus==="Lunas").reduce((s,b)=>s+(b.harga||0),0)
+            +bookings.filter(b=>b.payStatus==="DP").reduce((s,b)=>s+(b.dp_amount||0),0);
+  setEl("st-masuk",masuk>0?fmtRp(masuk):"Rp 0");
   setEl("gs-count",bookings.length);
   setEl("exp-info",`${bookings.length} booking · ${fmtDate(currentDate)}`);
   renderGrid();renderList();renderRekap();
+  updateTerapisMonitor();
   setTimeout(updateCountdowns,200);
+}
+
+function updateTerapisMonitor(){
+  const el=document.getElementById("terapis-monitor");
+  if(!el||!THERAPISTS.length) return;
+  const now=new Date();
+  const nowM=now.getHours()*60+now.getMinutes();
+  const isToday=fmtISO(currentDate)===fmtISO(now);
+  el.innerHTML=THERAPISTS.map(th=>{
+    const activeBk=isToday?bookings.find(b=>b.therapist===th.id&&toMin(b.start||"00:00")<=nowM&&toMin(b.end||"00:00")>nowM):null;
+    const nextBk=!activeBk&&isToday?bookings.filter(b=>b.therapist===th.id&&toMin(b.start||"00:00")>nowM).sort((a,b)=>toMin(a.start)-toMin(b.start))[0]:null;
+    const hasBkToday=bookings.some(b=>b.therapist===th.id);
+    const sisaWaktu=activeBk?(()=>{const s=toMin(activeBk.end||"00:00")-nowM;return s>0?s+"m":"selesai";})():"";
+    const dot=activeBk?"var(--emerald)":hasBkToday?"var(--gold-400)":"#64748b";
+    const bg=activeBk?"rgba(45,212,160,0.1)":hasBkToday?"rgba(201,160,65,0.07)":"rgba(5,28,34,0.5)";
+    const border=activeBk?"1.5px solid rgba(45,212,160,0.35)":hasBkToday?"1.5px solid rgba(201,160,65,0.2)":"1.5px solid rgba(201,160,65,0.1)";
+    const badge=activeBk?"AKTIF":hasBkToday?"JADWAL":"KOSONG";
+    const badgeClr=activeBk?"var(--emerald)":hasBkToday?"var(--gold-400)":"#64748b";
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:\${bg};border:\${border};margin-bottom:4px">
+      <div style="width:8px;height:8px;border-radius:50%;background:\${dot};flex-shrink:0;\${activeBk?"box-shadow:0 0 6px var(--emerald)":""}"></div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.75rem;font-weight:700;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">\${th.nama}</div>
+        <div style="font-size:.6rem;color:var(--cream-55);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">\${activeBk?"🟢 "+activeBk.patient+" · "+activeBk.start+"–"+activeBk.end+" · sisa "+sisaWaktu:nextBk?"⏳ "+nextBk.start+" · "+nextBk.patient:"⚪ Tidak ada jadwal"}</div>
+      </div>
+      <div style="font-size:.55rem;font-weight:700;padding:2px 6px;border-radius:4px;flex-shrink:0;color:\${badgeClr};border:1px solid \${badgeClr};opacity:.85">\${badge}</div>
+    </div>`;
+  }).join("");
 }
 
 function renderGrid(){
@@ -2885,7 +2958,7 @@ function initForm(){
     _diskonCache.forEach(d=>{
       const o=document.createElement("option");
       o.value=JSON.stringify(d);
-      o.text=d.nama+(d.tipe==="persen"?" ("+d.nilai+"%)":"" +" (Rp "+Number(d.nilai).toLocaleString("id-ID")+")");
+      o.text=d.nama+(d.tipe==="persen"?" ("+d.nilai+"%)":" (Rp "+Number(d.nilai).toLocaleString("id-ID")+")");
       dkSel.appendChild(o);
     });
   }
@@ -3624,14 +3697,17 @@ function populatePatientDatalist(){
 function onPatientInput(val){
   const infoEl=document.getElementById('fp-repeat-info');
   const textEl=document.getElementById('fp-repeat-text');
-  if(!val||val.length<2){if(infoEl)infoEl.style.display='none';return;}
+  if(!val||val.length<2){
+    if(infoEl)infoEl.style.display='none';
+    return;
+  }
   const cust=crmData.find(c=>c.nama.toLowerCase()===val.toLowerCase());
   if(cust){
-    // Selalu update data ketika nama cocok (termasuk saat ganti nama pasien)
+    // Selalu replace semua data saat nama cocok (fix: ganti Aldo→Amalia)
     const phoneEl=document.getElementById('fp-phone');
     if(phoneEl) phoneEl.value=cust.phone||'';
     const catEl=document.getElementById('fp-catatan');
-    if(catEl&&cust.preferensi&&!catEl.value) catEl.value=cust.preferensi;
+    if(catEl&&cust.preferensi) catEl.value=cust.preferensi;
     const kunjungan=cust.total_kunjungan||0;
     const lastVisit=cust.last_visit?new Date(cust.last_visit).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'}):'–';
     if(infoEl&&textEl){
@@ -3648,9 +3724,8 @@ function onPatientInput(val){
 // MEMBER = TIDAK ADA KOMISI TERAPIS
 // ══════════════════════════════════════════════════════════════════
 function isMemberBooking(b){
-  // Cek dari catatan — termasuk format "[Biaya Tambahan: 👑 Member ...]"
   const cat=b.catatan||"";
-  return cat.includes('Member')||cat.includes('member');
+  return cat.includes("Member")||cat.includes("member")||cat.includes("👑");
 }
 function isFormMember(){
   // Cek apakah form saat ini pilih member
