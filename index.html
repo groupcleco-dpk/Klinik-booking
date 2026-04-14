@@ -1825,8 +1825,8 @@ button[style*="50%"][style*="background:#"] {
       <button class="cbtn" onclick="closeModal('modal-change-pin')">✕</button>
     </div>
     <div class="sbody">
-      <div style="background:#dbeafe;border-radius:9px;padding:10px 14px;font-size:.72rem;color:#1e3a5f;margin-bottom:14px;line-height:1.5">
-        📌 PIN yang sama dipakai di <b>semua perangkat</b>. Catat baik-baik setelah diubah.
+      <div style="background:rgba(201,160,65,0.1);border:1px solid rgba(201,160,65,0.25);border-radius:9px;padding:10px 14px;font-size:.72rem;color:var(--cream-80);margin-bottom:14px;line-height:1.5">
+        📌 PIN yang sama dipakai di <b style="color:var(--gold-300)">semua perangkat</b>. Catat baik-baik setelah diubah.
       </div>
       <div class="ff">
         <label class="fl">PIN Lama</label>
@@ -1923,7 +1923,7 @@ button[style*="50%"][style*="background:#"] {
 <!-- TAB JADWAL -->
 <div id="tab-jadwal">
   <div class="grid-wrap">
-    <div class="g-header">📋 Jadwal Harian <span style="font-size:.62rem;color:#94a3b8;font-weight:400">Geser → lihat semua room</span></div>
+    <div class="g-header">📋 Jadwal Harian <span style="font-size:.62rem;color:var(--cream-55);font-weight:400">Geser → lihat semua room</span></div>
     <div class="g-scroll"><table id="sched-table"><thead></thead><tbody></tbody></table></div>
   </div>
 </div>
@@ -1976,6 +1976,7 @@ button[style*="50%"][style*="background:#"] {
     <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">💳 Status Pembayaran</div><div id="rek-pay"></div></div>
     <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">🚪 Kepadatan Room</div><div id="rek-room"></div></div>
     <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">👥 Sesi per Terapis</div><div id="rek-th"></div></div>
+    <div class="rek-card" id="rek-member-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">👑 Rekap Member Hari Ini</div><div id="rek-member"></div></div>
   </div>
 </div>
 
@@ -2006,7 +2007,7 @@ button[style*="50%"][style*="background:#"] {
       </div>
     </div>
     <!-- Summary Cards -->
-    <div id="lp-loading" class="hidden" style="text-align:center;padding:30px;color:#94a3b8">⏳ Memuat data...</div>
+    <div id="lp-loading" class="hidden" style="text-align:center;padding:30px;color:var(--cream-55)">⏳ Memuat data...</div>
     <div id="lp-content">
       <!-- Revenue Summary -->
       <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">
@@ -2055,24 +2056,24 @@ button[style*="50%"][style*="background:#"] {
     <!-- Search & Stats -->
     <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
       <div style="flex:1;position:relative">
-        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8">🔍</span>
+        <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--cream-55)">🔍</span>
         <input class="sinput" id="crm-search" placeholder="Cari nama / no HP..." oninput="renderCRM()">
       </div>
       <button onclick="openAddCustomer()" style="background:linear-gradient(135deg,var(--navy),var(--blue));color:#fff;border:none;border-radius:50px;padding:10px 16px;font-weight:700;font-size:.72rem;white-space:nowrap;cursor:pointer;box-shadow:0 4px 12px rgba(37,99,235,.35)">+ Pasien</button>
     </div>
     <!-- Summary -->
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:10px" id="crm-summary">
-      <div style="background:#fff;border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow-sm);border:1px solid var(--gray-b)">
-        <div style="font-size:1.4rem;font-weight:900;color:var(--navy)" id="crm-total-count">0</div>
-        <div style="font-size:.56rem;color:var(--text-l);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">Total Pasien</div>
+      <div style="background:rgba(10,46,58,0.62);border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow-sm);border:1px solid rgba(201,160,65,0.15)">
+        <div style="font-size:1.4rem;font-weight:900;color:var(--cream)" id="crm-total-count">0</div>
+        <div style="font-size:.56rem;color:var(--cream-55);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">Total Pasien</div>
       </div>
-      <div style="background:#fff;border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow-sm);border:1px solid var(--gray-b)">
-        <div style="font-size:1.4rem;font-weight:900;color:var(--green)" id="crm-aktif-count">0</div>
-        <div style="font-size:.56rem;color:var(--text-l);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">Bulan Ini</div>
+      <div style="background:rgba(10,46,58,0.62);border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow-sm);border:1px solid rgba(45,212,160,0.2)">
+        <div style="font-size:1.4rem;font-weight:900;color:var(--emerald)" id="crm-aktif-count">0</div>
+        <div style="font-size:.56rem;color:var(--cream-55);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">Bulan Ini</div>
       </div>
-      <div style="background:#fff;border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow-sm);border:1px solid var(--gray-b)">
-        <div style="font-size:1.4rem;font-weight:900;color:var(--blue)" id="crm-baru-count">0</div>
-        <div style="font-size:.56rem;color:var(--text-l);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">Pasien Baru</div>
+      <div style="background:rgba(10,46,58,0.62);border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow-sm);border:1px solid rgba(201,160,65,0.2)">
+        <div style="font-size:1.4rem;font-weight:900;color:var(--gold-400)" id="crm-baru-count">0</div>
+        <div style="font-size:.56rem;color:var(--cream-55);text-transform:uppercase;letter-spacing:.3px;margin-top:2px">Pasien Baru</div>
       </div>
     </div>
     <!-- Customer List -->
@@ -2098,7 +2099,7 @@ button[style*="50%"][style*="background:#"] {
           <input class="fi" id="eth-kom" type="number" min="0" max="100" step="0.5" placeholder="0" style="flex:1">
           <span style="font-size:.85rem;font-weight:800;color:#d97706" id="eth-kom-preview">0%</span>
         </div>
-        <div style="font-size:.65rem;color:#94a3b8;margin-top:4px">Persentase dari harga sesi yang menjadi insentif terapis</div>
+        <div style="font-size:.65rem;color:var(--cream-55);margin-top:4px">Persentase dari harga sesi yang menjadi insentif terapis</div>
       </div>
       <div class="ff">
         <label class="fl">🎨 Warna Jadwal</label>
@@ -2148,12 +2149,12 @@ button[style*="50%"][style*="background:#"] {
       <div class="ff">
         <label class="fl">💰 Harga per Durasi</label>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:#94a3b8;font-weight:700">30mnt</span><input class="fi" id="esv-h30" type="number" placeholder="0" style="padding-left:46px"></div>
-          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:#94a3b8;font-weight:700">60mnt</span><input class="fi" id="esv-h60" type="number" placeholder="0" style="padding-left:46px"></div>
-          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:#94a3b8;font-weight:700">90mnt</span><input class="fi" id="esv-h90" type="number" placeholder="0" style="padding-left:46px"></div>
-          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:#94a3b8;font-weight:700">120mnt</span><input class="fi" id="esv-h120" type="number" placeholder="0" style="padding-left:52px"></div>
+          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:var(--cream-55);font-weight:700">30mnt</span><input class="fi" id="esv-h30" type="number" placeholder="0" style="padding-left:46px"></div>
+          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:var(--cream-55);font-weight:700">60mnt</span><input class="fi" id="esv-h60" type="number" placeholder="0" style="padding-left:46px"></div>
+          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:var(--cream-55);font-weight:700">90mnt</span><input class="fi" id="esv-h90" type="number" placeholder="0" style="padding-left:46px"></div>
+          <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.62rem;color:var(--cream-55);font-weight:700">120mnt</span><input class="fi" id="esv-h120" type="number" placeholder="0" style="padding-left:52px"></div>
         </div>
-        <div style="font-size:.62rem;color:#94a3b8;margin-top:3px">Isi 0 jika durasi tidak tersedia</div>
+        <div style="font-size:.62rem;color:var(--cream-55);margin-top:3px">Isi 0 jika durasi tidak tersedia</div>
       </div>
       <div class="g2">
         <div><label class="fl">🏆 Komisi (%)</label><input class="fi" id="esv-kom" type="number" min="0" max="100" placeholder="20"></div>
@@ -2219,7 +2220,7 @@ button[style*="50%"][style*="background:#"] {
         <div><label class="fl">Jumlah Sesi</label><input class="fi" id="epk-sesi" type="number" min="1" placeholder="10"></div>
         <div><label class="fl">Harga Total (Rp)</label><input class="fi" id="epk-harga" type="number" min="0" placeholder="500000"></div>
       </div>
-      <div id="epk-preview" style="background:#f0fdf4;border-radius:9px;padding:8px 12px;font-size:.72rem;color:#16a34a;font-weight:700;margin-top:4px"></div>
+      <div id="epk-preview" style="background:rgba(45,212,160,0.1);border:1px solid rgba(45,212,160,0.25);border-radius:9px;padding:8px 12px;font-size:.72rem;color:var(--emerald);font-weight:700;margin-top:4px"></div>
       <div id="epk-err" class="lerr hidden"></div>
     </div>
     <div class="sfooter">
@@ -2425,14 +2426,14 @@ button[style*="50%"][style*="background:#"] {
         <!-- JAM SELESAI + HARGA — redesign -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
           <div style="background:rgba(10,46,58,0.8);border:1.5px solid rgba(201,160,65,0.25);border-radius:10px;padding:10px 12px;text-align:center">
-            <div style="font-size:.58rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">⏰ Jam Selesai</div>
+            <div style="font-size:.58rem;color:var(--cream-55);font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">⏰ Jam Selesai</div>
             <div style="font-size:1.15rem;font-weight:900;color:var(--gold-300)" id="fp-end-disp">–</div>
-            <div style="font-size:.58rem;color:#94a3b8;margin-top:1px">otomatis</div>
+            <div style="font-size:.58rem;color:var(--cream-55);margin-top:1px">otomatis</div>
           </div>
           <div style="background:rgba(10,46,58,0.8);border:1.5px solid rgba(45,212,160,0.3);border-radius:10px;padding:10px 12px;text-align:center">
-            <div style="font-size:.58rem;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">💰 Harga</div>
+            <div style="font-size:.58rem;color:var(--cream-55);font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px">💰 Harga</div>
             <div style="font-size:1.05rem;font-weight:900;color:#16a34a" id="fp-price-disp">–</div>
-            <div style="font-size:.58rem;color:#94a3b8;margin-top:1px">dari pricelist</div>
+            <div style="font-size:.58rem;color:var(--cream-55);margin-top:1px">dari pricelist</div>
           </div>
         </div>
         <div class="ff"><label class="fl">👨‍⚕️ Terapis</label><div class="g2" id="fp-th-grid"></div></div>
@@ -2497,7 +2498,7 @@ button[style*="50%"][style*="background:#"] {
         <div class="ff hidden" id="fp-dp-wrap">
           <label class="fl">💵 Nominal DP yang Dibayar</label>
           <div style="position:relative">
-            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.8rem;color:#64748b;font-weight:600">Rp</span>
+            <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:.8rem;color:var(--cream-55);font-weight:600">Rp</span>
             <input class="fi" id="fp-dp-amount" type="number" placeholder="0" min="0" step="1000"
               style="padding-left:36px" oninput="updatePriceDisplay();updateSummary()">
           </div>
@@ -2547,7 +2548,7 @@ button[style*="50%"][style*="background:#"] {
             <div id="split-info" style="font-size:.7rem;color:var(--cream-55);margin-top:6px;text-align:center"></div>
           </div>
         </div>
-        <div class="sumbox" style="margin-top:8px"><div style="font-size:.65rem;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:8px">Ringkasan</div><div id="fp-sum"></div></div>
+        <div class="sumbox" style="margin-top:8px"><div style="font-size:.65rem;font-weight:700;color:var(--cream-55);text-transform:uppercase;margin-bottom:8px">Ringkasan</div><div id="fp-sum"></div></div>
       </div>
     </div>
     <div class="sfooter" id="form-footer"></div>
@@ -2560,7 +2561,7 @@ button[style*="50%"][style*="background:#"] {
     <div style="height:5px;border-radius:22px 22px 0 0" id="det-bar"></div>
     <div style="padding:14px 18px 18px;overflow-y:auto">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
-        <div><div style="font-size:.62rem;color:#94a3b8;text-transform:uppercase;letter-spacing:1px">Detail Booking</div><div style="font-size:1.1rem;font-weight:800;color:#0f172a" id="det-name"></div><div style="font-size:.72rem;color:#94a3b8" id="det-sub"></div></div>
+        <div><div style="font-size:.62rem;color:var(--cream-55);text-transform:uppercase;letter-spacing:1px">Detail Booking</div><div style="font-size:1.1rem;font-weight:800;color:var(--cream)" id="det-name"></div><div style="font-size:.72rem;color:var(--cream-55)" id="det-sub"></div></div>
         <span class="badge" id="det-badge"></span>
       </div>
       <div class="det-grid">
@@ -2576,23 +2577,23 @@ button[style*="50%"][style*="background:#"] {
       </div>
       <div style="border-radius:9px;padding:9px 12px;display:flex;align-items:center;gap:10px;margin-bottom:12px" id="det-th-box">
         <div style="width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.8rem" id="det-th-av"></div>
-        <div><div style="font-size:.6rem;color:#94a3b8">Terapis</div><div style="font-weight:700;color:#0f172a;font-size:.88rem" id="det-th-name"></div></div>
+        <div><div style="font-size:.6rem;color:var(--cream-55)">Terapis</div><div style="font-weight:700;color:var(--cream);font-size:.88rem" id="det-th-name"></div></div>
       </div>
       <div id="det-catatan"></div>
       <!-- Active session countdown -->
-      <div id="det-countdown" class="hidden" style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:9px;padding:9px 12px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
-        <span style="font-size:.78rem;font-weight:700;color:#16a34a">🟢 Sesi Berlangsung</span>
-        <span style="font-size:.88rem;font-weight:800;color:#16a34a" id="det-remain"></span>
+      <div id="det-countdown" class="hidden" style="background:rgba(45,212,160,0.1);border:1.5px solid rgba(45,212,160,0.35);border-radius:9px;padding:9px 12px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:.78rem;font-weight:700;color:var(--emerald)">🟢 Sesi Berlangsung</span>
+        <span style="font-size:.88rem;font-weight:800;color:var(--emerald)" id="det-remain"></span>
       </div>
-      <div id="det-confirm" class="hidden" style="background:#fee2e2;border-radius:10px;padding:12px;margin-bottom:10px">
-        <div style="font-size:.8rem;font-weight:700;color:#dc2626;margin-bottom:8px">⚠️ Yakin hapus booking ini?</div>
+      <div id="det-confirm" class="hidden" style="background:rgba(255,107,117,0.12);border:1px solid rgba(255,107,117,0.3);border-radius:10px;padding:12px;margin-bottom:10px">
+        <div style="font-size:.8rem;font-weight:700;color:var(--rose);margin-bottom:8px">⚠️ Yakin hapus booking ini?</div>
         <div style="display:flex;gap:6px"><button class="btn-o" onclick="document.getElementById('det-confirm').classList.add('hidden')">Batal</button><button class="btn-r" style="flex:1" onclick="confirmDelete()">Ya, Hapus</button></div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn-o" onclick="closeModal('modal-detail')">Tutup</button>
         <button class="btn-p" style="flex:1" onclick="editCurrent()">✏️ Edit</button>
         <button class="btn-g" style="padding:8px 12px;font-size:.76rem" onclick="openPindahModal()">🔄 Pindah</button>
-        <button onclick="openInvoiceFromDetail2(currentBk?.id)" style="background:linear-gradient(135deg,#0f2744,#1e3a5f);color:#fff;border:none;border-radius:var(--radius-sm);padding:12px 14px;font-weight:700;font-size:.78rem;cursor:pointer">🧾</button>
+        <button onclick="openInvoiceFromDetail2(currentBk?.id)" style="background:rgba(201,160,65,0.15);color:var(--gold-300);border:1.5px solid rgba(201,160,65,0.35);border-radius:var(--radius-sm);padding:12px 14px;font-weight:700;font-size:.78rem;cursor:pointer">🧾</button>
         <button class="btn-ro" onclick="document.getElementById('det-confirm').classList.remove('hidden')">🗑</button>
       </div>
     </div>
@@ -2605,15 +2606,15 @@ button[style*="50%"][style*="background:#"] {
   <div class="sheet" style="max-height:60vh">
     <div class="hbar"></div>
     <div style="padding:16px 18px 20px">
-      <div style="font-size:.62rem;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Ubah Jadwal</div>
-      <div style="font-size:1.05rem;font-weight:800;color:#0f172a;margin-bottom:16px">🔄 Pindah Ruangan / Ganti Terapis</div>
+      <div style="font-size:.62rem;color:var(--cream-55);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Ubah Jadwal</div>
+      <div style="font-size:1.05rem;font-weight:800;color:var(--cream);margin-bottom:16px">🔄 Pindah Ruangan / Ganti Terapis</div>
       <div style="margin-bottom:12px">
-        <label style="font-size:.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">🚪 Ruangan</label>
+        <label style="font-size:.7rem;font-weight:700;color:var(--gold-400);display:block;margin-bottom:4px">🚪 Ruangan</label>
         <select id="pindah-room" class="fi" style="font-size:.85rem;padding:10px">
         </select>
       </div>
       <div style="margin-bottom:20px">
-        <label style="font-size:.7rem;font-weight:700;color:#64748b;display:block;margin-bottom:4px">👤 Terapis</label>
+        <label style="font-size:.7rem;font-weight:700;color:var(--cream-55);display:block;margin-bottom:4px">👤 Terapis</label>
         <select id="pindah-terapis" class="fi" style="font-size:.85rem;padding:10px">
         </select>
       </div>
@@ -2647,8 +2648,7 @@ button[style*="50%"][style*="background:#"] {
       </div>
       <!-- TAB 1: LAYANAN -->
       <div id="set-1" class="hidden">
-        <div style="background:#f8fafc;border-radius:10px;padding:12px;margin-bottom:12px">
-          <div class="g2" style="margin-bottom:8px">
+        <div style="background:rgba(5,28,34,0.5);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid rgba(201,160,65,0.15)">          <div class="g2" style="margin-bottom:8px">
             <div><label class="fl">Nama Layanan</label><input class="fi" id="sv-nama" placeholder="Contoh: Balinese Massage" style="font-size:.82rem"></div>
             <div><label class="fl">Kategori</label>
               <select class="fi" id="sv-kat" style="padding:9px;font-size:.82rem">
@@ -2664,12 +2664,12 @@ button[style*="50%"][style*="background:#"] {
           <div style="margin-bottom:8px">
             <label class="fl">💰 Harga per Durasi</label>
             <div class="g2" style="gap:6px">
-              <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:#94a3b8">30mnt</span><input class="fi" id="sv-h30" type="number" placeholder="0" style="padding-left:44px;font-size:.82rem"></div>
-              <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:#94a3b8">60mnt</span><input class="fi" id="sv-h60" type="number" placeholder="0" style="padding-left:44px;font-size:.82rem"></div>
-              <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:#94a3b8">90mnt</span><input class="fi" id="sv-h90" type="number" placeholder="0" style="padding-left:44px;font-size:.82rem"></div>
-              <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:#94a3b8">120mnt</span><input class="fi" id="sv-h120" type="number" placeholder="0" style="padding-left:48px;font-size:.82rem"></div>
+              <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:var(--cream-55)">30mnt</span><input class="fi" id="sv-h30" type="number" placeholder="0" style="padding-left:44px;font-size:.82rem"></div>
+              <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:var(--cream-55)">60mnt</span><input class="fi" id="sv-h60" type="number" placeholder="0" style="padding-left:44px;font-size:.82rem"></div>
+              <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:var(--cream-55)">90mnt</span><input class="fi" id="sv-h90" type="number" placeholder="0" style="padding-left:44px;font-size:.82rem"></div>
+              <div style="position:relative"><span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:.65rem;color:var(--cream-55)">120mnt</span><input class="fi" id="sv-h120" type="number" placeholder="0" style="padding-left:48px;font-size:.82rem"></div>
             </div>
-            <div style="font-size:.62rem;color:#94a3b8;margin-top:3px">Isi 0 jika durasi tersebut tidak tersedia</div>
+            <div style="font-size:.62rem;color:var(--cream-55);margin-top:3px">Isi 0 jika durasi tersebut tidak tersedia</div>
           </div>
           <div class="g2">
             <div><label class="fl">🏆 Komisi Terapis (%)</label><input class="fi" id="sv-kom" type="number" placeholder="20" min="0" max="100" style="font-size:.82rem"></div>
@@ -2688,7 +2688,7 @@ button[style*="50%"][style*="background:#"] {
       </div>
       <!-- TAB 2: DISKON -->
       <div id="set-2" class="hidden">
-        <div style="background:#f8fafc;border-radius:9px;padding:12px;margin-bottom:12px">
+        <div style="background:rgba(5,28,34,0.5);border-radius:9px;padding:12px;margin-bottom:12px;border:1px solid rgba(201,160,65,0.15)">
           <div class="ff"><label class="fl">Nama Diskon</label><input class="fi" id="dk-nama" placeholder="Contoh: Member, Lansia..."></div>
           <div class="g2">
             <div><label class="fl">Tipe</label><select class="fi" id="dk-tipe" style="padding:9px"><option value="persen">Persentase (%)</option><option value="nominal">Nominal (Rp)</option></select></div>
@@ -2700,7 +2700,7 @@ button[style*="50%"][style*="background:#"] {
       </div>
       <!-- TAB 3: PAKET -->
       <div id="set-3" class="hidden">
-        <div style="background:#f8fafc;border-radius:9px;padding:12px;margin-bottom:12px">
+        <div style="background:rgba(5,28,34,0.5);border-radius:9px;padding:12px;margin-bottom:12px;border:1px solid rgba(201,160,65,0.15)">
           <div class="ff"><label class="fl">Nama Paket</label><input class="fi" id="pk-nama" placeholder="Contoh: Paket 10 Sesi..."></div>
           <div class="g2">
             <div><label class="fl">Jumlah Sesi</label><input class="fi" id="pk-sesi" type="number" placeholder="10"></div>
@@ -2720,7 +2720,7 @@ button[style*="50%"][style*="background:#"] {
     <div class="hbar"></div>
     <div class="shdr"><div><div class="stitle-s">Integrasi</div><div class="stitle">📊 Google Sheets</div></div><button class="cbtn" onclick="closeModal('modal-sheets')">✕</button></div>
     <div class="sbody">
-      <div class="ff"><label class="fl">🔗 URL Apps Script</label><input class="fi" id="gs-url" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:.72rem"><div id="gs-last" style="font-size:.65rem;color:#94a3b8;margin-top:4px"></div></div>
+      <div class="ff"><label class="fl">🔗 URL Apps Script</label><input class="fi" id="gs-url" placeholder="https://script.google.com/macros/s/.../exec" style="font-size:.72rem"><div id="gs-last" style="font-size:.65rem;color:var(--cream-55);margin-top:4px"></div></div>
       <div id="gs-status"></div>
       <div style="display:flex;gap:6px;margin-top:8px">
         <button class="btn-o" style="font-size:.72rem" onclick="testGS()">🔌 Test</button>
@@ -3377,15 +3377,15 @@ function showUnpaidAlert(bk){
   if(!el){
     el=document.createElement("div");
     el.id="unpaid-alert";
-    el.style.cssText="position:fixed;bottom:100px;left:14px;right:14px;background:#fff;border-radius:16px;padding:14px 16px;z-index:500;box-shadow:0 8px 30px rgba(0,0,0,.2);border-left:4px solid "+c+";cursor:pointer;animation:slideDown .3s ease";
+    el.style.cssText="position:fixed;bottom:100px;left:14px;right:14px;background:rgba(10,46,58,0.97);backdrop-filter:blur(20px);border-radius:16px;padding:14px 16px;z-index:500;box-shadow:0 8px 30px rgba(0,0,0,.5);border-left:4px solid "+c+";border:1px solid rgba(201,160,65,0.2);border-left:4px solid "+c+";cursor:pointer;animation:slideDown .3s ease";
     el.onclick=()=>{ openDetail(bk.id); el.remove(); };
     document.body.appendChild(el);
   }
   const sisaText=bk.payStatus==="DP"?fmtRp(bk.sisa_bayar)+" belum dibayar":"Belum ada pembayaran";
-  el.innerHTML=`<div style="font-size:.72rem;font-weight:800;color:#e11d48;margin-bottom:4px">⚠️ SESI SELESAI — BELUM LUNAS</div>
-    <div style="font-size:.82rem;font-weight:700;color:#0f172a">${bk.patient}</div>
-    <div style="font-size:.68rem;color:#64748b">${bk.service||""} · ${sisaText}</div>
-    <div style="font-size:.65rem;color:#2563eb;margin-top:6px;font-weight:600">Ketuk untuk buka detail & input pembayaran →</div>`;
+  el.innerHTML=`<div style="font-size:.72rem;font-weight:800;color:var(--rose);margin-bottom:4px">⚠️ SESI SELESAI — BELUM LUNAS</div>
+    <div style="font-size:.82rem;font-weight:700;color:var(--cream)">${bk.patient}</div>
+    <div style="font-size:.68rem;color:var(--cream-55)">${bk.service||""} · ${sisaText}</div>
+    <div style="font-size:.65rem;color:var(--gold-400);margin-top:6px;font-weight:600">Ketuk untuk buka detail & input pembayaran →</div>`;
   // Auto dismiss after 15s
   clearTimeout(el._t);
   el._t=setTimeout(()=>el&&el.remove(),15000);
@@ -3414,22 +3414,43 @@ function updateTerapisMonitor(){
   if(!el||!THERAPISTS.length) return;
   const now=new Date();
   const nowM=now.getHours()*60+now.getMinutes();
+  // Only show realtime status for today's date
   const isToday=fmtISO(currentDate)===fmtISO(now);
   el.innerHTML=THERAPISTS.map(th=>{
-    const activeBk=isToday?bookings.find(b=>b.therapist===th.id&&toMin(b.start||"00:00")<=nowM&&toMin(b.end||"00:00")>nowM):null;
-    const nextBk=!activeBk&&isToday?bookings.filter(b=>b.therapist===th.id&&toMin(b.start||"00:00")>nowM).sort((a,b)=>toMin(a.start)-toMin(b.start))[0]:null;
+    // Find active booking: start <= now < end (only valid if both start and end exist)
+    const activeBk=isToday?bookings.find(b=>{
+      if(b.therapist!==th.id||!b.start||!b.end) return false;
+      const s=toMin(b.start); const e=toMin(b.end);
+      if(e<=s) return false; // skip invalid times
+      return s<=nowM && e>nowM;
+    }):null;
+    // Find next booking (upcoming today)
+    const nextBk=(!activeBk&&isToday)?bookings.filter(b=>{
+      if(b.therapist!==th.id||!b.start) return false;
+      return toMin(b.start)>nowM;
+    }).sort((a,b)=>toMin(a.start)-toMin(b.start))[0]:null;
     const hasBkToday=bookings.some(b=>b.therapist===th.id);
-    const sisaWaktu=activeBk?(()=>{const s=toMin(activeBk.end||"00:00")-nowM;return s>0?s+"m":"selesai";})():"";
-    const dot=activeBk?"var(--emerald)":hasBkToday?"var(--gold-400)":"#64748b";
+    // Sisa waktu active session
+    const sisaWaktu=activeBk?(()=>{
+      const e=toMin(activeBk.end||"00:00");
+      const s=nowM;
+      const diff=e-s;
+      return diff>0?diff+"m":"selesai";
+    })():"";
+    // Status dot & badge
+    const dot=activeBk?"var(--emerald)":hasBkToday?"var(--gold-400)":"rgba(248,243,236,0.3)";
     const bg=activeBk?"rgba(45,212,160,0.1)":hasBkToday?"rgba(201,160,65,0.07)":"rgba(5,28,34,0.5)";
     const border=activeBk?"1.5px solid rgba(45,212,160,0.35)":hasBkToday?"1.5px solid rgba(201,160,65,0.2)":"1.5px solid rgba(201,160,65,0.1)";
-    const badge=activeBk?"AKTIF":hasBkToday?"JADWAL":"KOSONG";
-    const badgeClr=activeBk?"var(--emerald)":hasBkToday?"var(--gold-400)":"#64748b";
+    const badge=isToday?(activeBk?"AKTIF":hasBkToday?"JADWAL":"KOSONG"):hasBkToday?"TERJADWAL":"KOSONG";
+    const badgeClr=activeBk?"var(--emerald)":hasBkToday?"var(--gold-400)":"rgba(248,243,236,0.35)";
+    const statusText=activeBk?("🟢 "+activeBk.patient+" · "+activeBk.start+"–"+activeBk.end+" · sisa "+sisaWaktu):
+                    nextBk?("⏳ "+nextBk.start+" · "+nextBk.patient):
+                    (isToday?"⚪ Tidak ada jadwal hari ini":"⚪ Tidak ada jadwal");
     return `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:9px;background:${bg};border:${border};margin-bottom:4px">
       <div style="width:8px;height:8px;border-radius:50%;background:${dot};flex-shrink:0;${activeBk?"box-shadow:0 0 6px var(--emerald)":""}"></div>
       <div style="flex:1;min-width:0">
         <div style="font-size:.75rem;font-weight:700;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${th.nama}</div>
-        <div style="font-size:.6rem;color:var(--cream-55);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${activeBk?"🟢 "+activeBk.patient+" · "+activeBk.start+"–"+activeBk.end+" · sisa "+sisaWaktu:nextBk?"⏳ "+nextBk.start+" · "+nextBk.patient:"⚪ Tidak ada jadwal"}</div>
+        <div style="font-size:.6rem;color:var(--cream-55);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${statusText}</div>
       </div>
       <div style="font-size:.55rem;font-weight:700;padding:2px 6px;border-radius:4px;flex-shrink:0;color:${badgeClr};border:1px solid ${badgeClr};opacity:.85">${badge}</div>
     </div>`;
@@ -3474,7 +3495,8 @@ function renderGrid(){
         const sisaText=bk.payStatus==="DP"&&bk.sisa_bayar>0?"Sisa: "+fmtRp(bk.sisa_bayar):"";const sisaHtml=sisaText?"<span class='bk-timer'>"+sisaText+"</span>":"<span class='bk-timer'></span>";
         const thLabel=th.nama||bk.therapistName||"";
         const subLine=bk.service?`${bk.service} · ${thLabel}`:(thLabel||bk.start+"–"+bk.end);
-        html+=`<td class="td-r" data-bk="${bk.id}" style="background:${cellBg};color:#fff;vertical-align:top;padding:2px;position:relative;" rowspan="${spans}" onclick="openDetail('${bk.id}')"><div class="bk-card"><div class="bk-name">${bk.patient}</div><div class="bk-sub">${subLine}</div><div class="bk-foot"><span class="bk-badge">${bk.payStatus}</span><span class="bk-timer" data-start="${bk.start}" data-end="${bk.end}">Menunggu...</span></div></div></td>`;
+        const lblHtml=getBookingLabels(bk).map(l=>`<span style="font-size:.45rem;font-weight:800;background:rgba(0,0,0,0.35);color:#fff;border-radius:3px;padding:1px 3px">${l.icon}${l.text}</span>`).join(" ");
+        html+=`<td class="td-r" data-bk="${bk.id}" style="background:${cellBg};color:#fff;vertical-align:top;padding:2px;position:relative;" rowspan="${spans}" onclick="openDetail('${bk.id}')"><div class="bk-card"><div class="bk-name">${bk.patient}${lblHtml?" "+lblHtml:""}</div><div class="bk-sub">${subLine}</div><div class="bk-foot"><span class="bk-badge">${bk.payStatus}</span><span class="bk-timer" data-start="${bk.start}" data-end="${bk.end}">Menunggu...</span></div></div></td>`;
       }else{
         html+=`<td class="td-r" style="background:${ti%2===0?"rgba(10,46,58,0.35)":"rgba(5,28,34,0.3)"}" onclick="openAddSlot('${room}','${ts}')"></td>`;
       }
@@ -3492,7 +3514,7 @@ function renderList(){
   const fP=document.getElementById("fp-filter")?.value||"";
   const fl=bookings.filter(b=>(!s||b.patient.toLowerCase().includes(s))&&(!fR||b.room===fR)&&(!fT||b.therapist===fT)&&(!fP||b.payStatus===fP));
   const c=document.getElementById("list-cont");if(!c)return;
-  if(!fl.length){c.innerHTML=`<div style="text-align:center;padding:40px;color:#94a3b8"><div style="font-size:2rem;margin-bottom:8px">📭</div><div style="font-weight:700">Tidak ada booking</div></div>`;return}
+  if(!fl.length){c.innerHTML=`<div style="text-align:center;padding:40px;color:var(--cream-55)"><div style="font-size:2rem;margin-bottom:8px">📭</div><div style="font-weight:700">Tidak ada booking</div></div>`;return}
   c.innerHTML=fl.map(b=>{
     const th=getTh(b.therapist);const[cl,bg]=PAY_CLR[b.payStatus]||["#94a3b8","#f1f5f9"];
     const dur=b.duration||calcDur(b.start,b.end)||60;
@@ -3503,7 +3525,10 @@ function renderList(){
     return`<div class="li-item" onclick="openDetail('${b.id}')">
       <div class="li-av" style="background:${cellBg};border-radius:10px;width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.75rem;color:#fff">${b.patient.slice(0,2).toUpperCase()}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-weight:800;color:var(--cream);font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</div>
+        <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+          <span style="font-weight:800;color:var(--cream);font-size:.88rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</span>
+          ${renderBookingLabelHTML(b)}
+        </div>
         <div style="font-size:.65rem;color:var(--cream-55);margin-top:1px">${b.service||"-"} · ${thNama}</div>
         <div style="font-size:.62rem;color:var(--cream-55);margin-top:1px">🚪 ${b.room} · ⏰ ${b.start}–${b.end||"?"}</div>
         ${sisaTxt?`<div style="font-size:.62rem;font-weight:700;color:var(--rose);margin-top:2px">${sisaTxt}</div>`:""}
@@ -3575,16 +3600,68 @@ function renderRekap(){
     })()}`;
   document.getElementById("rek-pay").innerHTML=PAY_ST.map(s=>{
     const c=bookings.filter(b=>b.payStatus===s).length;const[cl]=PAY_CLR[s];
-    return`<div class="rek-row"><div style="width:9px;height:9px;border-radius:50%;background:${cl};flex-shrink:0"></div><div style="flex:1;font-size:.8rem">${s}</div><div style="font-weight:800;color:${cl}">${c}</div><div style="width:70px;height:7px;background:#f1f5f9;border-radius:3px"><div style="width:${c/t*100}%;height:100%;border-radius:3px;background:${cl}"></div></div></div>`;
+    return`<div class="rek-row"><div style="width:9px;height:9px;border-radius:50%;background:${cl};flex-shrink:0"></div><div style="flex:1;font-size:.8rem">${s}</div><div style="font-weight:800;color:${cl}">${c}</div><div style="width:70px;height:7px;background:rgba(248,243,236,0.1);border-radius:3px"><div style="width:${c/t*100}%;height:100%;border-radius:3px;background:${cl}"></div></div></div>`;
   }).join("");
   document.getElementById("rek-room").innerHTML=ROOMS.map(r=>{
     const c=bookings.filter(b=>b.room===r).length;
-    return`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:3px"><span style="font-weight:700">${r}</span><span style="color:#64748b">${c} sesi</span></div><div style="height:7px;background:#f1f5f9;border-radius:3px"><div style="width:${Math.min(c/TIME_SLOTS.length*100,100)}%;height:100%;border-radius:3px;background:var(--blue)"></div></div></div>`;
+    return`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:3px"><span style="font-weight:700;color:var(--cream)">${r}</span><span style="color:var(--cream-55)">${c} sesi</span></div><div style="height:7px;background:rgba(248,243,236,0.1);border-radius:3px"><div style="width:${Math.min(c/TIME_SLOTS.length*100,100)}%;height:100%;border-radius:3px;background:var(--blue)"></div></div></div>`;
   }).join("");
   const _rekTh=document.getElementById("rek-th");if(_rekTh) _rekTh.innerHTML=THERAPISTS.map(th=>{
     const c=bookings.filter(b=>b.therapist===th.id).length;
-    return`<div class="rek-row"><div style="width:9px;height:9px;border-radius:3px;background:${th.warna};flex-shrink:0"></div><div style="flex:1;font-size:.8rem;font-weight:600">${th.nama}</div><div style="font-weight:800;color:${th.warna}">${c}</div><div style="width:70px;height:7px;background:#f1f5f9;border-radius:3px"><div style="width:${c/t*100}%;height:100%;border-radius:3px;background:${th.warna}"></div></div></div>`;
+    return`<div class="rek-row"><div style="width:9px;height:9px;border-radius:3px;background:${th.warna};flex-shrink:0"></div><div style="flex:1;font-size:.8rem;font-weight:600;color:var(--cream)">${th.nama}</div><div style="font-weight:800;color:${th.warna}">${c}</div><div style="width:70px;height:7px;background:rgba(248,243,236,0.1);border-radius:3px"><div style="width:${c/t*100}%;height:100%;border-radius:3px;background:${th.warna}"></div></div></div>`;
   }).join("");
+
+  // ── REKAP MEMBER ─────────────────────────────────────────
+  const memberBks=bookings.filter(b=>isMemberBooking(b));
+  const privateBks=bookings.filter(b=>isPrivateRoomBooking(b));
+  const minyakBks=bookings.filter(b=>isMinyakBooking(b));
+  const rekMemberEl=document.getElementById("rek-member");
+  if(rekMemberEl){
+    // Summary baris
+    const summaryRows=[
+      {icon:"👑",label:"Member",count:memberBks.length,total:memberBks.length*25000,clr:"var(--gold-400)",bg:"rgba(201,160,65,0.12)"},
+      {icon:"🚪",label:"Private Room",count:privateBks.length,total:privateBks.length*50000,clr:"#5DADE2",bg:"rgba(93,173,226,0.12)"},
+      {icon:"🫙",label:"Minyak Hangat",count:minyakBks.length,total:minyakBks.length*35000,clr:"var(--emerald)",bg:"rgba(45,212,160,0.12)"},
+    ];
+    const totalBiayaTambahan=memberBks.length*25000+privateBks.length*50000+minyakBks.length*35000;
+    let html=summaryRows.map(r=>`
+      <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:${r.bg};border-radius:9px;margin-bottom:6px;border:1px solid ${r.clr}30">
+        <span style="font-size:.95rem">${r.icon}</span>
+        <div style="flex:1">
+          <div style="font-size:.78rem;font-weight:700;color:var(--cream)">${r.label}</div>
+          <div style="font-size:.62rem;color:var(--cream-55)">${r.count} transaksi hari ini</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:.8rem;font-weight:900;color:${r.clr}">${r.count}×</div>
+          <div style="font-size:.65rem;color:var(--cream-55)">${fmtRp(r.total)}</div>
+        </div>
+      </div>`).join("");
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(201,160,65,0.08);border-radius:9px;border:1px solid rgba(201,160,65,0.25);margin-top:4px">
+      <span style="font-size:.75rem;font-weight:700;color:var(--cream-80)">💰 Total Biaya Tambahan</span>
+      <span style="font-size:.85rem;font-weight:900;color:var(--gold-400)">${fmtRp(totalBiayaTambahan)}</span>
+    </div>`;
+    // Daftar pasien member hari ini
+    if(memberBks.length>0){
+      html+=`<div style="font-size:.65rem;font-weight:700;color:var(--gold-400);text-transform:uppercase;letter-spacing:.12em;margin:10px 0 6px">Daftar Pasien Member Hari Ini</div>`;
+      html+=memberBks.map(b=>{
+        const th=getTh(b.therapist);
+        return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(248,243,236,0.07)">
+          <div style="width:32px;height:32px;border-radius:9px;background:rgba(201,160,65,0.2);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900;color:var(--gold-300);flex-shrink:0">${b.patient.slice(0,2).toUpperCase()}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:.8rem;font-weight:700;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</div>
+            <div style="font-size:.62rem;color:var(--cream-55)">${b.service||"-"} · ${th.nama||"-"}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-size:.72rem;font-weight:800;color:var(--gold-400)">${b.start}–${b.end||"?"}</div>
+            <div style="font-size:.6rem;color:var(--cream-55)">${b.room}</div>
+          </div>
+        </div>`;
+      }).join("");
+    } else {
+      html+=`<div style="text-align:center;padding:16px;color:var(--cream-55);font-size:.75rem">Belum ada pasien member hari ini</div>`;
+    }
+    rekMemberEl.innerHTML=html;
+  }
 }
 
 // ═══ NAVIGATION ═══════════════════════════════════════════════
@@ -4040,7 +4117,7 @@ function updateSummary(){
       const m2=(m2el?.options[m2el.selectedIndex]?.text||"").replace(/^[^\s]+ /,"");
       return `Split: ${m1} ${fmtRp(a1)} + ${m2} ${fmtRp(a2)}`;
     })():formSel.method],
-  ].map(([k,v])=>`<div class="sumrow"><span style="color:#64748b">${k}</span><span style="font-weight:700">${v}</span></div>`).join("");
+  ].map(([k,v])=>`<div class="sumrow"><span style="color:var(--cream-55)">${k}</span><span style="font-weight:700">${v}</span></div>`).join("");
 }
 
 // ── BIAYA TAMBAHAN OPTIONAL ──────────────────────────────────
@@ -4258,6 +4335,21 @@ function openDetail(id){
   document.getElementById("det-bar").style.background=th.warna;
   document.getElementById("det-name").textContent=bk.patient;
   document.getElementById("det-sub").textContent=(bk.phone||"No HP")+" · "+bk.id;
+  // Show booking labels (member / private room / minyak)
+  let detLabelsEl=document.getElementById("det-booking-labels");
+  const lblHTML=renderBookingLabelHTML(bk);
+  if(lblHTML){
+    if(!detLabelsEl){
+      detLabelsEl=document.createElement("div");
+      detLabelsEl.id="det-booking-labels";
+      detLabelsEl.style.cssText="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px";
+      document.getElementById("det-name").parentNode.appendChild(detLabelsEl);
+    }
+    detLabelsEl.innerHTML=lblHTML;
+    detLabelsEl.style.display="flex";
+  } else if(detLabelsEl){
+    detLabelsEl.style.display="none";
+  }
   document.getElementById("det-badge").style.cssText=`background:${bg};color:${c}`;
   document.getElementById("det-badge").textContent=bk.payStatus;
   document.getElementById("det-sv").textContent=bk.service||"-";
@@ -4270,15 +4362,15 @@ function openDetail(id){
       const thBox=document.getElementById("det-th-box");
       if(thBox) thBox.parentNode.insertBefore(dpInfoEl,thBox);
     }
-    dpInfoEl.style.cssText="background:#fef3c7;border:1.5px solid #fde68a;border-radius:9px;padding:10px 14px;margin-bottom:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;";
+    dpInfoEl.style.cssText="background:rgba(217,119,6,0.12);border:1.5px solid rgba(217,119,6,0.3);border-radius:9px;padding:10px 14px;margin-bottom:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px;";
     dpInfoEl.innerHTML=`
       <div style="text-align:center">
-        <div style="font-size:.6rem;color:#92400e;margin-bottom:2px">💵 DP Dibayar</div>
-        <div style="font-size:.9rem;font-weight:900;color:#d97706">${fmtRp(bk.dp_amount)}</div>
+        <div style="font-size:.6rem;color:var(--amber);margin-bottom:2px">💵 DP Dibayar</div>
+        <div style="font-size:.9rem;font-weight:900;color:var(--amber)">${fmtRp(bk.dp_amount)}</div>
       </div>
       <div style="text-align:center">
-        <div style="font-size:.6rem;color:#92400e;margin-bottom:2px">🔴 Sisa Pembayaran</div>
-        <div style="font-size:.9rem;font-weight:900;color:#dc2626">${fmtRp(bk.sisa_bayar||bk.harga-bk.dp_amount)}</div>
+        <div style="font-size:.6rem;color:var(--rose);margin-bottom:2px">🔴 Sisa Pembayaran</div>
+        <div style="font-size:.9rem;font-weight:900;color:var(--rose)">${fmtRp(bk.sisa_bayar||bk.harga-bk.dp_amount)}</div>
       </div>`;
   }else if(dpInfoEl){dpInfoEl.remove();}
   document.getElementById("det-room").textContent=bk.room;
@@ -4303,7 +4395,7 @@ function openDetail(id){
   document.getElementById("det-th-av").style.background=th.warna;
   document.getElementById("det-th-av").textContent=(bk.therapistName||th.nama).slice(0,2).toUpperCase();
   document.getElementById("det-th-name").textContent=(bk.therapistName||th.nama)+" · "+bk.therapist;
-  document.getElementById("det-catatan").innerHTML=bk.catatan?`<div style="background:#fef9c3;border-radius:9px;padding:9px 12px;font-size:.75rem;color:#713f12;margin-bottom:12px">📝 ${bk.catatan}</div>`:"";
+  document.getElementById("det-catatan").innerHTML=bk.catatan?`<div style="background:rgba(201,160,65,0.1);border:1px solid rgba(201,160,65,0.25);border-radius:9px;padding:9px 12px;font-size:.75rem;color:var(--cream-80);margin-bottom:12px">📝 ${bk.catatan}</div>`:"";
   // Check if session is active
   const now=new Date();
   const isToday=fmtISO(currentDate)===fmtISO(now);
@@ -4440,15 +4532,44 @@ function onPatientInput(val){
 // ══════════════════════════════════════════════════════════════════
 function isMemberBooking(b){
   const cat=b.catatan||"";
-  return cat.includes("Member")||cat.includes("member")||cat.includes("👑");
+  const svc=b.service||"";
+  // Detect member dari catatan (biaya tambahan disimpan di catatan)
+  return cat.includes("👑 Member")||cat.includes("[Member]")||
+         cat.toLowerCase().includes("member")||
+         svc.toLowerCase().includes("member");
+}
+function isPrivateRoomBooking(b){
+  const cat=b.catatan||"";
+  return cat.includes("🚪 Private Room")||cat.includes("Private Room");
+}
+function isMinyakBooking(b){
+  const cat=b.catatan||"";
+  return cat.includes("🫙 Minyak Hangat")||cat.includes("Minyak Hangat");
 }
 function isFormMember(){
   // Cek apakah form saat ini pilih member
   return !!(biayaTambahanSel&&biayaTambahanSel['member']);
 }
 function calcInsentif(b,th){
+  // Member tidak dapat komisi — komisi hanya dari harga LAYANAN (bukan biaya tambahan)
   if(isMemberBooking(b)) return 0;
-  return Math.round((b.harga||0)*((th.insentif||0)/100));
+  // Hitung komisi hanya dari harga pokok (tanpa biaya tambahan private room / minyak)
+  const hargaPokok=(b.harga||0) - (isPrivateRoomBooking(b)?50000:0) - (isMinyakBooking(b)?35000:0);
+  return Math.round(Math.max(hargaPokok,0)*((th.insentif||0)/100));
+}
+
+// Helper: get label badges for a booking (member/private/minyak)
+function getBookingLabels(b){
+  const labels=[];
+  if(isMemberBooking(b)) labels.push({icon:"👑",text:"Member",clr:"#C9A041",bg:"rgba(201,160,65,0.18)"});
+  if(isPrivateRoomBooking(b)) labels.push({icon:"🚪",text:"Private",clr:"#5DADE2",bg:"rgba(93,173,226,0.18)"});
+  if(isMinyakBooking(b)) labels.push({icon:"🫙",text:"Minyak",clr:"#2DD4A0",bg:"rgba(45,212,160,0.15)"});
+  return labels;
+}
+function renderBookingLabelHTML(b){
+  return getBookingLabels(b).map(l=>
+    `<span style="display:inline-flex;align-items:center;gap:2px;font-size:.55rem;font-weight:800;background:${l.bg};color:${l.clr};border-radius:4px;padding:1px 5px;border:1px solid ${l.clr}40">${l.icon} ${l.text}</span>`
+  ).join(" ");
 }
 
 
@@ -4783,9 +4904,9 @@ function renderSvList(){
   });
   let out="";
   Object.entries(cats).forEach(([kat,items])=>{
-    out+=`<div style="font-size:.65rem;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 5px">${kat}</div>`;
+    out+=`<div style="font-size:.65rem;font-weight:800;color:var(--gold-400);text-transform:uppercase;letter-spacing:.5px;margin:10px 0 5px">${kat}</div>`;
     items.forEach(s=>{
-      const hargaList=Object.entries(s.harga||{}).map(([d,h])=>`<span style="background:#dbeafe;color:#2563eb;border-radius:4px;padding:1px 6px;font-size:.58rem;font-weight:700;margin-right:3px">${d}mnt: Rp${(h/1000).toFixed(0)}k</span>`).join("");
+      const hargaList=Object.entries(s.harga||{}).map(([d,h])=>`<span style="background:rgba(201,160,65,0.15);color:var(--gold-300);border-radius:4px;padding:1px 6px;font-size:.58rem;font-weight:700;margin-right:3px">${d}mnt: Rp${(h/1000).toFixed(0)}k</span>`).join("");
       out+=`<div class="set-item" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;align-items:center;width:100%">
           <div class="set-item-name" style="font-size:.82rem">💆 ${s.nama}</div>
@@ -4794,7 +4915,7 @@ function renderSvList(){
             <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteSv('${s.nama}')">🗑</button>
           </div>
         </div>
-        <div>${hargaList||'<span style="font-size:.62rem;color:#94a3b8">Harga belum diset</span>'}</div>
+        <div>${hargaList||'<span style="font-size:.62rem;color:var(--cream-55)">Harga belum diset</span>'}</div>
       </div>`;
     });
   });
@@ -4858,7 +4979,7 @@ function renderDkList(){
       <button class="set-btn-sm" style="border-color:var(--blue);color:var(--blue);padding:4px 8px" onclick="openEditDk(${d.id})">✏️ Edit</button>
       <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deleteDk(${d.id})">🗑</button>
     </div></div>`).join(""):
-    '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.78rem">Belum ada diskon — tambahkan di atas</div>';
+    '<div style="text-align:center;padding:20px;color:var(--cream-55);font-size:.78rem">Belum ada diskon — tambahkan di atas</div>';
 }
 async function addDiskon(){
   const nama=document.getElementById("dk-nama").value.trim();
@@ -4893,7 +5014,7 @@ function renderPkList(){
       <button class="set-btn-sm" style="border-color:var(--blue);color:var(--blue);padding:4px 8px" onclick="openEditPk(${p.id})">✏️ Edit</button>
       <button class="set-btn-sm" style="border-color:var(--red);color:var(--red)" onclick="deletePk(${p.id})">🗑</button>
     </div></div>`).join(""):
-    '<div style="text-align:center;padding:20px;color:#94a3b8;font-size:.78rem">Belum ada paket — tambahkan di atas</div>';
+    '<div style="text-align:center;padding:20px;color:var(--cream-55);font-size:.78rem">Belum ada paket — tambahkan di atas</div>';
 }
 async function addPaket(){
   const nama=document.getElementById("pk-nama").value.trim();
@@ -5048,7 +5169,7 @@ async function loadLaporan(){
   document.getElementById("lp-content").style.opacity="0.4";
   try{
     const{data,error}=await db.from("app_booking")
-      .select("id,tanggal,patient,service,therapist_id,therapist_name,harga,dp_amount,sisa_bayar,pay_status,duration_min,method")
+      .select("id,tanggal,patient,service,therapist_id,therapist_name,harga,dp_amount,sisa_bayar,pay_status,duration_min,method,catatan")
       .gte("tanggal",from).lte("tanggal",to)
       .order("tanggal").order("start_time");
     if(error) throw error;
@@ -5058,7 +5179,7 @@ async function loadLaporan(){
       therapistName:r.therapist_name||"",
       harga:r.harga||0, dp:r.dp_amount||0, sisa:r.sisa_bayar||0,
       payStatus:r.pay_status||"Belum Bayar", dur:r.duration_min||60,
-      method:r.method||"-"
+      method:r.method||"-", catatan:r.catatan||""
     }));
   }catch(e){
     console.error("loadLaporan error:",e);
@@ -5141,7 +5262,7 @@ function renderLaporan(){
         <div style="width:34px;height:34px;border-radius:10px;background:${t.warna};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.78rem;flex-shrink:0">${t.nama.slice(0,2).toUpperCase()}</div>
         <div style="flex:1">
           <div style="font-weight:800;font-size:.85rem;color:var(--cream)">${t.nama}</div>
-          <div style="font-size:.62rem;color:var(--cream-55)">${t.insentifPct}% komisi · ${t.sesi} sesi</div>
+          <div style="font-size:.62rem;color:var(--cream-55)">${t.insentifPct}% komisi · ${t.sesi} sesi${t.member?` · <span style="color:var(--gold-400)">👑 ${t.member} member (no komisi)</span>`:""}</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:.88rem;font-weight:900;color:var(--amber)">${fmtRp(t.insentif)}</div>
@@ -5162,16 +5283,16 @@ function renderLaporan(){
   if(thLayEl){
     const _tlm=buildThLayananMap(d);
     thLayEl.innerHTML=Object.values(_tlm).map(t=>`
-      <div style="background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:8px;border:1px solid #f1f5f9;box-shadow:0 1px 4px rgba(0,0,0,.04)">
+      <div style="background:rgba(10,46,58,0.7);border-radius:10px;padding:10px 12px;margin-bottom:8px;border:1px solid rgba(201,160,65,0.15);box-shadow:var(--shadow-sm)">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
           <div style="width:28px;height:28px;border-radius:8px;background:${t.warna};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.68rem">${t.nama.slice(0,2).toUpperCase()}</div>
-          <div style="font-weight:800;font-size:.82rem;color:#0f172a">${t.nama}</div>
+          <div style="font-weight:800;font-size:.82rem;color:var(--cream)">${t.nama}</div>
         </div>
         ${Object.entries(t.lMap).sort((a,b)=>b[1].c-a[1].c).map(([sv,d2])=>`
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f8fafc;font-size:.72rem">
-            <span style="color:#374151;flex:1">${sv}</span>
-            <span style="font-weight:700;color:#2563eb;margin:0 8px">${d2.c}×</span>
-            <span style="color:#16a34a;font-weight:700">${fmtRp(d2.o)}</span>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(248,243,236,0.07);font-size:.72rem">
+            <span style="color:var(--cream-80);flex:1">${sv}</span>
+            <span style="font-weight:700;color:var(--gold-400);margin:0 8px">${d2.c}×</span>
+            <span style="color:var(--emerald);font-weight:700">${fmtRp(d2.o)}</span>
           </div>`).join("")}
       </div>`).join("");
   }
@@ -5188,8 +5309,8 @@ function renderLaporan(){
   document.getElementById("lp-top-layanan").innerHTML=svArr.map((s,i)=>`
     <div style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:3px">
-        <span style="font-weight:700;color:#0f172a">${i+1}. ${s.nama}</span>
-        <span style="color:#64748b">${s.count} sesi · ${fmtRp(s.omzet)}</span>
+        <span style="font-weight:700;color:var(--cream)">${i+1}. ${s.nama}</span>
+        <span style="color:var(--cream-55)">${s.count} sesi · ${fmtRp(s.omzet)}</span>
       </div>
       <div class="lp-sv-bar"><div class="lp-sv-fill" style="width:${(s.count/maxCount*100).toFixed(0)}%"></div></div>
     </div>`).join("");
@@ -5201,32 +5322,37 @@ function renderLaporan(){
 
   document.getElementById("lp-detail-list").innerHTML=Object.entries(grouped).map(([tgl,items])=>`
     <div style="margin-bottom:10px">
-      <div style="font-size:.68rem;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid #f1f5f9">${tgl}</div>
+      <div style="font-size:.68rem;font-weight:800;color:var(--gold-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;padding-bottom:4px;border-bottom:1px solid rgba(201,160,65,0.2)">${tgl}</div>
       ${items.map(b=>{
         const[c,bg]=PAY_CLR[b.payStatus]||["#94a3b8","#f1f5f9"];
         const th=getTh(b.therapistId);
         const insentif=calcInsentif(b,th);
-        const insentifLbl=isMemberBooking(b)?'<span style="color:#dc2626;font-size:.6rem">❌ No Komisi (Member)</span>':fmtRp(insentif)+' ('+((th.insentif||0))+'%)';
+        const insentifLbl=isMemberBooking(b)?'<span style="color:var(--rose);font-size:.6rem">❌ No Komisi (Member)</span>':fmtRp(insentif)+' ('+((th.insentif||0))+'%)';
         const cellClr=b.payStatus==="Lunas"?"#16a34a":b.payStatus==="DP"?"#d97706":"#dc2626";
         const dpBlock=b.payStatus==="DP"
-          ?`<div style="margin-top:6px;background:#fef9c3;border-radius:7px;padding:6px 10px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
-              <div><div style="font-size:.55rem;color:#92400e">💵 DP Dibayar</div><div style="font-size:.72rem;font-weight:800;color:#d97706">${fmtRp(b.dp)}</div></div>
-              <div><div style="font-size:.55rem;color:#92400e">🔴 Sisa Bayar</div><div style="font-size:.72rem;font-weight:800;color:#dc2626">${fmtRp(b.sisa)}</div></div>
+          ?`<div style="margin-top:6px;background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.25);border-radius:7px;padding:6px 10px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+              <div><div style="font-size:.55rem;color:var(--amber)">💵 DP Dibayar</div><div style="font-size:.72rem;font-weight:800;color:var(--amber)">${fmtRp(b.dp)}</div></div>
+              <div><div style="font-size:.55rem;color:var(--rose)">🔴 Sisa Bayar</div><div style="font-size:.72rem;font-weight:800;color:var(--rose)">${fmtRp(b.sisa)}</div></div>
             </div>`:"";
-        return`<div style="background:#fff;border:1px solid #f1f5f9;border-left:3px solid ${cellClr};border-radius:11px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.04)">
+        // Build member/extra label
+        const lblHtml=renderBookingLabelHTML(b);
+        return`<div style="background:rgba(10,46,58,0.7);border:1px solid rgba(201,160,65,0.12);border-left:3px solid ${cellClr};border-radius:11px;padding:10px 12px;margin-bottom:8px;box-shadow:var(--shadow-sm)">
           <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
             <div style="width:36px;height:36px;border-radius:10px;background:${cellClr};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.72rem;flex-shrink:0">${b.patient.slice(0,2).toUpperCase()}</div>
             <div style="flex:1;min-width:0">
-              <div style="font-size:.88rem;font-weight:800;color:#0f172a">${b.patient}</div>
-              <div style="font-size:.62rem;color:#64748b">${b.service||"-"} · ${b.dur}mnt</div>
+              <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">
+                <span style="font-size:.88rem;font-weight:800;color:var(--cream)">${b.patient}</span>
+                ${lblHtml}
+              </div>
+              <div style="font-size:.62rem;color:var(--cream-55)">${b.service||"-"} · ${b.dur}mnt</div>
             </div>
             <span style="background:${bg};color:${c};font-size:.6rem;font-weight:700;border-radius:6px;padding:3px 8px;white-space:nowrap">${b.payStatus}</span>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;background:#f8fafc;border-radius:8px;padding:8px;margin-bottom:4px">
-            <div><div style="font-size:.55rem;color:#94a3b8;margin-bottom:1px">👨‍⚕️ Terapis</div><div style="font-size:.72rem;font-weight:700;color:#0f172a">${b.therapistName||"-"}</div></div>
-            <div><div style="font-size:.55rem;color:#94a3b8;margin-bottom:1px">💳 Metode</div><div style="font-size:.72rem;font-weight:700;color:#0f172a">${b.method||"-"}</div></div>
-            <div><div style="font-size:.55rem;color:#94a3b8;margin-bottom:1px">💰 Harga</div><div style="font-size:.72rem;font-weight:800;color:#16a34a">${fmtRp(b.harga)}</div></div>
-            <div><div style="font-size:.55rem;color:#94a3b8;margin-bottom:1px">🏆 Insentif</div><div style="font-size:.72rem;font-weight:700;color:#d97706">${insentifLbl}</div></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;background:rgba(5,28,34,0.5);border-radius:8px;padding:8px;margin-bottom:4px">
+            <div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">👨‍⚕️ Terapis</div><div style="font-size:.72rem;font-weight:700;color:var(--cream)">${b.therapistName||"-"}</div></div>
+            <div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">💳 Metode</div><div style="font-size:.72rem;font-weight:700;color:var(--cream)">${b.method||"-"}</div></div>
+            <div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">💰 Harga</div><div style="font-size:.72rem;font-weight:800;color:var(--emerald)">${fmtRp(b.harga)}</div></div>
+            <div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">🏆 Insentif</div><div style="font-size:.72rem;font-weight:700;color:var(--amber)">${insentifLbl}</div></div>
           </div>
           ${dpBlock}
         </div>`}).join("")}
@@ -5589,9 +5715,9 @@ async function openCustomerDetail(id){
   </div>`).join("");
   // Medical notes
   document.getElementById("cd-medis-box").innerHTML=c.catatan_medis?`
-    <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:10px 14px;margin-bottom:4px">
-      <div style="font-size:.62rem;font-weight:700;color:#c2410c;margin-bottom:4px">⚕️ CATATAN MEDIS</div>
-      <div style="font-size:.78rem;color:#7c2d12;line-height:1.5">${c.catatan_medis}</div>
+    <div style="background:rgba(194,65,12,0.12);border:1px solid rgba(194,65,12,0.3);border-radius:10px;padding:10px 14px;margin-bottom:4px">
+      <div style="font-size:.62rem;font-weight:700;color:#f97316;margin-bottom:4px">⚕️ CATATAN MEDIS</div>
+      <div style="font-size:.78rem;color:var(--cream-80);line-height:1.5">${c.catatan_medis}</div>
     </div>`:"";
   // Visit history
   await loadCustomerVisits(c.nama, c.phone);
@@ -5615,14 +5741,14 @@ async function loadCustomerVisits(nama, phone){
     if(currentCustomer) currentCustomer.total_kunjungan=visits.length;
     document.getElementById("cd-visits").innerHTML=visits.map(v=>{
       const[c,bg]=PAY_CLR[v.pay_status]||["#94a3b8","#f1f5f9"];
-      return`<div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f8fafc">
+      return`<div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(248,243,236,0.08)">
         <div style="width:8px;height:8px;border-radius:50%;background:${v.pay_status==="Lunas"?"#059669":v.pay_status==="DP"?"#d97706":"#e11d48"};flex-shrink:0;margin-top:4px"></div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:.78rem;font-weight:700;color:var(--text)">${v.service||"–"}</div>
-          <div style="font-size:.62rem;color:var(--text-l)">${v.tanggal} · ${v.therapist_name||"–"} · ${v.duration_min||60}mnt</div>
+          <div style="font-size:.78rem;font-weight:700;color:var(--cream)">${v.service||"–"}</div>
+          <div style="font-size:.62rem;color:var(--cream-55)">${v.tanggal} · ${v.therapist_name||"–"} · ${v.duration_min||60}mnt</div>
         </div>
         <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:.78rem;font-weight:800;color:var(--green)">${fmtRp(v.harga||0)}</div>
+          <div style="font-size:.78rem;font-weight:800;color:var(--emerald)">${fmtRp(v.harga||0)}</div>
           <span style="font-size:.58rem;background:${bg};color:${c};border-radius:4px;padding:1px 5px;font-weight:700">${v.pay_status}</span>
         </div>
       </div>`;
