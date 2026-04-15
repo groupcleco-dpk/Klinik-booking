@@ -4625,21 +4625,20 @@ function isFormMember(){
   return !!(biayaTambahanSel&&biayaTambahanSel['member']);
 }
 function calcInsentif(b,th){
-  // Komisi terapis HANYA dari harga pricelist (bukan total invoice)
-  // Dapatkan harga pricelist dari service name + duration
-  const svNama = (b.service||"").split(" + ")[0]; // ambil service utama saja
-  const dur = b.duration||60;
+  // Komisi terapis = harga pricelist × % komisi terapis
+  // Bukan dari total invoice (biaya tambahan tidak ikut)
+  // Terapis TETAP dapat komisi meski pasien beli member
+  const svNama = (b.service||"").split(" + ")[0];
+  const dur = b.duration_min || b.duration || b.dur || 60;
   const hargaPricelist = getPrice(svNama, dur) || b.hargaPricelist || 0;
-  // Gunakan harga pricelist sebagai basis, BUKAN harga total (yang include biaya tambahan)
+  // Jika pricelist tidak ditemukan, fallback ke harga booking dikurangi biaya tambahan
   const basis = hargaPricelist > 0 ? hargaPricelist : Math.max(
     (b.harga||0)
-    - (isMemberBooking(b) ? (BIAYA_TAMBAHAN_LIST.member?.harga||25000) : 0)
     - (isPrivateRoomBooking(b) ? (BIAYA_TAMBAHAN_LIST.private_room?.harga||50000) : 0)
-    - (isMinyakBooking(b) ? (BIAYA_TAMBAHAN_LIST.minyak_hangat?.harga||35000) : 0),
+    - (isMinyakBooking(b)      ? (BIAYA_TAMBAHAN_LIST.minyak_hangat?.harga||35000) : 0)
+    - (isMemberBooking(b)      ? (BIAYA_TAMBAHAN_LIST.member?.harga||25000) : 0),
     0
   );
-  // Terapis tidak dapat komisi dari member
-  if(isMemberBooking(b)) return 0;
   return Math.round(basis * ((th.insentif||0)/100));
 }
 
@@ -5365,7 +5364,7 @@ function renderLaporan(){
         <div style="width:34px;height:34px;border-radius:10px;background:${t.warna};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.78rem;flex-shrink:0">${t.nama.slice(0,2).toUpperCase()}</div>
         <div style="flex:1">
           <div style="font-weight:800;font-size:.85rem;color:var(--cream)">${t.nama}</div>
-          <div style="font-size:.62rem;color:var(--cream-55)">${t.insentifPct}% komisi · ${t.sesi} sesi${t.member?` · <span style="color:var(--gold-400)">👑 ${t.member} member (no komisi)</span>`:""}</div>
+          <div style="font-size:.62rem;color:var(--cream-55)">${t.insentifPct}% komisi · ${t.sesi} sesi${t.member?` · <span style="color:var(--gold-400)">👑 ${t.member} member</span>`:""}</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:.88rem;font-weight:900;color:var(--amber)">${fmtRp(t.insentif)}</div>
@@ -5481,7 +5480,7 @@ function renderLaporan(){
         const[c,bg]=PAY_CLR[b.payStatus]||["#94a3b8","#f1f5f9"];
         const th=getTh(b.therapistId);
         const insentif=calcInsentif(b,th);
-        const insentifLbl=isMemberBooking(b)?'<span style="color:var(--rose);font-size:.6rem">❌ No Komisi (Member)</span>':fmtRp(insentif)+' ('+((th.insentif||0))+'%)';
+        const insentifLbl=fmtRp(insentif)+' ('+(th.insentif||0)+'%)';
         const resep=getResepsionisFromBooking(b);
         const komisiResep=calcKomisiResepsionis(b);
         const cellClr=b.payStatus==="Lunas"?"#16a34a":b.payStatus==="DP"?"#d97706":"#dc2626";
