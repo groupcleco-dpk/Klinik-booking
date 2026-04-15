@@ -1977,6 +1977,7 @@ button[style*="50%"][style*="background:#"] {
     <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">🚪 Kepadatan Room</div><div id="rek-room"></div></div>
     <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">👥 Sesi per Terapis</div><div id="rek-th"></div></div>
     <div class="rek-card" id="rek-member-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">👑 Rekap Member Hari Ini</div><div id="rek-member"></div></div>
+    <div class="rek-card"><div style="font-weight:800;font-size:.85rem;color:var(--gold-300);margin-bottom:10px">👩‍💼 Komisi Resepsionis Hari Ini</div><div id="rek-resep"></div></div>
   </div>
 </div>
 
@@ -2025,6 +2026,18 @@ button[style*="50%"][style*="background:#"] {
         <div style="margin-top:10px;padding:8px 10px;background:rgba(45,212,160,0.1);border:1px solid rgba(45,212,160,0.25);border-radius:9px;display:flex;justify-content:space-between">
           <span style="font-size:.75rem;font-weight:700;color:var(--cream-80)">Total Insentif Semua Terapis</span>
           <span style="font-size:.82rem;font-weight:900;color:var(--emerald)" id="lp-total-insentif">Rp 0</span>
+        </div>
+      </div>
+      <!-- Resepsionis Komisi -->
+      <div style="background:rgba(10,46,58,0.75);border:1.5px solid rgba(201,160,65,0.22);border-radius:14px;padding:12px 14px;margin-bottom:10px;box-shadow:var(--shadow)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div style="font-weight:800;font-size:.82rem;color:var(--gold-300)">👩‍💼 Komisi Resepsionis</div>
+          <span style="font-size:.62rem;color:var(--cream-55)" id="lp-resep-count"></span>
+        </div>
+        <div id="lp-resep-list"></div>
+        <div style="margin-top:8px;padding:8px 10px;background:rgba(45,212,160,0.1);border:1px solid rgba(45,212,160,0.25);border-radius:9px;display:flex;justify-content:space-between">
+          <span style="font-size:.75rem;font-weight:700;color:var(--cream-80)">Total Komisi Semua Resepsionis</span>
+          <span style="font-size:.82rem;font-weight:900;color:var(--emerald)" id="lp-total-resep-komisi">Rp 0</span>
         </div>
       </div>
       <!-- Top Layanan -->
@@ -2409,6 +2422,11 @@ button[style*="50%"][style*="background:#"] {
           </div>
         </div>
         <div class="ff"><label class="fl">📝 Catatan</label><textarea class="fi" id="fp-catatan" rows="3" style="resize:none;line-height:1.5"></textarea></div>
+        <!-- RESEPSIONIS -->
+        <div class="ff">
+          <label class="fl">👩‍💼 Resepsionis <span style="font-size:.6rem;color:var(--cream-55);font-weight:400">(wajib jika ada member)</span></label>
+          <div id="fp-resep-list" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+        </div>
       </div>
       <div id="fpanel-1" class="hidden">
         <div class="ff"><label class="fl">📆 Tanggal</label><input class="fi" id="fp-date" type="date"></div>
@@ -2454,43 +2472,8 @@ button[style*="50%"][style*="background:#"] {
         <!-- BIAYA TAMBAHAN OPTIONAL -->
         <div class="ff">
           <label class="fl">➕ Biaya Tambahan <span style="font-size:.6rem;color:var(--text-l);font-weight:500">(opsional)</span></label>
-          <div style="display:flex;flex-direction:column;gap:6px;background:rgba(5,28,34,0.4);border:1px solid rgba(201,160,65,0.15);border-radius:var(--radius-sm);padding:10px 12px">
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0" onclick="toggleBiayaTambahan('member')">
-              <div id="chk-member" style="width:20px;height:20px;border-radius:5px;border:2px solid rgba(201,160,65,0.4);background:rgba(248,243,236,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s">
-                <span id="chk-member-icon" style="display:none;color:var(--teal-900);font-size:.72rem;font-weight:900">✓</span>
-              </div>
-              <div style="flex:1">
-                <div style="font-size:.82rem;font-weight:600;color:var(--cream-80)">👑 Member</div>
-                <div style="font-size:.65rem;color:var(--cream-55)">Biaya keanggotaan member</div>
-              </div>
-              <div style="font-size:.78rem;font-weight:700;color:var(--gold-400)">+ Rp 25.000</div>
-            </label>
-            <div style="height:1px;background:rgba(248,243,236,0.06)"></div>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0" onclick="toggleBiayaTambahan('private_room')">
-              <div id="chk-private_room" style="width:20px;height:20px;border-radius:5px;border:2px solid rgba(201,160,65,0.4);background:rgba(248,243,236,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s">
-                <span id="chk-private_room-icon" style="display:none;color:var(--teal-900);font-size:.72rem;font-weight:900">✓</span>
-              </div>
-              <div style="flex:1">
-                <div style="font-size:.82rem;font-weight:600;color:var(--cream-80)">🚪 Private Room</div>
-                <div style="font-size:.65rem;color:var(--cream-55)">Upgrade ke ruangan private</div>
-              </div>
-              <div style="font-size:.78rem;font-weight:700;color:var(--gold-400)">+ Rp 50.000</div>
-            </label>
-            <div style="height:1px;background:rgba(248,243,236,0.06)"></div>
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0" onclick="toggleBiayaTambahan('minyak_hangat')">
-              <div id="chk-minyak_hangat" style="width:20px;height:20px;border-radius:5px;border:2px solid rgba(201,160,65,0.4);background:rgba(248,243,236,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s">
-                <span id="chk-minyak_hangat-icon" style="display:none;color:var(--teal-900);font-size:.72rem;font-weight:900">✓</span>
-              </div>
-              <div style="flex:1">
-                <div style="font-size:.82rem;font-weight:600;color:var(--cream-80)">🫙 Minyak Hangat</div>
-                <div style="font-size:.65rem;color:var(--cream-55)">Tambahan minyak hangat esensial</div>
-              </div>
-              <div style="font-size:.78rem;font-weight:700;color:var(--gold-400)">+ Rp 35.000</div>
-            </label>
-            <div id="biaya-tambahan-total" style="display:none;border-top:1px solid rgba(201,160,65,0.2);margin-top:4px;padding-top:8px;display:none;justify-content:space-between;align-items:center">
-              <span style="font-size:.72rem;font-weight:700;color:var(--gold-400)">Total Biaya Tambahan</span>
-              <span style="font-size:.8rem;font-weight:800;color:var(--gold-300)" id="biaya-tambahan-total-val"></span>
-            </div>
+          <div id="biaya-tambahan-form-wrap" style="display:flex;flex-direction:column;gap:6px;background:rgba(5,28,34,0.4);border:1px solid rgba(201,160,65,0.15);border-radius:var(--radius-sm);padding:10px 12px">
+            <!-- rendered by renderBiayaTambahanForm() -->
           </div>
         </div>
         <div class="ff"><label class="fl">📊 Status Bayar</label><div style="display:flex;gap:6px" id="fp-pay-list"></div></div>
@@ -2636,6 +2619,8 @@ button[style*="50%"][style*="background:#"] {
       <button class="stab" onclick="setTab(1,this)">💆 Layanan</button>
       <button class="stab" onclick="setTab(2,this)">🏷️ Diskon</button>
       <button class="stab" onclick="setTab(3,this)">📦 Paket</button>
+      <button class="stab" onclick="setTab(4,this)">👩‍💼 Resep</button>
+      <button class="stab" onclick="setTab(5,this)">➕ B.Tambah</button>
     </div>
     <div class="sbody">
       <!-- TAB 0: TERAPIS -->
@@ -2709,6 +2694,22 @@ button[style*="50%"][style*="background:#"] {
           <button class="btn-g" style="width:100%;padding:10px;font-size:.82rem" onclick="addPaket()">+ Tambah Paket</button>
         </div>
         <div id="set-pk-list"></div>
+      </div>
+      <!-- TAB 4: RESEPSIONIS -->
+      <div id="set-4" class="hidden">
+        <div style="font-size:.72rem;color:var(--cream-55);margin-bottom:10px;line-height:1.5">Resepsionis yang bisa dipilih saat input booking. Komisi resepsionis dihitung dari penjualan biaya tambahan (Member, Private Room, Minyak).</div>
+        <div style="background:rgba(5,28,34,0.5);border-radius:9px;padding:12px;margin-bottom:12px;border:1px solid rgba(201,160,65,0.15)">
+          <div style="display:flex;gap:6px">
+            <input class="fi" id="new-resep-nama" placeholder="Nama resepsionis..." style="flex:1;text-transform:uppercase">
+            <button class="btn-g" style="padding:9px 14px;font-size:.78rem" onclick="addResepsionis()">+ Tambah</button>
+          </div>
+        </div>
+        <div id="set-resep-list"></div>
+      </div>
+      <!-- TAB 5: BIAYA TAMBAHAN -->
+      <div id="set-5" class="hidden">
+        <div style="font-size:.72rem;color:var(--cream-55);margin-bottom:10px;line-height:1.5">Atur harga dan komisi untuk setiap biaya tambahan. Komisi resepsionis dari biaya tambahan ini, <b style="color:var(--gold-300)">tidak masuk ke terapis</b>.</div>
+        <div id="set-biaya-list"></div>
       </div>
     </div>
   </div>
@@ -3081,6 +3082,8 @@ async function afterLogin(){
   document.getElementById("app").classList.remove("hidden");
   // Load konfigurasi global (PIN, GS URL, dll) dari Supabase
   try{ await loadConfig(); }catch(e){ console.warn("loadConfig failed:",e); }
+  // Load resepsionis & biaya tambahan config
+  try{ await loadResepsionisConfig(); }catch(e){ console.warn("loadResepsionisConfig failed:",e); }
   // Load master data (terapis, layanan) - fallback to defaults if Supabase unavailable
   try{
     await loadMaster();
@@ -3617,13 +3620,16 @@ function renderRekap(){
   const minyakBks=bookings.filter(b=>isMinyakBooking(b));
   const rekMemberEl=document.getElementById("rek-member");
   if(rekMemberEl){
+    const mHarga=BIAYA_TAMBAHAN_LIST.member?.harga||25000;
+    const pHarga=BIAYA_TAMBAHAN_LIST.private_room?.harga||50000;
+    const miyHarga=BIAYA_TAMBAHAN_LIST.minyak_hangat?.harga||35000;
     // Summary baris
     const summaryRows=[
-      {icon:"👑",label:"Member",count:memberBks.length,total:memberBks.length*25000,clr:"var(--gold-400)",bg:"rgba(201,160,65,0.12)"},
-      {icon:"🚪",label:"Private Room",count:privateBks.length,total:privateBks.length*50000,clr:"#5DADE2",bg:"rgba(93,173,226,0.12)"},
-      {icon:"🫙",label:"Minyak Hangat",count:minyakBks.length,total:minyakBks.length*35000,clr:"var(--emerald)",bg:"rgba(45,212,160,0.12)"},
+      {icon:"👑",label:"Member",count:memberBks.length,total:memberBks.length*mHarga,clr:"var(--gold-400)",bg:"rgba(201,160,65,0.12)"},
+      {icon:"🚪",label:"Private Room",count:privateBks.length,total:privateBks.length*pHarga,clr:"#5DADE2",bg:"rgba(93,173,226,0.12)"},
+      {icon:"🫙",label:"Minyak Hangat",count:minyakBks.length,total:minyakBks.length*miyHarga,clr:"var(--emerald)",bg:"rgba(45,212,160,0.12)"},
     ];
-    const totalBiayaTambahan=memberBks.length*25000+privateBks.length*50000+minyakBks.length*35000;
+    const totalBiayaTambahan=memberBks.length*mHarga+privateBks.length*pHarga+minyakBks.length*miyHarga;
     let html=summaryRows.map(r=>`
       <div style="display:flex;align-items:center;gap:8px;padding:7px 10px;background:${r.bg};border-radius:9px;margin-bottom:6px;border:1px solid ${r.clr}30">
         <span style="font-size:.95rem">${r.icon}</span>
@@ -3645,11 +3651,12 @@ function renderRekap(){
       html+=`<div style="font-size:.65rem;font-weight:700;color:var(--gold-400);text-transform:uppercase;letter-spacing:.12em;margin:10px 0 6px">Daftar Pasien Member Hari Ini</div>`;
       html+=memberBks.map(b=>{
         const th=getTh(b.therapist);
+        const resep=getResepsionisFromBooking(b);
         return`<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(248,243,236,0.07)">
           <div style="width:32px;height:32px;border-radius:9px;background:rgba(201,160,65,0.2);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:900;color:var(--gold-300);flex-shrink:0">${b.patient.slice(0,2).toUpperCase()}</div>
           <div style="flex:1;min-width:0">
             <div style="font-size:.8rem;font-weight:700;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${b.patient}</div>
-            <div style="font-size:.62rem;color:var(--cream-55)">${b.service||"-"} · ${th.nama||"-"}</div>
+            <div style="font-size:.62rem;color:var(--cream-55)">${b.service||"-"} · ${th.nama||"-"}${resep?` · <span style="color:var(--gold-400)">👩‍💼 ${resep}</span>`:""}</div>
           </div>
           <div style="text-align:right;flex-shrink:0">
             <div style="font-size:.72rem;font-weight:800;color:var(--gold-400)">${b.start}–${b.end||"?"}</div>
@@ -3662,6 +3669,8 @@ function renderRekap(){
     }
     rekMemberEl.innerHTML=html;
   }
+  // Render resepsionis komisi rekap
+  renderRekResepsionis();
 }
 
 // ═══ NAVIGATION ═══════════════════════════════════════════════
@@ -3766,6 +3775,8 @@ function initForm(){
     });
   }
   updateEndTime();
+  renderBiayaTambahanForm();
+  renderResepsionisButtons();
 }
 
 function updateEndTime(){
@@ -3967,6 +3978,9 @@ function resetForm(){
   ["fp-patient","fp-phone","fp-service","fp-dp-amount"].forEach(id=>{const el=document.getElementById(id);if(el){el.classList.remove("invalid");el.value="";}});
   ["err-fp-patient","err-fp-phone","err-fp-service","err-fp-dp-amount"].forEach(id=>{const el=document.getElementById(id);if(el)el.remove()});
   document.getElementById("fp-catatan").value="";
+  // Reset resepsionis
+  _formResepsionis="";
+  renderResepsionisButtons();
   // Hide DP wrap
   const dpW=document.getElementById("fp-dp-wrap");if(dpW)dpW.classList.add("hidden");
   // Reset biaya tambahan optional
@@ -3996,6 +4010,9 @@ function fillForm(bk){
   document.getElementById("fp-patient").value=bk.patient||"";
   document.getElementById("fp-phone").value=bk.phone||"";
   document.getElementById("fp-catatan").value=bk.catatan||"";
+  // Restore resepsionis
+  _formResepsionis = getResepsionisFromBooking(bk);
+  renderResepsionisButtons();
   // Use booking's tanggal if available, else currentDate
   document.getElementById("fp-date").value=bk.tanggal||fmtISO(currentDate);
   document.getElementById("fp-start").value=bk.start||"08:00";
@@ -4121,12 +4138,37 @@ function updateSummary(){
 }
 
 // ── BIAYA TAMBAHAN OPTIONAL ──────────────────────────────────
-const BIAYA_TAMBAHAN_LIST = {
-  member:      { label:"👑 Member",       harga: 25000 },
-  private_room:{ label:"🚪 Private Room", harga: 50000 },
-  minyak_hangat:{ label:"🫙 Minyak Hangat",harga: 35000 },
+// Dynamic — loaded from app_config "biaya_tambahan_config"
+// Default fallback:
+let BIAYA_TAMBAHAN_LIST = {
+  member:       { label:"👑 Member",       harga: 25000, komisi_resep: 10000, komisi_terapis: 0 },
+  private_room: { label:"🚪 Private Room", harga: 50000, komisi_resep: 15000, komisi_terapis: 0 },
+  minyak_hangat:{ label:"🫙 Minyak Hangat",harga: 35000, komisi_resep: 5000,  komisi_terapis: 0 },
 };
 let biayaTambahanSel = {}; // key => true/false
+
+// ── RESEPSIONIS ──────────────────────────────────────────────
+// Loaded from app_config "resepsionis_list"
+let RESEPSIONIS_LIST = ["AJENG","NIA","REGINA"];
+let _formResepsionis = ""; // selected in current form
+
+async function loadResepsionisConfig(){
+  try{
+    const val = await getConfig("resepsionis_list","");
+    if(val) RESEPSIONIS_LIST = JSON.parse(val);
+  }catch(e){}
+  try{
+    const val = await getConfig("biaya_tambahan_config","");
+    if(val){
+      const parsed = JSON.parse(val);
+      // merge with defaults so new keys always have komisi fields
+      Object.keys(parsed).forEach(k=>{
+        BIAYA_TAMBAHAN_LIST[k] = Object.assign({komisi_resep:0,komisi_terapis:0}, BIAYA_TAMBAHAN_LIST[k]||{}, parsed[k]);
+      });
+    }
+  }catch(e){}
+  renderBiayaTambahanForm();
+}
 
 function toggleBiayaTambahan(key){
   biayaTambahanSel[key] = !biayaTambahanSel[key];
@@ -4159,6 +4201,41 @@ function toggleBiayaTambahan(key){
   if(splitActive) updateSplitSisa();
 }
 
+// Render dynamic biaya tambahan checkboxes in form
+function renderBiayaTambahanForm(){
+  const wrap = document.getElementById("biaya-tambahan-form-wrap");
+  if(!wrap) return;
+  const keys = Object.keys(BIAYA_TAMBAHAN_LIST);
+  wrap.innerHTML = keys.map((key,i)=>{
+    const bt = BIAYA_TAMBAHAN_LIST[key];
+    const isFirst = i===0;
+    return `${!isFirst?'<div style="height:1px;background:rgba(248,243,236,0.06)"></div>':''}
+    <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:4px 0" onclick="toggleBiayaTambahan('${key}')">
+      <div id="chk-${key}" style="width:20px;height:20px;border-radius:5px;border:2px solid rgba(201,160,65,0.4);background:rgba(248,243,236,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s">
+        <span id="chk-${key}-icon" style="display:none;color:var(--teal-900);font-size:.72rem;font-weight:900">✓</span>
+      </div>
+      <div style="flex:1">
+        <div style="font-size:.82rem;font-weight:600;color:var(--cream-80)">${bt.label}</div>
+        <div style="font-size:.62rem;color:var(--cream-55)">Komisi resep: ${fmtRp(bt.komisi_resep||0)}</div>
+      </div>
+      <div style="font-size:.78rem;font-weight:700;color:var(--gold-400)">+ ${fmtRp(bt.harga)}</div>
+    </label>`;
+  }).join("") + `
+  <div id="biaya-tambahan-total" style="display:none;border-top:1px solid rgba(201,160,65,0.2);margin-top:4px;padding-top:8px;justify-content:space-between;align-items:center">
+    <span style="font-size:.72rem;font-weight:700;color:var(--gold-400)">Total Biaya Tambahan</span>
+    <span style="font-size:.8rem;font-weight:800;color:var(--gold-300)" id="biaya-tambahan-total-val"></span>
+  </div>`;
+  // Re-apply existing selections
+  Object.keys(biayaTambahanSel).forEach(k=>{
+    if(biayaTambahanSel[k]){
+      const chk=document.getElementById("chk-"+k);
+      const icon=document.getElementById("chk-"+k+"-icon");
+      if(chk){chk.style.background="var(--gold-500)";chk.style.borderColor="var(--gold-400)";}
+      if(icon)icon.style.display="inline";
+    }
+  });
+}
+
 function getBiayaTambahan(){
   return Object.entries(biayaTambahanSel)
     .filter(([k,v]) => v && BIAYA_TAMBAHAN_LIST[k])
@@ -4167,12 +4244,7 @@ function getBiayaTambahan(){
 
 function resetBiayaTambahan(){
   biayaTambahanSel = {};
-  Object.keys(BIAYA_TAMBAHAN_LIST).forEach(key => {
-    const chk = document.getElementById("chk-"+key);
-    const icon = document.getElementById("chk-"+key+"-icon");
-    if(chk){ chk.style.background="rgba(248,243,236,0.05)"; chk.style.borderColor="rgba(201,160,65,0.4)"; }
-    if(icon){ icon.style.display="none"; }
-  });
+  renderBiayaTambahanForm();
   const totalRow = document.getElementById("biaya-tambahan-total");
   if(totalRow) totalRow.style.display = "none";
 }
@@ -4237,7 +4309,9 @@ async function submitForm(){
     .join(", ");
   const catatanBase=document.getElementById("fp-catatan").value;
   const svFull=extraLayanan.length>0?(svNama+" + "+getExtraLayananNames()):svNama;
-  const catatanFull=biayaTambahanCatatan?(catatanBase?catatanBase+" | [Biaya Tambahan: "+biayaTambahanCatatan+"]":"[Biaya Tambahan: "+biayaTambahanCatatan+"]"):catatanBase;
+  // Include resepsionis in catatan
+  const resepTag = _formResepsionis ? `[Resep:${_formResepsionis}]` : "";
+  const catatanFull=(biayaTambahanCatatan?(catatanBase?catatanBase+" | [Biaya Tambahan: "+biayaTambahanCatatan+"]":"[Biaya Tambahan: "+biayaTambahanCatatan+"]"):catatanBase)+(resepTag?" "+resepTag:"");
   const paketData=document.getElementById("fp-paket")?.value||"";
   const dpAmount=formSel.payStatus==="DP"?parseInt(document.getElementById("fp-dp-amount")?.value||0):0;
   const sisaBayar=formSel.payStatus==="DP"?Math.max(harga-dpAmount,0):0;
@@ -4551,11 +4625,38 @@ function isFormMember(){
   return !!(biayaTambahanSel&&biayaTambahanSel['member']);
 }
 function calcInsentif(b,th){
-  // Member tidak dapat komisi — komisi hanya dari harga LAYANAN (bukan biaya tambahan)
+  // Komisi terapis HANYA dari harga pricelist (bukan total invoice)
+  // Dapatkan harga pricelist dari service name + duration
+  const svNama = (b.service||"").split(" + ")[0]; // ambil service utama saja
+  const dur = b.duration||60;
+  const hargaPricelist = getPrice(svNama, dur) || b.hargaPricelist || 0;
+  // Gunakan harga pricelist sebagai basis, BUKAN harga total (yang include biaya tambahan)
+  const basis = hargaPricelist > 0 ? hargaPricelist : Math.max(
+    (b.harga||0)
+    - (isMemberBooking(b) ? (BIAYA_TAMBAHAN_LIST.member?.harga||25000) : 0)
+    - (isPrivateRoomBooking(b) ? (BIAYA_TAMBAHAN_LIST.private_room?.harga||50000) : 0)
+    - (isMinyakBooking(b) ? (BIAYA_TAMBAHAN_LIST.minyak_hangat?.harga||35000) : 0),
+    0
+  );
+  // Terapis tidak dapat komisi dari member
   if(isMemberBooking(b)) return 0;
-  // Hitung komisi hanya dari harga pokok (tanpa biaya tambahan private room / minyak)
-  const hargaPokok=(b.harga||0) - (isPrivateRoomBooking(b)?50000:0) - (isMinyakBooking(b)?35000:0);
-  return Math.round(Math.max(hargaPokok,0)*((th.insentif||0)/100));
+  return Math.round(basis * ((th.insentif||0)/100));
+}
+
+// Hitung komisi resepsionis dari biaya tambahan saja
+function calcKomisiResepsionis(b){
+  let total = 0;
+  if(isMemberBooking(b))       total += (BIAYA_TAMBAHAN_LIST.member?.komisi_resep||10000);
+  if(isPrivateRoomBooking(b))  total += (BIAYA_TAMBAHAN_LIST.private_room?.komisi_resep||15000);
+  if(isMinyakBooking(b))       total += (BIAYA_TAMBAHAN_LIST.minyak_hangat?.komisi_resep||5000);
+  return total;
+}
+
+// Extract resepsionis dari catatan booking
+function getResepsionisFromBooking(b){
+  const cat = b.catatan||"";
+  const m = cat.match(/\[Resep:([^\]]+)\]/);
+  return m ? m[1].trim() : "";
 }
 
 // Helper: get label badges for a booking (member/private/minyak)
@@ -4669,13 +4770,15 @@ function buildThLayananMap(data){
 let setTabIdx=0;
 function setTab(n,btn){
   setTabIdx=n;
-  [0,1,2,3].forEach(i=>document.getElementById("set-"+i).classList.toggle("hidden",i!==n));
+  [0,1,2,3,4,5].forEach(i=>document.getElementById("set-"+i)?.classList.toggle("hidden",i!==n));
   document.querySelectorAll("#set-tabs .stab").forEach(b=>b.classList.remove("active"));
   btn.classList.add("active");
   if(n===0)renderThList();
   if(n===1)renderSvList();
   if(n===2)renderDkList();
   if(n===3)renderPkList();
+  if(n===4)renderResepList();
+  if(n===5)renderBiayaSettingList();
 }
 
 function initSettingsLists(){renderThList();renderSvList();renderDkList();renderPkList()}
@@ -5278,6 +5381,57 @@ function renderLaporan(){
       </div>
     </div>`).join("");
 
+  // ── RESEPSIONIS KOMISI ─────────────────────────────────────
+  const resepMap={};
+  d.forEach(b=>{
+    const resep=getResepsionisFromBooking(b);
+    const komisi=calcKomisiResepsionis(b);
+    if(!resep||komisi===0) return;
+    if(!resepMap[resep]) resepMap[resep]={nama:resep,member:0,private:0,minyak:0,totalKomisi:0,sesi:0};
+    resepMap[resep].sesi++;
+    resepMap[resep].totalKomisi+=komisi;
+    if(isMemberBooking(b)) resepMap[resep].member++;
+    if(isPrivateRoomBooking(b)) resepMap[resep].private++;
+    if(isMinyakBooking(b)) resepMap[resep].minyak++;
+  });
+  const resepArr=Object.values(resepMap).sort((a,b)=>b.totalKomisi-a.totalKomisi);
+  const totalResepKomisi=resepArr.reduce((s,r)=>s+r.totalKomisi,0);
+  const resepCountEl=document.getElementById("lp-resep-count");
+  const resepListEl=document.getElementById("lp-resep-list");
+  const totalResepEl=document.getElementById("lp-total-resep-komisi");
+  if(resepCountEl) resepCountEl.textContent=resepArr.length+" resepsionis aktif";
+  if(totalResepEl) totalResepEl.textContent=fmtRp(totalResepKomisi);
+  if(resepListEl){
+    resepListEl.innerHTML=resepArr.length?resepArr.map(r=>`
+      <div class="lp-th-card">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+          <div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--teal-600),var(--teal-400));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.78rem;flex-shrink:0">${r.nama.slice(0,2)}</div>
+          <div style="flex:1">
+            <div style="font-weight:800;font-size:.85rem;color:var(--cream)">${r.nama}</div>
+            <div style="font-size:.62rem;color:var(--cream-55)">${r.sesi} transaksi biaya tambahan</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:.88rem;font-weight:900;color:var(--emerald)">${fmtRp(r.totalKomisi)}</div>
+            <div style="font-size:.6rem;color:var(--cream-55)">total komisi</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          ${r.member>0?`<div style="background:rgba(5,28,34,0.6);border:1px solid rgba(201,160,65,0.2);border-radius:7px;padding:6px 10px;text-align:center;flex:1">
+            <div style="font-size:.72rem;font-weight:800;color:var(--gold-400)">👑 ${r.member}× = ${fmtRp(r.member*(BIAYA_TAMBAHAN_LIST.member?.komisi_resep||10000))}</div>
+            <div style="font-size:.55rem;color:var(--cream-55)">Member</div>
+          </div>`:''}
+          ${r.private>0?`<div style="background:rgba(5,28,34,0.6);border:1px solid rgba(93,173,226,0.2);border-radius:7px;padding:6px 10px;text-align:center;flex:1">
+            <div style="font-size:.72rem;font-weight:800;color:#5DADE2">🚪 ${r.private}× = ${fmtRp(r.private*(BIAYA_TAMBAHAN_LIST.private_room?.komisi_resep||15000))}</div>
+            <div style="font-size:.55rem;color:var(--cream-55)">Private</div>
+          </div>`:''}
+          ${r.minyak>0?`<div style="background:rgba(5,28,34,0.6);border:1px solid rgba(45,212,160,0.2);border-radius:7px;padding:6px 10px;text-align:center;flex:1">
+            <div style="font-size:.72rem;font-weight:800;color:var(--emerald)">🫙 ${r.minyak}× = ${fmtRp(r.minyak*(BIAYA_TAMBAHAN_LIST.minyak_hangat?.komisi_resep||5000))}</div>
+            <div style="font-size:.55rem;color:var(--cream-55)">Minyak</div>
+          </div>`:''}
+        </div>
+      </div>`).join(""):`<div style="text-align:center;padding:16px;color:var(--cream-55);font-size:.75rem">Tidak ada data komisi resepsionis periode ini</div>`;
+  }
+
   // ── DETAIL LAYANAN PER TERAPIS ──────────────────────────
   const thLayEl=document.getElementById("lp-th-layanan-list");
   if(thLayEl){
@@ -5328,6 +5482,8 @@ function renderLaporan(){
         const th=getTh(b.therapistId);
         const insentif=calcInsentif(b,th);
         const insentifLbl=isMemberBooking(b)?'<span style="color:var(--rose);font-size:.6rem">❌ No Komisi (Member)</span>':fmtRp(insentif)+' ('+((th.insentif||0))+'%)';
+        const resep=getResepsionisFromBooking(b);
+        const komisiResep=calcKomisiResepsionis(b);
         const cellClr=b.payStatus==="Lunas"?"#16a34a":b.payStatus==="DP"?"#d97706":"#dc2626";
         const dpBlock=b.payStatus==="DP"
           ?`<div style="margin-top:6px;background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.25);border-radius:7px;padding:6px 10px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
@@ -5352,7 +5508,9 @@ function renderLaporan(){
             <div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">👨‍⚕️ Terapis</div><div style="font-size:.72rem;font-weight:700;color:var(--cream)">${b.therapistName||"-"}</div></div>
             <div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">💳 Metode</div><div style="font-size:.72rem;font-weight:700;color:var(--cream)">${b.method||"-"}</div></div>
             <div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">💰 Harga</div><div style="font-size:.72rem;font-weight:800;color:var(--emerald)">${fmtRp(b.harga)}</div></div>
-            <div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">🏆 Insentif</div><div style="font-size:.72rem;font-weight:700;color:var(--amber)">${insentifLbl}</div></div>
+            <div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">🏆 Insentif Terapis</div><div style="font-size:.72rem;font-weight:700;color:var(--amber)">${insentifLbl}</div></div>
+            ${resep?`<div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">👩‍💼 Resepsionis</div><div style="font-size:.72rem;font-weight:700;color:var(--gold-300)">${resep}</div></div>`:''}
+            ${komisiResep>0?`<div><div style="font-size:.55rem;color:var(--cream-55);margin-bottom:1px">💵 Komisi Resep</div><div style="font-size:.72rem;font-weight:800;color:var(--emerald)">${fmtRp(komisiResep)}</div></div>`:''}
           </div>
           ${dpBlock}
         </div>`}).join("")}
@@ -5393,11 +5551,30 @@ function exportLaporan(){
     "Tanggal":b.tanggal,"Pasien":b.patient,"Layanan":b.service,
     "Terapis":b.therapistName,"Durasi (mnt)":b.dur,
     "Harga (Rp)":b.harga,"DP (Rp)":b.dp,"Sisa (Rp)":b.sisa,
-    "Status":b.payStatus,"Metode":b.method
+    "Status":b.payStatus,"Metode":b.method,
+    "Resepsionis":getResepsionisFromBooking(b)||"-",
+    "Komisi Resep (Rp)":calcKomisiResepsionis(b)
   }));
   const ws2=XLSX.utils.json_to_sheet(detail);
-  ws2["!cols"]=Array(10).fill({wch:16});
+  ws2["!cols"]=Array(12).fill({wch:16});
   XLSX.utils.book_append_sheet(wb,ws2,"Detail Sesi");
+
+  // Sheet: Komisi Resepsionis
+  const resepMapExp={};
+  lapData.forEach(b=>{
+    const resep=getResepsionisFromBooking(b);
+    const komisi=calcKomisiResepsionis(b);
+    if(!resep||!komisi) return;
+    if(!resepMapExp[resep]) resepMapExp[resep]={"Resepsionis":resep,"Jml Transaksi":0,"Member":0,"Private Room":0,"Minyak Hangat":0,"Total Komisi (Rp)":0};
+    resepMapExp[resep]["Jml Transaksi"]++;
+    resepMapExp[resep]["Total Komisi (Rp)"]+=komisi;
+    if(isMemberBooking(b)) resepMapExp[resep]["Member"]++;
+    if(isPrivateRoomBooking(b)) resepMapExp[resep]["Private Room"]++;
+    if(isMinyakBooking(b)) resepMapExp[resep]["Minyak Hangat"]++;
+  });
+  const wsResep=XLSX.utils.json_to_sheet(Object.values(resepMapExp));
+  wsResep["!cols"]=[{wch:18},{wch:14},{wch:10},{wch:14},{wch:14},{wch:18}];
+  XLSX.utils.book_append_sheet(wb,wsResep,"Komisi Resepsionis");
 
   // Sheet: Top Layanan
   const svMap={};
@@ -6096,6 +6273,170 @@ const _observer = new MutationObserver(()=>{
   });
 });
 _observer.observe(document.body, {childList:true,subtree:true,attributes:true,attributeFilter:['style']});
+
+</script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// RESEPSIONIS SYSTEM — TAPA JIVA
+// ═══════════════════════════════════════════════════════════════
+
+// Render resepsionis buttons in booking form
+function renderResepsionisButtons(){
+  const wrap = document.getElementById("fp-resep-list");
+  if(!wrap) return;
+  wrap.innerHTML = ['','...KOSONG...'].concat(RESEPSIONIS_LIST).map(r=>{
+    if(r==='...KOSONG...') r='';
+    const lbl = r||'– Tidak Ada –';
+    const sel = _formResepsionis===r;
+    return `<button type="button" onclick="selResepsionis('${r}')" style="
+      padding:7px 14px;border-radius:20px;font-size:.72rem;font-weight:700;cursor:pointer;
+      border:1.5px solid ${sel?'var(--gold-400)':'rgba(201,160,65,0.25)'};
+      background:${sel?'rgba(201,160,65,0.2)':'rgba(5,28,34,0.5)'};
+      color:${sel?'var(--gold-300)':'var(--cream-55)'};
+      transition:all .15s;
+    ">${lbl}</button>`;
+  }).filter(Boolean).join("");
+}
+
+function selResepsionis(nama){
+  _formResepsionis = nama;
+  renderResepsionisButtons();
+}
+
+// ── SETTINGS: Resepsionis list ────────────────────────────────
+function renderResepList(){
+  const el = document.getElementById("set-resep-list");
+  if(!el) return;
+  if(!RESEPSIONIS_LIST.length){
+    el.innerHTML='<div style="text-align:center;padding:20px;color:var(--cream-55);font-size:.78rem">Belum ada resepsionis</div>';
+    return;
+  }
+  el.innerHTML = RESEPSIONIS_LIST.map((r,i)=>`
+    <div class="set-item" style="align-items:center">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal-600),var(--teal-400));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.78rem;flex-shrink:0">${r.slice(0,2)}</div>
+      <div class="set-item-info">
+        <div class="set-item-name">${r}</div>
+        <div class="set-item-sub">Resepsionis #${i+1}</div>
+      </div>
+      <button class="set-btn-sm" style="border-color:var(--rose);color:var(--rose)" onclick="deleteResepsionis(${i})">🗑</button>
+    </div>`).join("");
+}
+
+async function addResepsionis(){
+  const inp = document.getElementById("new-resep-nama");
+  if(!inp) return;
+  const nama = inp.value.trim().toUpperCase();
+  if(!nama){ toast("⚠️ Nama resepsionis wajib diisi"); return; }
+  if(RESEPSIONIS_LIST.includes(nama)){ toast("⚠️ Nama sudah ada"); return; }
+  RESEPSIONIS_LIST.push(nama);
+  await setConfig("resepsionis_list", JSON.stringify(RESEPSIONIS_LIST));
+  inp.value="";
+  renderResepList();
+  renderResepsionisButtons();
+  toast("✅ Resepsionis '"+nama+"' ditambahkan");
+}
+
+async function deleteResepsionis(idx){
+  if(!confirm("Hapus resepsionis '"+RESEPSIONIS_LIST[idx]+"'?")) return;
+  RESEPSIONIS_LIST.splice(idx,1);
+  await setConfig("resepsionis_list", JSON.stringify(RESEPSIONIS_LIST));
+  renderResepList();
+  renderResepsionisButtons();
+  toast("🗑️ Resepsionis dihapus");
+}
+
+// ── SETTINGS: Biaya Tambahan ──────────────────────────────────
+function renderBiayaSettingList(){
+  const el = document.getElementById("set-biaya-list");
+  if(!el) return;
+  el.innerHTML = Object.entries(BIAYA_TAMBAHAN_LIST).map(([key,bt])=>`
+    <div class="set-item" style="flex-direction:column;align-items:flex-start;gap:10px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:10px;width:100%">
+        <div style="flex:1;font-size:.9rem;font-weight:700;color:var(--cream)">${bt.label}</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%">
+        <div>
+          <label class="fl" style="font-size:.6rem">💰 Harga (Rp)</label>
+          <input class="fi" id="bt-harga-${key}" type="number" value="${bt.harga}" min="0" step="1000" style="font-size:.82rem">
+        </div>
+        <div>
+          <label class="fl" style="font-size:.6rem">👩‍💼 Komisi Resep (Rp)</label>
+          <input class="fi" id="bt-komisi-resep-${key}" type="number" value="${bt.komisi_resep||0}" min="0" step="1000" style="font-size:.82rem">
+        </div>
+      </div>
+      <div style="width:100%">
+        <label class="fl" style="font-size:.6rem">👨‍⚕️ Komisi Terapis (Rp) — biasanya 0</label>
+        <input class="fi" id="bt-komisi-terapis-${key}" type="number" value="${bt.komisi_terapis||0}" min="0" step="1000" style="font-size:.82rem">
+      </div>
+      <button class="btn-g" style="width:100%;padding:8px;font-size:.78rem" onclick="saveBiayaSetting('${key}')">💾 Simpan ${bt.label}</button>
+    </div>
+    <div style="height:1px;background:rgba(201,160,65,0.12);margin-bottom:10px"></div>
+  `).join("");
+}
+
+async function saveBiayaSetting(key){
+  const harga = parseInt(document.getElementById("bt-harga-"+key)?.value||0);
+  const komisiResep = parseInt(document.getElementById("bt-komisi-resep-"+key)?.value||0);
+  const komisiTerapis = parseInt(document.getElementById("bt-komisi-terapis-"+key)?.value||0);
+  if(!BIAYA_TAMBAHAN_LIST[key]) return;
+  BIAYA_TAMBAHAN_LIST[key].harga = harga;
+  BIAYA_TAMBAHAN_LIST[key].komisi_resep = komisiResep;
+  BIAYA_TAMBAHAN_LIST[key].komisi_terapis = komisiTerapis;
+  await setConfig("biaya_tambahan_config", JSON.stringify(BIAYA_TAMBAHAN_LIST));
+  renderBiayaTambahanForm(); // refresh form
+  toast("✅ "+BIAYA_TAMBAHAN_LIST[key].label+" disimpan");
+}
+
+// ── REKAP RESEPSIONIS (Hari Ini) ─────────────────────────────
+function renderRekResepsionis(){
+  const el = document.getElementById("rek-resep");
+  if(!el) return;
+
+  // Group by resepsionis
+  const resepMap = {};
+  bookings.forEach(b=>{
+    const resep = getResepsionisFromBooking(b);
+    const komisi = calcKomisiResepsionis(b);
+    if(!resep || komisi===0) return;
+    if(!resepMap[resep]) resepMap[resep] = {nama:resep, member:0, private:0, minyak:0, totalKomisi:0, bookings:[]};
+    if(isMemberBooking(b)) resepMap[resep].member++;
+    if(isPrivateRoomBooking(b)) resepMap[resep].private++;
+    if(isMinyakBooking(b)) resepMap[resep].minyak++;
+    resepMap[resep].totalKomisi += komisi;
+    resepMap[resep].bookings.push(b);
+  });
+
+  const totalKomisiAll = Object.values(resepMap).reduce((s,r)=>s+r.totalKomisi,0);
+
+  if(!Object.keys(resepMap).length){
+    el.innerHTML=`<div style="text-align:center;padding:16px;color:var(--cream-55);font-size:.75rem">Belum ada komisi resepsionis hari ini</div>`;
+    return;
+  }
+
+  el.innerHTML = Object.values(resepMap).sort((a,b)=>b.totalKomisi-a.totalKomisi).map(r=>`
+    <div style="background:rgba(10,46,58,0.6);border:1px solid rgba(201,160,65,0.18);border-radius:12px;padding:11px 13px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--teal-600),var(--teal-400));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:.75rem;flex-shrink:0">${r.nama.slice(0,2)}</div>
+        <div style="flex:1">
+          <div style="font-size:.85rem;font-weight:800;color:var(--cream)">${r.nama}</div>
+          <div style="font-size:.62rem;color:var(--cream-55)">${r.bookings.length} transaksi biaya tambahan</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:.9rem;font-weight:900;color:var(--emerald)">${fmtRp(r.totalKomisi)}</div>
+          <div style="font-size:.6rem;color:var(--cream-55)">total komisi</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        ${r.member>0?`<span style="font-size:.6rem;font-weight:700;background:rgba(201,160,65,0.15);color:var(--gold-300);border-radius:5px;padding:2px 7px;border:1px solid rgba(201,160,65,0.3)">👑 Member ×${r.member} = ${fmtRp(r.member*(BIAYA_TAMBAHAN_LIST.member?.komisi_resep||10000))}</span>`:''}
+        ${r.private>0?`<span style="font-size:.6rem;font-weight:700;background:rgba(93,173,226,0.15);color:#5DADE2;border-radius:5px;padding:2px 7px;border:1px solid rgba(93,173,226,0.3)">🚪 Private ×${r.private} = ${fmtRp(r.private*(BIAYA_TAMBAHAN_LIST.private_room?.komisi_resep||15000))}</span>`:''}
+        ${r.minyak>0?`<span style="font-size:.6rem;font-weight:700;background:rgba(45,212,160,0.12);color:var(--emerald);border-radius:5px;padding:2px 7px;border:1px solid rgba(45,212,160,0.25)">🫙 Minyak ×${r.minyak} = ${fmtRp(r.minyak*(BIAYA_TAMBAHAN_LIST.minyak_hangat?.komisi_resep||5000))}</span>`:''}
+      </div>
+    </div>`).join("") + `
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(45,212,160,0.1);border:1px solid rgba(45,212,160,0.25);border-radius:9px;margin-top:4px">
+    <span style="font-size:.75rem;font-weight:700;color:var(--cream-80)">💰 Total Komisi Resepsionis</span>
+    <span style="font-size:.88rem;font-weight:900;color:var(--emerald)">${fmtRp(totalKomisiAll)}</span>
+  </div>`;
+}
 
 </script>
 <script>
