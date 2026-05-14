@@ -4403,11 +4403,22 @@ function renderLaporan(){
   const totalSesi=d.length;
   const avgHarga=totalSesi?Math.round(totalRev/totalSesi):0;
 
+  // Calculate Net Profit (Revenue - Therapist Incentive - Receptionist Commission)
+  let totalTherapistIncentive=0;
+  let totalReceptionistCommission=0;
+  d.forEach(b=>{
+    const th=getTh(b.therapistId);
+    totalTherapistIncentive+=calcInsentif(b,th);
+    totalReceptionistCommission+=calcKomisiResepsionis(b);
+  });
+  const netProfit=totalRev-totalTherapistIncentive-totalReceptionistCommission;
+
   document.getElementById("lp-rev-cards").innerHTML=[
     ["💰 Total Potensi",fmtRp(totalRev),"var(--gold-400)","rgba(201,160,65,0.15)","rgba(201,160,65,0.25)"],
     ["✅ Sudah Lunas",fmtRp(revLunas),"var(--emerald)","rgba(45,212,160,0.12)","rgba(45,212,160,0.25)"],
     ["💵 DP Masuk",fmtRp(revDP),"var(--amber)","rgba(240,185,110,0.12)","rgba(240,185,110,0.25)"],
     ["🔴 Piutang",fmtRp(revPiutang),"var(--rose)","rgba(255,107,117,0.12)","rgba(255,107,117,0.25)"],
+    ["📈 Net Profit/Laba Kotor",fmtRp(netProfit),"var(--emerald)","rgba(30,207,160,0.15)","rgba(30,207,160,0.3)"],
   ].map(([l,v,c,bg,border])=>`<div style="background:${bg};border:1px solid ${border};border-radius:11px;padding:11px 13px;text-align:center">
     <div style="font-size:.98rem;font-weight:900;color:${c}">${v}</div>
     <div style="font-size:.6rem;color:var(--cream-55);margin-top:3px;font-weight:600">${l}</div>
